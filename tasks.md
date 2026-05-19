@@ -22,7 +22,7 @@
   - Add links from result items back into practice mode.
   - Show selected answer, correct answer, and explanation when available.
 
-- [ ] Persist progress locally.
+- [x] Persist progress locally.
   - Store answered questions, correct counts, wrong counts, and completed test history in `localStorage`.
   - Track progress across browser sessions.
   - Add a reset-progress action.

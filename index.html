@@ -211,6 +211,35 @@
         gap: 14px;
       }
 
+      .progress-summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .progress-stat {
+        min-height: 70px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--soft);
+      }
+
+      .progress-stat b {
+        display: block;
+        color: var(--accent-strong);
+        font-size: 1.25rem;
+        line-height: 1;
+      }
+
+      .progress-stat span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.32;
+      }
+
       .start-detail {
         padding-top: 14px;
         border-top: 1px solid var(--line);
@@ -220,6 +249,14 @@
         margin: 0 0 8px;
         font-size: 1rem;
         line-height: 1.25;
+      }
+
+      .reset-progress {
+        justify-self: start;
+        width: auto;
+        min-height: 38px;
+        margin-top: 10px;
+        padding: 0 12px;
       }
 
       .format-section h2,
@@ -762,12 +799,34 @@
                   <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
                   <li><span class="feature-mark">✓</span><span>Draw questions from all 300 general items plus the Berlin state set.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
                 </ul>
+              </section>
+              <section class="start-detail" aria-labelledby="progress-title">
+                <h2 id="progress-title">Your progress</h2>
+                <div class="progress-summary" aria-live="polite">
+                  <div class="progress-stat">
+                    <b id="answered-stat">0</b>
+                    <span>answers saved</span>
+                  </div>
+                  <div class="progress-stat">
+                    <b id="accuracy-stat">0%</b>
+                    <span>overall accuracy</span>
+                  </div>
+                  <div class="progress-stat">
+                    <b id="tests-stat">0</b>
+                    <span>tests completed</span>
+                  </div>
+                  <div class="progress-stat">
+                    <b id="pass-rate-stat">0%</b>
+                    <span>test pass rate</span>
+                  </div>
+                </div>
+                <button id="reset-progress-button" class="secondary-action reset-progress" type="button">Reset progress</button>
               </section>
               <section class="start-detail" aria-labelledby="planned-title">
                 <h2 id="planned-title">Planned next</h2>
                 <ul class="feature-list">
-                  <li><span class="feature-mark is-muted">•</span><span>Progress tracking across sessions.</span></li>
                   <li><span class="feature-mark is-muted">•</span><span>Focused review for repeated mistakes and bookmarked questions.</span></li>
                 </ul>
               </section>
@@ -854,11 +913,15 @@
         const TOTAL_GENERAL = 30;
         const TOTAL_STATE = 3;
         const PASS_THRESHOLD = 17;
+        const STORAGE_KEY = "lidTestPrepProgress";
+        const STORAGE_VERSION = 1;
         const LETTERS = ["A", "B", "C", "D"];
 
         const questions = window.LID_QUESTIONS || [];
         const translations = window.LID_TRANSLATIONS_EN || {};
+        const progress = loadProgress();
         const state = {
+          mode: "test",
           run: [],
           index: 0,
           selected: null,
@@ -875,6 +938,7 @@
         const practiceButton = $("practice-button");
         const restartButton = $("restart-button");
         const newTestButton = $("new-test-button");
+        const resetProgressButton = $("reset-progress-button");
         const nextButton = $("next-button");
         const translationToggle = $("translation-toggle");
         const questionKicker = $("question-kicker");
@@ -890,6 +954,96 @@
         const resultStatus = $("result-status");
         const reviewHeading = $("review-heading");
         const reviewList = $("review-list");
+        const answeredStat = $("answered-stat");
+        const accuracyStat = $("accuracy-stat");
+        const testsStat = $("tests-stat");
+        const passRateStat = $("pass-rate-stat");
+
+        function createEmptyProgress() {
+          return {
+            version: STORAGE_VERSION,
+            questionStats: {},
+            testHistory: []
+          };
+        }
+
+        function loadProgress() {
+          try {
+            const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY));
+            if (!saved || saved.version !== STORAGE_VERSION) return createEmptyProgress();
+            return {
+              version: STORAGE_VERSION,
+              questionStats: saved.questionStats && typeof saved.questionStats === "object" ? saved.questionStats : {},
+              testHistory: Array.isArray(saved.testHistory) ? saved.testHistory : []
+            };
+          } catch (error) {
+            return createEmptyProgress();
+          }
+        }
+
+        function saveProgress() {
+          try {
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+          } catch (error) {
+            // Progress is helpful, but the quiz should still work if storage is blocked.
+          }
+        }
+
+        function resetProgress() {
+          progress.questionStats = {};
+          progress.testHistory = [];
+          saveProgress();
+          renderProgressSummary();
+        }
+
+        function recordAnswer(entry) {
+          const questionId = String(entry.question.id);
+          const current = progress.questionStats[questionId] || {
+            answered: 0,
+            correct: 0,
+            wrong: 0
+          };
+
+          current.answered += 1;
+          if (entry.isCorrect) {
+            current.correct += 1;
+          } else {
+            current.wrong += 1;
+          }
+
+          progress.questionStats[questionId] = current;
+          saveProgress();
+          renderProgressSummary();
+        }
+
+        function recordCompletedTest() {
+          if (state.mode !== "test" || state.run.length !== TOTAL_GENERAL + TOTAL_STATE) return;
+
+          progress.testHistory.push({
+            completedAt: new Date().toISOString(),
+            correct: state.score,
+            total: state.run.length,
+            passed: state.score >= PASS_THRESHOLD,
+            questionIds: state.run.map((question) => question.id),
+            wrongQuestionIds: state.answers.filter((entry) => !entry.isCorrect).map((entry) => entry.question.id)
+          });
+          saveProgress();
+          renderProgressSummary();
+        }
+
+        function renderProgressSummary() {
+          const stats = Object.values(progress.questionStats);
+          const answered = stats.reduce((total, item) => total + item.answered, 0);
+          const correct = stats.reduce((total, item) => total + item.correct, 0);
+          const tests = progress.testHistory.length;
+          const passedTests = progress.testHistory.filter((test) => test.passed).length;
+
+          answeredStat.textContent = String(answered);
+          accuracyStat.textContent = answered ? `${Math.round((correct / answered) * 100)}%` : "0%";
+          testsStat.textContent = String(tests);
+          passRateStat.textContent = tests ? `${Math.round((passedTests / tests) * 100)}%` : "0%";
+          resetProgressButton.disabled = answered === 0 && tests === 0;
+        }
 
         function show(screen) {
           startScreen.classList.toggle("is-hidden", screen !== "start");
@@ -913,6 +1067,7 @@
         function startRun() {
           const general = sampleByCategory("general", TOTAL_GENERAL);
           const stateQuestions = sampleByCategory("state", TOTAL_STATE);
+          state.mode = "test";
           state.run = shuffle([...general, ...stateQuestions]);
           resetRunState();
           renderQuestion();
@@ -923,6 +1078,7 @@
           const question = questions.find((item) => item.id === questionId);
           if (!question) return;
 
+          state.mode = "practice";
           state.run = [question];
           resetRunState();
           renderQuestion();
@@ -1063,14 +1219,16 @@
           const question = state.run[state.index];
           const correctIndex = question.options.findIndex((option) => option.correct);
           const isCorrect = selectedIndex === correctIndex;
-          state.selected = selectedIndex;
-          state.score += isCorrect ? 1 : 0;
-          state.answers.push({
+          const answerEntry = {
             question,
             selectedIndex,
             correctIndex,
             isCorrect
-          });
+          };
+          state.selected = selectedIndex;
+          state.score += isCorrect ? 1 : 0;
+          state.answers.push(answerEntry);
+          recordAnswer(answerEntry);
 
           [...answers.children].forEach((button, index) => {
             button.disabled = true;
@@ -1089,6 +1247,7 @@
           if (state.selected === null) return;
 
           if (state.index === state.run.length - 1) {
+            recordCompletedTest();
             renderResult();
             show("result");
             return;
@@ -1180,8 +1339,10 @@
         practiceButton.addEventListener("click", startRun);
         restartButton.addEventListener("click", startRun);
         newTestButton.addEventListener("click", startRun);
+        resetProgressButton.addEventListener("click", resetProgress);
         nextButton.addEventListener("click", nextQuestion);
         translationToggle.addEventListener("click", toggleTranslations);
+        renderProgressSummary();
 
         if (!questions.length) {
           startButton.disabled = true;
