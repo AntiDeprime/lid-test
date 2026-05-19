@@ -102,6 +102,166 @@
         margin: 0;
       }
 
+      .start-layout {
+        display: grid;
+        gap: 22px;
+      }
+
+      .start-copy {
+        display: grid;
+        gap: 18px;
+      }
+
+      .start-actions {
+        display: grid;
+        gap: 10px;
+      }
+
+      .format-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin: 0;
+      }
+
+      .format-item {
+        min-height: 76px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--soft);
+      }
+
+      .format-item dt {
+        color: var(--accent-strong);
+        font-size: 1.35rem;
+        font-weight: 820;
+        line-height: 1;
+      }
+
+      .format-item dd {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.32;
+      }
+
+      .start-details {
+        display: grid;
+        gap: 14px;
+      }
+
+      .start-detail {
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+      }
+
+      .start-detail h2 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+        line-height: 1.25;
+      }
+
+      .feature-list {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .feature-list li {
+        display: grid;
+        grid-template-columns: 22px 1fr;
+        gap: 8px;
+        align-items: start;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .feature-mark {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border: 1px solid rgb(79 179 165 / 0.42);
+        border-radius: 999px;
+        color: var(--accent-strong);
+        font-size: 0.75rem;
+        font-weight: 820;
+      }
+
+      .feature-mark.is-muted {
+        border-color: var(--line);
+        color: var(--muted);
+      }
+
+      .catalogue-preview {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel-raised);
+      }
+
+      .preview-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .preview-title {
+        margin: 0;
+        font-weight: 780;
+      }
+
+      .preview-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: rgb(79 179 165 / 0.14);
+        color: var(--accent-strong);
+        font-size: 0.8rem;
+        font-weight: 780;
+        white-space: nowrap;
+      }
+
+      .preview-image {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+      }
+
+      .preview-image img {
+        max-height: 170px;
+      }
+
+      .preview-options {
+        display: grid;
+        gap: 8px;
+      }
+
+      .preview-option {
+        min-height: 38px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .preview-option.is-correct {
+        border-color: var(--correct-border);
+        background: var(--correct-bg);
+        color: #d7f7df;
+      }
+
       .topbar {
         display: grid;
         gap: 14px;
@@ -396,6 +556,16 @@
           padding: clamp(28px, 4vw, 40px);
         }
 
+        .start-layout {
+          grid-template-columns: minmax(0, 1.22fr) minmax(250px, 0.78fr);
+          align-items: start;
+        }
+
+        .start-actions {
+          grid-template-columns: repeat(2, minmax(0, max-content));
+          align-items: center;
+        }
+
         .topbar {
           grid-template-columns: 1fr auto;
           align-items: start;
@@ -429,12 +599,70 @@
   <body>
     <main class="shell">
       <section id="start-screen" class="app-panel" aria-labelledby="start-title">
-        <p class="eyebrow">Leben in Deutschland</p>
-        <h1 id="start-title">Practice test</h1>
-        <p class="lede">
-          33 random questions: 30 general and 3 Berlin questions. Pass threshold for Einbürgerung: 17 correct answers.
-        </p>
-        <button id="start-button" class="primary-action" type="button">Start test</button>
+        <div class="start-layout">
+          <div class="start-copy">
+            <div>
+              <p class="eyebrow">Leben in Deutschland / Einbürgerungstest</p>
+              <h1 id="start-title">Prepare for the German citizenship test</h1>
+              <p class="lede">
+                Practice with the official-style question catalogue in a focused mock test for Berlin. The app gives you randomized questions, instant feedback, English translations, and a review of missed answers.
+              </p>
+              <div class="start-actions">
+                <button id="start-button" class="primary-action" type="button">Start mock test</button>
+                <button id="practice-button" class="secondary-action" type="button">Practice questions</button>
+              </div>
+            </div>
+
+            <dl class="format-list" aria-label="Test format">
+              <div class="format-item">
+                <dt>33</dt>
+                <dd>questions per test</dd>
+              </div>
+              <div class="format-item">
+                <dt>30 + 3</dt>
+                <dd>general plus Bundesland questions</dd>
+              </div>
+              <div class="format-item">
+                <dt>17</dt>
+                <dd>correct answers needed to pass</dd>
+              </div>
+            </dl>
+
+            <div class="start-details">
+              <section class="start-detail" aria-labelledby="included-title">
+                <h2 id="included-title">Available now</h2>
+                <ul class="feature-list">
+                  <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Draw questions from all 300 general items plus the Berlin state set.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
+                </ul>
+              </section>
+              <section class="start-detail" aria-labelledby="planned-title">
+                <h2 id="planned-title">Planned next</h2>
+                <ul class="feature-list">
+                  <li><span class="feature-mark is-muted">•</span><span>Progress tracking across sessions.</span></li>
+                  <li><span class="feature-mark is-muted">•</span><span>Focused review for repeated mistakes and bookmarked questions.</span></li>
+                </ul>
+              </section>
+            </div>
+          </div>
+
+          <aside class="catalogue-preview" aria-label="Question preview">
+            <div class="preview-top">
+              <p class="preview-title">Question preview</p>
+              <span class="preview-badge">Berlin set</span>
+            </div>
+            <div class="preview-image">
+              <img src="lid-v2-images/lid-q328-bild.png" alt="Map image used in a Berlin state question">
+            </div>
+            <div class="preview-options" aria-label="Example answers">
+              <div class="preview-option">A. 1</div>
+              <div class="preview-option">B. 2</div>
+              <div class="preview-option">C. 3</div>
+              <div class="preview-option is-correct">D. 4</div>
+            </div>
+          </aside>
+        </div>
       </section>
 
       <section id="quiz-screen" class="app-panel is-hidden" aria-labelledby="question-title">
@@ -500,6 +728,7 @@
         const quizScreen = $("quiz-screen");
         const resultScreen = $("result-screen");
         const startButton = $("start-button");
+        const practiceButton = $("practice-button");
         const restartButton = $("restart-button");
         const newTestButton = $("new-test-button");
         const nextButton = $("next-button");
@@ -755,6 +984,7 @@
         }
 
         startButton.addEventListener("click", startRun);
+        practiceButton.addEventListener("click", startRun);
         restartButton.addEventListener("click", startRun);
         newTestButton.addEventListener("click", startRun);
         nextButton.addEventListener("click", nextQuestion);
@@ -762,6 +992,7 @@
 
         if (!questions.length) {
           startButton.disabled = true;
+          practiceButton.disabled = true;
           startButton.textContent = "Question data missing";
         }
       })();
