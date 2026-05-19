@@ -3,7 +3,67 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LiD Test Prep - Standalone</title>
+    <title>Leben in Deutschland Test & Einbürgerungstest Practice | LiD Test Prep</title>
+    <meta name="description" content="Prepare for the Leben in Deutschland Test and Einbürgerungstest with a mobile-friendly Berlin mock test using 30 general questions, 3 Bundesland questions, instant feedback, and answer review.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LiD Test Prep">
+    <meta property="og:title" content="Leben in Deutschland Test & Einbürgerungstest Practice">
+    <meta property="og:description" content="Practice a 33-question mock test for the German Leben in Deutschland / Einbürgerungstest with Berlin state questions, instant feedback, and review.">
+    <meta property="og:image" content="lid-v2-images/lid-q328-bild.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Leben in Deutschland Test & Einbürgerungstest Practice">
+    <meta name="twitter:description" content="Prepare for the German citizenship test with randomized mock tests, Berlin questions, instant feedback, and missed-answer review.">
+    <meta name="twitter:image" content="lid-v2-images/lid-q328-bild.png">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "LiD Test Prep",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Any",
+            "inLanguage": ["en", "de"],
+            "description": "A mobile-friendly practice app for the German Leben in Deutschland Test and Einbürgerungstest with randomized Berlin mock tests, instant feedback, English translations, and missed-answer review.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How many questions are in the Leben in Deutschland Test?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "A test run has 33 questions: 30 general questions and 3 Bundesland questions."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How many correct answers do I need to pass?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "You need at least 17 correct answers out of 33."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which Bundesland questions are included?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "This version includes Berlin state questions."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
     <style>
       :root {
         color-scheme: dark;
@@ -162,6 +222,13 @@
         line-height: 1.25;
       }
 
+      .format-section h2,
+      .faq-section h2 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+        line-height: 1.25;
+      }
+
       .feature-list {
         display: grid;
         gap: 8px;
@@ -260,6 +327,29 @@
         border-color: var(--correct-border);
         background: var(--correct-bg);
         color: #d7f7df;
+      }
+
+      .faq-section {
+        display: grid;
+        gap: 10px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+      }
+
+      .faq-item {
+        margin: 0;
+      }
+
+      .faq-item dt {
+        color: var(--text);
+        font-weight: 760;
+        line-height: 1.35;
+      }
+
+      .faq-item dd {
+        margin: 4px 0 0;
+        color: var(--muted);
+        line-height: 1.45;
       }
 
       .topbar {
@@ -603,7 +693,7 @@
           <div class="start-copy">
             <div>
               <p class="eyebrow">Leben in Deutschland / Einbürgerungstest</p>
-              <h1 id="start-title">Prepare for the German citizenship test</h1>
+              <h1 id="start-title">Leben in Deutschland Test and Einbürgerungstest practice</h1>
               <p class="lede">
                 Practice with the official-style question catalogue in a focused mock test for Berlin. The app gives you randomized questions, instant feedback, English translations, and a review of missed answers.
               </p>
@@ -613,24 +703,27 @@
               </div>
             </div>
 
-            <dl class="format-list" aria-label="Test format">
-              <div class="format-item">
-                <dt>33</dt>
-                <dd>questions per test</dd>
-              </div>
-              <div class="format-item">
-                <dt>30 + 3</dt>
-                <dd>general plus Bundesland questions</dd>
-              </div>
-              <div class="format-item">
-                <dt>17</dt>
-                <dd>correct answers needed to pass</dd>
-              </div>
-            </dl>
+            <section class="format-section" aria-labelledby="format-title">
+              <h2 id="format-title">Test format</h2>
+              <dl class="format-list">
+                <div class="format-item">
+                  <dt>33</dt>
+                  <dd>questions per test</dd>
+                </div>
+                <div class="format-item">
+                  <dt>30 + 3</dt>
+                  <dd>general plus Bundesland questions</dd>
+                </div>
+                <div class="format-item">
+                  <dt>17</dt>
+                  <dd>correct answers needed to pass</dd>
+                </div>
+              </dl>
+            </section>
 
             <div class="start-details">
               <section class="start-detail" aria-labelledby="included-title">
-                <h2 id="included-title">Available now</h2>
+                <h2 id="included-title">Practice features</h2>
                 <ul class="feature-list">
                   <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
                   <li><span class="feature-mark">✓</span><span>Draw questions from all 300 general items plus the Berlin state set.</span></li>
@@ -645,6 +738,22 @@
                 </ul>
               </section>
             </div>
+
+            <section class="faq-section" aria-labelledby="faq-title">
+              <h2 id="faq-title">Leben in Deutschland Test FAQ</h2>
+              <dl class="faq-item">
+                <dt>How is the mock test built?</dt>
+                <dd>Each run uses 30 general questions and 3 Berlin Bundesland questions.</dd>
+              </dl>
+              <dl class="faq-item">
+                <dt>What score is needed to pass?</dt>
+                <dd>You need 17 correct answers out of 33, matching the Einbürgerungstest threshold.</dd>
+              </dl>
+              <dl class="faq-item">
+                <dt>Can I review mistakes?</dt>
+                <dd>Yes. The result screen shows missed questions with your selected answer and the correct answer.</dd>
+              </dl>
+            </section>
           </div>
 
           <aside class="catalogue-preview" aria-label="Question preview">

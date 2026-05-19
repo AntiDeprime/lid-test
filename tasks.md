@@ -9,12 +9,12 @@
   - Add clear primary and secondary actions, such as "Start mock test" and "Practice questions".
   - Keep the first screen useful on mobile without hiding the main action too far down the page.
 
-- [ ] Add SEO-friendly page structure and metadata.
+- [x] Add SEO-friendly page structure and metadata.
   - Update the page title to include high-intent search terms such as "Leben in Deutschland Test" and "Einbürgerungstest".
   - Add a concise meta description explaining the app and its exam-prep purpose.
   - Use one clear `h1` on the start page and structured `h2` sections for features, test format, and FAQ-style content.
   - Add Open Graph and Twitter card metadata for better link previews.
-  - Add canonical URL support once the production domain is known.
+  - Add canonical URL support once the production domain is known. Production domain is not available in the repo yet, so no canonical URL was added.
   - Add structured data where useful, such as `WebApplication` or FAQ schema.
 
 - [ ] Improve result review.
