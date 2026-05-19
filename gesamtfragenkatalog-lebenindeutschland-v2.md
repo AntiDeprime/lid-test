@@ -1,0 +1,3451 @@
+# Gesamtfragenkatalog zum Test "Leben in Deutschland" und zum "Einbürgerungstest" - v2
+
+Stand der PDF-Vorlage: 07.05.2025
+
+Umfang dieser v2:
+- Teil I: alle 300 allgemeinen Fragen.
+- Teil II: nur Berlin, 10 landesbezogene Fragen.
+- Bildfragen enthalten Obsidian-Wikilinks zu extrahierten Bildern in `files/lid-v2-images/`.
+
+Quellen und Prüfung:
+- Fragen und Antwortoptionen wurden aus `files/gesamtfragenkatalog-lebenindeutschland.pdf` extrahiert.
+- Offizielle Referenzen: BAMF-Downloadseite/PDF und BAMF Online-Testcenter. Das BAMF beschreibt, dass der interaktive Fragenkatalog nach Bearbeitung jeder Frage die richtige Antwort anzeigt.
+- Antwortmarkierungen wurden gegen die aus dem PDF extrahierten Optionen geprüft. Für Berlin wurden die Bild-/Flaggenfragen anhand der gerenderten PDF-Seiten korrigiert (`Bild 4` beim Berliner Wappen, `weiß-rot` bei der Landesflagge).
+
+Notation: `[x]` = richtige Antwort, `[ ]` = falsche Antwort.
+
+## Teil I: Allgemeine Fragen
+
+#### Aufgabe 1
+
+In Deutschland dürfen Menschen offen etwas gegen die Regierung sagen, weil …
+
+- [ ] hier Religionsfreiheit gilt.
+- [ ] die Menschen Steuern zahlen.
+- [ ] die Menschen das Wahlrecht haben.
+- [x] hier Meinungsfreiheit gilt.
+
+Richtige Antwort: hier Meinungsfreiheit gilt.
+
+#### Aufgabe 2
+
+In Deutschland können Eltern bis zum 14. Lebensjahr ihres Kindes entscheiden, ob es in der Schule am …
+
+- [ ] Geschichtsunterricht teilnimmt.
+- [x] Religionsunterricht teilnimmt.
+- [ ] Politikunterricht teilnimmt.
+- [ ] Sprachunterricht teilnimmt.
+
+Richtige Antwort: Religionsunterricht teilnimmt.
+
+#### Aufgabe 3
+
+Deutschland ist ein Rechtsstaat. Was ist damit gemeint?
+
+- [x] Alle Einwohnerinnen/Einwohner und der Staat müssen sich an die Gesetze halten.
+- [ ] Der Staat muss sich nicht an die Gesetze halten.
+- [ ] Nur Deutsche müssen die Gesetze befolgen.
+- [ ] Die Gerichte machen die Gesetze.
+
+Richtige Antwort: Alle Einwohnerinnen/Einwohner und der Staat müssen sich an die Gesetze halten.
+
+#### Aufgabe 4
+
+Welches Recht gehört zu den Grundrechten in Deutschland?
+
+- [ ] Waffenbesitz
+- [ ] Faustrecht
+- [x] Meinungsfreiheit
+- [ ] Selbstjustiz
+
+Richtige Antwort: Meinungsfreiheit
+
+#### Aufgabe 5
+
+Wahlen in Deutschland sind frei. Was bedeutet das?
+
+- [ ] Man darf Geld annehmen, wenn man dafür eine bestimmte Kandidatin/einen bestimmten Kandidaten wählt.
+- [ ] Nur Personen, die noch nie im Gefängnis waren, dürfen wählen.
+- [x] Die Wählerin/der Wähler darf bei der Wahl weder beeinflusst noch zu einer bestimmten Stimmabgabe gezwungen werden und keine Nachteile durch die Wahl haben.
+- [ ] Alle wahlberechtigten Personen müssen wählen.
+
+Richtige Antwort: Die Wählerin/der Wähler darf bei der Wahl weder beeinflusst noch zu einer bestimmten Stimmabgabe gezwungen werden und keine Nachteile durch die Wahl haben.
+
+#### Aufgabe 6
+
+Wie heißt die deutsche Verfassung?
+
+- [ ] Volksgesetz
+- [ ] Bundesgesetz
+- [ ] Deutsches Gesetz
+- [x] Grundgesetz
+
+Richtige Antwort: Grundgesetz
+
+#### Aufgabe 7
+
+Welches Recht gehört zu den Grundrechten, die nach der deutschen Verfassung garantiert werden? Das Recht auf …
+
+- [x] Glaubens- und Gewissensfreiheit
+- [ ] Unterhaltung
+- [ ] Arbeit
+- [ ] Wohnung
+
+Richtige Antwort: Glaubens- und Gewissensfreiheit
+
+#### Aufgabe 8
+
+Was steht nicht im Grundgesetz von Deutschland?
+
+- [ ] Die Würde des Menschen ist unantastbar.
+- [x] Alle sollen gleich viel Geld haben.
+- [ ] Jeder Mensch darf seine Meinung sagen.
+- [ ] Alle sind vor dem Gesetz gleich.
+
+Richtige Antwort: Alle sollen gleich viel Geld haben.
+
+#### Aufgabe 9
+
+Welches Grundrecht gilt in Deutschland nur für Ausländerinnen/Ausländer? Das Grundrecht auf …
+
+- [ ] Schutz der Familie
+- [ ] Menschenwürde
+- [x] Asyl
+- [ ] Meinungsfreiheit
+
+Richtige Antwort: Asyl
+
+#### Aufgabe 10
+
+Was ist mit dem deutschen Grundgesetz vereinbar?
+
+- [ ] die Prügelstrafe
+- [ ] die Folter
+- [ ] die Todesstrafe
+- [x] die Geldstrafe
+
+Richtige Antwort: die Geldstrafe
+
+#### Aufgabe 11
+
+Wie wird die Verfassung der Bundesrepublik Deutschland genannt?
+
+- [x] Grundgesetz
+- [ ] Bundesverfassung
+- [ ] Gesetzbuch
+- [ ] Verfassungsvertrag
+
+Richtige Antwort: Grundgesetz
+
+#### Aufgabe 12
+
+Eine Partei im Deutschen Bundestag will die Pressefreiheit abschaffen. Ist das möglich?
+
+- [ ] Ja, wenn mehr als die Hälfte der Abgeordneten im Bundestag dafür sind.
+- [ ] Ja, aber dazu müssen zwei Drittel der Abgeordneten im Bundestag dafür sein.
+- [x] Nein, denn die Pressefreiheit ist ein Grundrecht. Sie kann nicht abgeschafft werden.
+- [ ] Nein, denn nur der Bundesrat kann die Pressefreiheit abschaffen.
+
+Richtige Antwort: Nein, denn die Pressefreiheit ist ein Grundrecht. Sie kann nicht abgeschafft werden.
+
+#### Aufgabe 13
+
+Im Parlament steht der Begriff "Opposition" für …
+
+- [ ] die regierenden Parteien.
+- [ ] die Fraktion mit den meisten Abgeordneten.
+- [ ] alle Parteien, die bei der letzten Wahl die 5%-Hürde erreichen konnten.
+- [x] alle Abgeordneten, die nicht zu der Regierungspartei/den Regierungsparteien gehören.
+
+Richtige Antwort: alle Abgeordneten, die nicht zu der Regierungspartei/den Regierungsparteien gehören.
+
+#### Aufgabe 14
+
+Meinungsfreiheit in Deutschland heißt, dass ich …
+
+- [ ] Passanten auf der Straße beschimpfen darf.
+- [x] meine Meinung im Internet äußern kann.
+- [ ] Nazi-, Hamas- oder Islamischer Staat-Symbole öffentlich tragen darf.
+- [ ] meine Meinung nur dann äußern darf, solange ich der Regierung nicht widerspreche.
+
+Richtige Antwort: meine Meinung im Internet äußern kann.
+
+#### Aufgabe 15
+
+Was verbietet das deutsche Grundgesetz?
+
+- [ ] Militärdienst
+- [x] Zwangsarbeit
+- [ ] freie Berufswahl
+- [ ] Arbeit im Ausland
+
+Richtige Antwort: Zwangsarbeit
+
+#### Aufgabe 16
+
+Wann ist die Meinungsfreiheit in Deutschland eingeschränkt?
+
+- [x] bei der öffentlichen Verbreitung falscher Behauptungen über einzelne Personen
+- [ ] bei Meinungsäußerungen über die Bundesregierung
+- [ ] bei Diskussionen über Religionen
+- [ ] bei Kritik am Staat
+
+Richtige Antwort: bei der öffentlichen Verbreitung falscher Behauptungen über einzelne Personen
+
+#### Aufgabe 17
+
+Die deutschen Gesetze verbieten …
+
+- [ ] Meinungsfreiheit der Einwohnerinnen und Einwohner.
+- [ ] Petitionen der Bürgerinnen und Bürger.
+- [ ] Versammlungsfreiheit der Einwohnerinnen und Einwohner.
+- [x] Ungleichbehandlung der Bürgerinnen und Bürger durch den Staat.
+
+Richtige Antwort: Ungleichbehandlung der Bürgerinnen und Bürger durch den Staat.
+
+#### Aufgabe 18
+
+Welches Grundrecht ist in Artikel 1 des Grundgesetzes der Bundesrepublik Deutschland garantiert?
+
+- [x] die Unantastbarkeit der Menschenwürde
+- [ ] das Recht auf Leben
+- [ ] Religionsfreiheit
+- [ ] Meinungsfreiheit
+
+Richtige Antwort: die Unantastbarkeit der Menschenwürde
+
+#### Aufgabe 19
+
+Was versteht man unter dem Recht der "Freizügigkeit" in Deutschland?
+
+- [x] Man darf sich seinen Wohnort selbst aussuchen.
+- [ ] Man kann seinen Beruf wechseln.
+- [ ] Man darf sich für eine andere Religion entscheiden.
+- [ ] Man darf sich in der Öffentlichkeit nur leicht bekleidet bewegen.
+
+Richtige Antwort: Man darf sich seinen Wohnort selbst aussuchen.
+
+#### Aufgabe 20
+
+Eine Partei in Deutschland verfolgt das Ziel, eine Diktatur zu errichten. Sie ist dann …
+
+- [ ] tolerant.
+- [ ] rechtsstaatlich orientiert.
+- [ ] gesetzestreu.
+- [x] verfassungswidrig.
+
+Richtige Antwort: verfassungswidrig.
+
+#### Aufgabe 21
+
+Welches ist das Wappen der Bundesrepublik Deutschland? Bild 1 Bild 2 Bild 3 Bild 4
+
+| Bild 1 | Bild 2 | Bild 3 | Bild 4 |
+|---|---|---|---|
+| ![[lid-v2-images/lid-q021-bild-1.png|120]] | ![[lid-v2-images/lid-q021-bild-2.png|120]] | ![[lid-v2-images/lid-q021-bild-3.png|120]] | ![[lid-v2-images/lid-q021-bild-4.png|120]] |
+
+- [x] Bild 1
+- [ ] Bild 2
+- [ ] Bild 3
+- [ ] Bild 4
+
+Richtige Antwort: Bild 1
+
+#### Aufgabe 22
+
+Was für eine Staatsform hat Deutschland?
+
+- [ ] Monarchie
+- [ ] Diktatur
+- [x] Republik
+- [ ] Fürstentum
+
+Richtige Antwort: Republik
+
+#### Aufgabe 23
+
+In Deutschland sind die meisten Erwerbstätigen …
+
+- [ ] in kleinen Familienunternehmen beschäftigt.
+- [ ] ehrenamtlich für ein Bundesland tätig.
+- [ ] selbstständig mit einer eigenen Firma tätig.
+- [x] bei einer Firma oder Behörde beschäftigt.
+
+Richtige Antwort: bei einer Firma oder Behörde beschäftigt.
+
+#### Aufgabe 24
+
+Wie viele Bundesländer hat die Bundesrepublik Deutschland?
+
+- [ ] 14
+- [ ] 15
+- [x] 16
+- [ ] 17
+
+Richtige Antwort: 16
+
+#### Aufgabe 25
+
+Was ist kein Bundesland der Bundesrepublik Deutschland?
+
+- [x] Elsass-Lothringen
+- [ ] Nordrhein-Westfalen
+- [ ] Mecklenburg-Vorpommern
+- [ ] Sachsen-Anhalt
+
+Richtige Antwort: Elsass-Lothringen
+
+#### Aufgabe 26
+
+Deutschland ist …
+
+- [ ] eine kommunistische Republik.
+- [x] ein demokratischer und sozialer Bundesstaat.
+- [ ] eine kapitalistische und soziale Monarchie.
+- [ ] ein sozialer und sozialistischer Bundesstaat.
+
+Richtige Antwort: ein demokratischer und sozialer Bundesstaat.
+
+#### Aufgabe 27
+
+Deutschland ist …
+
+- [ ] ein sozialistischer Staat.
+- [x] ein Bundesstaat.
+- [ ] eine Diktatur.
+- [ ] eine Monarchie.
+
+Richtige Antwort: ein Bundesstaat.
+
+#### Aufgabe 28
+
+Wer wählt in Deutschland die Abgeordneten zum Bundestag?
+
+- [ ] das Militär
+- [ ] die Wirtschaft
+- [x] das wahlberechtigte Volk
+- [ ] die Verwaltung
+
+Richtige Antwort: das wahlberechtigte Volk
+
+#### Aufgabe 29
+
+Welches Tier ist das Wappentier der Bundesrepublik Deutschland?
+
+- [ ] Löwe
+- [x] Adler
+- [ ] Bär
+- [ ] Pferd
+
+Richtige Antwort: Adler
+
+#### Aufgabe 30
+
+Was ist kein Merkmal unserer Demokratie?
+
+- [ ] regelmäßige Wahlen
+- [x] Pressezensur
+- [ ] Meinungsfreiheit
+- [ ] verschiedene Parteien
+
+Richtige Antwort: Pressezensur
+
+#### Aufgabe 31
+
+Die Zusammenarbeit von Parteien zur Bildung einer Regierung nennt man in Deutschland …
+
+- [ ] Einheit.
+- [x] Koalition.
+- [ ] Ministerium.
+- [ ] Fraktion.
+
+Richtige Antwort: Koalition.
+
+#### Aufgabe 32
+
+Was ist keine staatliche Gewalt in Deutschland?
+
+- [ ] Gesetzgebung
+- [ ] Regierung
+- [x] Presse
+- [ ] Rechtsprechung
+
+Richtige Antwort: Presse
+
+#### Aufgabe 33
+
+Welche Aussage ist richtig? In Deutschland …
+
+- [x] sind Staat und Religionsgemeinschaften voneinander getrennt.
+- [ ] bilden die Religionsgemeinschaften den Staat.
+- [ ] ist der Staat abhängig von den Religionsgemeinschaften.
+- [ ] bilden Staat und Religionsgemeinschaften eine Einheit.
+
+Richtige Antwort: sind Staat und Religionsgemeinschaften voneinander getrennt.
+
+#### Aufgabe 34
+
+Was ist Deutschland nicht?
+
+- [ ] eine Demokratie
+- [ ] ein Rechtsstaat
+- [x] eine Monarchie
+- [ ] ein Sozialstaat
+
+Richtige Antwort: eine Monarchie
+
+#### Aufgabe 35
+
+Womit finanziert der deutsche Staat die Sozialversicherung?
+
+- [ ] Kirchensteuer
+- [x] Sozialabgaben
+- [ ] Spendengeldern
+- [ ] Vereinsbeiträgen
+
+Richtige Antwort: Sozialabgaben
+
+#### Aufgabe 36
+
+Welche Maßnahme schafft in Deutschland soziale Sicherheit?
+
+- [x] die Krankenversicherung
+- [ ] die Autoversicherung
+- [ ] die Gebäudeversicherung
+- [ ] die Haftpflichtversicherung
+
+Richtige Antwort: die Krankenversicherung
+
+#### Aufgabe 37
+
+Wie werden die Regierungschefinnen/Regierungschefs der meisten Bundesländer in Deutschland genannt?
+
+- [ ] Erste Ministerin/Erster Minister
+- [ ] Premierministerin/Premierminister
+- [ ] Senatorin/Senator
+- [x] Ministerpräsidentin/Ministerpräsident
+
+Richtige Antwort: Ministerpräsidentin/Ministerpräsident
+
+#### Aufgabe 38
+
+Die Bundesrepublik Deutschland ist ein demokratischer und sozialer …
+
+- [ ] Staatenverbund.
+- [x] Bundesstaat.
+- [ ] Staatenbund.
+- [ ] Zentralstaat.
+
+Richtige Antwort: Bundesstaat.
+
+#### Aufgabe 39
+
+Was hat jedes deutsche Bundesland?
+
+- [ ] eine eigene Außenministerin/einen eigenen Außenminister
+- [ ] eine eigene Währung
+- [ ] eine eigene Armee
+- [x] eine eigene Regierung
+
+Richtige Antwort: eine eigene Regierung
+
+#### Aufgabe 40
+
+Mit welchen Worten beginnt die deutsche Nationalhymne?
+
+- [ ] Völker, hört die Signale …
+- [x] Einigkeit und Recht und Freiheit …
+- [ ] Freude schöner Götterfunken …
+- [ ] Deutschland einig Vaterland …
+
+Richtige Antwort: Einigkeit und Recht und Freiheit ...
+
+#### Aufgabe 41
+
+Warum gibt es in einer Demokratie mehr als eine Partei?
+
+- [x] weil dadurch die unterschiedlichen Meinungen der Bürgerinnen und Bürger vertreten werden
+- [ ] damit Bestechung in der Politik begrenzt wird
+- [ ] um politische Demonstrationen zu verhindern
+- [ ] um wirtschaftlichen Wettbewerb anzuregen
+
+Richtige Antwort: weil dadurch die unterschiedlichen Meinungen der Bürgerinnen und Bürger vertreten werden
+
+#### Aufgabe 42
+
+Wer beschließt in Deutschland ein neues Gesetz?
+
+- [ ] die Regierung
+- [x] das Parlament
+- [ ] die Gerichte
+- [ ] die Polizei
+
+Richtige Antwort: das Parlament
+
+#### Aufgabe 43
+
+Wann kann in Deutschland eine Partei verboten werden?
+
+- [ ] wenn ihr Wahlkampf zu teuer ist
+- [x] wenn sie gegen die Verfassung kämpft
+- [ ] wenn sie Kritik am Staatsoberhaupt äußert
+- [ ] wenn ihr Programm eine neue Richtung vorschlägt
+
+Richtige Antwort: wenn sie gegen die Verfassung kämpft
+
+#### Aufgabe 44
+
+Wen kann man als Bürgerin/Bürger in Deutschland nicht direkt wählen?
+
+- [ ] Abgeordnete des EU-Parlaments
+- [x] Die Bundespräsidentin/den Bundespräsidenten
+- [ ] Landtagsabgeordnete
+- [ ] Bundestagsabgeordnete
+
+Richtige Antwort: Die Bundespräsidentin/den Bundespräsidenten
+
+#### Aufgabe 45
+
+Zu welcher Versicherung gehört die Pflegeversicherung?
+
+- [x] Sozialversicherung
+- [ ] Unfallversicherung
+- [ ] Hausratsversicherung
+- [ ] Haftpflicht- und Feuerversicherung
+
+Richtige Antwort: Sozialversicherung
+
+#### Aufgabe 46
+
+Der deutsche Staat hat viele Aufgaben. Welche Aufgabe gehört dazu?
+
+- [x] Er baut Straßen und Schulen.
+- [ ] Er verkauft Lebensmittel und Kleidung.
+- [ ] Er versorgt alle Einwohnerinnen und Einwohner kostenlos mit Zeitungen.
+- [ ] Er produziert Autos und Busse.
+
+Richtige Antwort: Er baut Straßen und Schulen.
+
+#### Aufgabe 47
+
+Der deutsche Staat hat viele Aufgaben. Welche Aufgabe gehört nicht dazu?
+
+- [x] Er bezahlt für alle Staatsangehörigen Urlaubsreisen.
+- [ ] Er zahlt Kindergeld.
+- [ ] Er unterstützt Museen.
+- [ ] Er fördert Sportlerinnen und Sportler.
+
+Richtige Antwort: Er bezahlt für alle Staatsangehörigen Urlaubsreisen.
+
+#### Aufgabe 48
+
+Welches Organ gehört nicht zu den Verfassungsorganen Deutschlands?
+
+- [ ] der Bundesrat
+- [ ] die Bundespräsidentin/der Bundespräsident
+- [x] die Bürgerversammlung
+- [ ] die Regierung
+
+Richtige Antwort: die Bürgerversammlung
+
+#### Aufgabe 49
+
+Wer bestimmt in Deutschland die Schulpolitik?
+
+- [ ] die Lehrer und Lehrerinnen
+- [x] die Bundesländer
+- [ ] das Familienministerium
+- [ ] die Universitäten
+
+Richtige Antwort: die Bundesländer
+
+#### Aufgabe 50
+
+Die Wirtschaftsform in Deutschland nennt man …
+
+- [ ] freie Zentralwirtschaft.
+- [x] soziale Marktwirtschaft.
+- [ ] gelenkte Zentralwirtschaft.
+- [ ] Planwirtschaft.
+
+Richtige Antwort: soziale Marktwirtschaft.
+
+#### Aufgabe 51
+
+Zu einem demokratischen Rechtsstaat gehört es nicht, dass …
+
+- [ ] Menschen sich kritisch über die Regierung äußern können.
+- [ ] Bürger friedlich demonstrieren gehen dürfen.
+- [x] Menschen von einer Privatpolizei ohne Grund verhaftet werden.
+- [ ] jemand ein Verbrechen begeht und deshalb verhaftet wird.
+
+Richtige Antwort: Menschen von einer Privatpolizei ohne Grund verhaftet werden.
+
+#### Aufgabe 52
+
+Was bedeutet "Volkssouveränität"? Alle Staatsgewalt geht vom ...
+
+- [x] Volke aus.
+- [ ] Bundestag aus.
+- [ ] preußischen König aus.
+- [ ] Bundesverfassungsgericht aus.
+
+Richtige Antwort: Volke aus.
+
+#### Aufgabe 53
+
+Was bedeutet "Rechtsstaat" in Deutschland?
+
+- [ ] Der Staat hat Recht.
+- [ ] Es gibt nur rechte Parteien.
+- [ ] Die Bürgerinnen und Bürger entscheiden über Gesetze.
+- [x] Der Staat muss die Gesetze einhalten.
+
+Richtige Antwort: Der Staat muss die Gesetze einhalten.
+
+#### Aufgabe 54
+
+Was ist keine staatliche Gewalt in Deutschland?
+
+- [ ] Legislative
+- [ ] Judikative
+- [ ] Exekutive
+- [x] Direktive
+
+Richtige Antwort: Direktive
+
+#### Aufgabe 55
+
+Was zeigt dieses Bild? © Deutscher Bundestag/Achim Melde
+
+![[lid-v2-images/lid-q055-bild.png|420]]
+
+- [x] den Bundestagssitz in Berlin
+- [ ] das Bundesverfassungsgericht in Karlsruhe
+- [ ] das Bundesratsgebäude in Berlin
+- [ ] das Bundeskanzleramt in Berlin
+
+Richtige Antwort: den Bundestagssitz in Berlin
+
+#### Aufgabe 56
+
+Welches Amt gehört in Deutschland zur Gemeindeverwaltung?
+
+- [ ] Pfarramt
+- [x] Ordnungsamt
+- [ ] Finanzamt
+- [ ] Auswärtiges Amt
+
+Richtige Antwort: Ordnungsamt
+
+#### Aufgabe 57
+
+Wer wird meistens zur Präsidentin/zum Präsidenten des Deutschen Bundestages gewählt?
+
+- [ ] die/der älteste Abgeordnete im Parlament
+- [ ] die Ministerpräsidentin/der Ministerpräsident des größten Bundeslandes
+- [ ] eine ehemalige Bundeskanzlerin/ein ehemaliger Bundeskanzler
+- [x] eine Abgeordnete/ein Abgeordneter der stärksten Fraktion
+
+Richtige Antwort: eine Abgeordnete/ein Abgeordneter der stärksten Fraktion
+
+#### Aufgabe 58
+
+Wer ernennt in Deutschland die Ministerinnen/die Minister der Bundesregierung?
+
+- [ ] die Präsidentin/der Präsident des Bundesverfassungsgerichtes
+- [x] die Bundespräsidentin/der Bundespräsident
+- [ ] die Bundesratspräsidentin/der Bundesratspräsident
+- [ ] die Bundestagspräsidentin/der Bundestagspräsident
+
+Richtige Antwort: die Bundespräsidentin/der Bundespräsident
+
+#### Aufgabe 59
+
+Vor wie vielen Jahren gab es erstmals eine jüdische Gemeinde auf dem Gebiet des heutigen Deutschlands?
+
+- [ ] vor etwa 300 Jahren
+- [ ] vor etwa 700 Jahren
+- [ ] vor etwa 1150 Jahren
+- [x] vor etwa 1700 Jahren
+
+Richtige Antwort: vor etwa 1700 Jahren
+
+#### Aufgabe 60
+
+In Deutschland gehören der Bundestag und der Bundesrat zur …
+
+- [ ] Exekutive.
+- [x] Legislative.
+- [ ] Direktive.
+- [ ] Judikative.
+
+Richtige Antwort: Legislative.
+
+#### Aufgabe 61
+
+Was bedeutet "Volkssouveränität"?
+
+- [ ] Die Königin/der König herrscht über das Volk.
+- [ ] Das Bundesverfassungsgericht steht über der Verfassung.
+- [ ] Die Interessenverbände üben die Souveränität zusammen mit der Regierung aus.
+- [x] Die Staatsgewalt geht vom Volke aus.
+
+Richtige Antwort: Die Staatsgewalt geht vom Volke aus.
+
+#### Aufgabe 62
+
+Wenn das Parlament eines deutschen Bundeslandes gewählt wird, nennt man das …
+
+- [ ] Kommunalwahl
+- [x] Landtagswahl
+- [ ] Europawahl
+- [ ] Bundestagswahl
+
+Richtige Antwort: Landtagswahl
+
+#### Aufgabe 63
+
+Was gehört in Deutschland nicht zur Exekutive?
+
+- [ ] die Polizei
+- [x] die Gerichte
+- [ ] das Finanzamt
+- [ ] die Ministerien
+
+Richtige Antwort: die Gerichte
+
+#### Aufgabe 64
+
+Die Bundesrepublik Deutschland ist heute gegliedert in …
+
+- [ ] vier Besatzungszonen.
+- [ ] einen Oststaat und einen Weststaat.
+- [ ] 16 Kantone.
+- [x] Bund, Länder und Kommunen.
+
+Richtige Antwort: Bund, Länder und Kommunen.
+
+#### Aufgabe 65
+
+Es gehört nicht zu den Aufgaben des Deutschen Bundestages, …
+
+- [ ] Gesetze zu entwerfen.
+- [ ] die Bundesregierung zu kontrollieren.
+- [ ] die Bundeskanzlerin/den Bundeskanzler zu wählen.
+- [x] das Bundeskabinett zu bilden.
+
+Richtige Antwort: das Bundeskabinett zu bilden.
+
+#### Aufgabe 66
+
+Welche Städte haben die größten jüdischen Gemeinden in Deutschland?
+
+- [x] Berlin und München
+- [ ] Hamburg und Essen
+- [ ] Nürnberg und Stuttgart
+- [ ] Worms und Speyer
+
+Richtige Antwort: Berlin und München
+
+#### Aufgabe 67
+
+Was ist in Deutschland vor allem eine Aufgabe der Bundesländer?
+
+- [ ] Verteidigungspolitik
+- [ ] Außenpolitik
+- [ ] Wirtschaftspolitik
+- [x] Schulpolitik
+
+Richtige Antwort: Schulpolitik
+
+#### Aufgabe 68
+
+Warum kontrolliert der Staat in Deutschland das Schulwesen?
+
+- [ ] weil es in Deutschland nur staatliche Schulen gibt
+- [ ] weil alle Schülerinnen und Schüler einen Schulabschluss haben müssen
+- [ ] weil es in den Bundesländern verschiedene Schulen gibt
+- [x] weil es nach dem Grundgesetz seine Aufgabe ist
+
+Richtige Antwort: weil es nach dem Grundgesetz seine Aufgabe ist
+
+#### Aufgabe 69
+
+Die Bundesrepublik Deutschland hat einen dreistufigen Verwaltungsaufbau. Wie heißt die unterste politische Stufe?
+
+- [ ] Stadträte
+- [ ] Landräte
+- [x] Gemeinden
+- [ ] Bezirksämter
+
+Richtige Antwort: Gemeinden
+
+#### Aufgabe 70
+
+Der deutsche Bundespräsident Gustav Heinemann gibt Helmut Schmidt 1974 die Ernennungsurkunde zum deutschen Bundeskanzler. Was gehört zu den Aufgaben der deutschen Bundespräsidentin/des deutschen Bundespräsidenten? © Bundesregierung/Engelbert Reineke
+
+- [ ] Sie/Er führt die Regierungsgeschäfte.
+- [ ] Sie/Er kontrolliert die Regierungspartei.
+- [ ] Sie/Er wählt die Ministerinnen/Minister aus.
+- [x] Sie/Er schlägt die Kanzlerin/den Kanzler zur Wahl vor.
+
+Richtige Antwort: Sie/Er schlägt die Kanzlerin/den Kanzler zur Wahl vor.
+
+#### Aufgabe 71
+
+Wo hält sich die deutsche Bundeskanzlerin/der deutsche Bundeskanzler am häufigsten auf? Am häufigsten ist sie/er …
+
+- [ ] in Bonn, weil sich dort das Bundeskanzleramt und der Bundestag befinden.
+- [ ] auf Schloss Meseberg, dem Gästehaus der Bundesregierung, um Staatsgäste zu empfangen.
+- [ ] auf Schloss Bellevue, dem Amtssitz der Bundespräsidentin/des Bundespräsidenten, um Staatsgäste zu empfangen.
+- [x] in Berlin, weil sich dort das Bundeskanzleramt und der Bundestag befinden.
+
+Richtige Antwort: in Berlin, weil sich dort das Bundeskanzleramt und der Bundestag befinden.
+
+#### Aufgabe 72
+
+Wie heißt die jetzige Bundeskanzlerin/der jetzige Bundeskanzler von Deutschland?
+
+- [ ] Gerhard Schröder
+- [ ] Angela Merkel
+- [ ] Ursula von der Leyen
+- [x] Friedrich Merz
+
+Richtige Antwort: Friedrich Merz
+
+#### Aufgabe 73
+
+Die beiden größten Fraktionen im Deutschen Bundestag heißen zurzeit …
+
+- [x] CDU/CSU und AfD.
+- [ ] Die Linke und Bündnis 90/Die Grünen.
+- [ ] Bündnis 90/Die Grünen und SPD.
+- [ ] Die Linke und CDU/CSU.
+
+Richtige Antwort: CDU/CSU und AfD.
+
+#### Aufgabe 74
+
+Wie heißt das Parlament für ganz Deutschland?
+
+- [ ] Bundesversammlung
+- [ ] Volkskammer
+- [x] Bundestag
+- [ ] Bundesgerichtshof
+
+Richtige Antwort: Bundestag
+
+#### Aufgabe 75
+
+Wie heißt Deutschlands heutiges Staatsoberhaupt?
+
+- [x] Frank-Walter Steinmeier
+- [ ] Bärbel Bas
+- [ ] Bodo Ramelow
+- [ ] Joachim Gauck
+
+Richtige Antwort: Frank-Walter Steinmeier
+
+#### Aufgabe 76
+
+Was bedeutet die Abkürzung CDU in Deutschland?
+
+- [ ] Christliche Deutsche Union
+- [ ] Club Deutscher Unternehmer
+- [ ] Christlicher Deutscher Umweltschutz
+- [x] Christlich Demokratische Union
+
+Richtige Antwort: Christlich Demokratische Union
+
+#### Aufgabe 77
+
+Was ist die Bundeswehr?
+
+- [ ] die deutsche Polizei
+- [ ] ein deutscher Hafen
+- [ ] eine deutsche Bürgerinitiative
+- [x] die deutsche Armee
+
+Richtige Antwort: die deutsche Armee
+
+#### Aufgabe 78
+
+Was bedeutet die Abkürzung SPD?
+
+- [ ] Sozialistische Partei Deutschlands
+- [ ] Sozialpolitische Partei Deutschlands
+- [x] Sozialdemokratische Partei Deutschlands
+- [ ] Sozialgerechte Partei Deutschlands
+
+Richtige Antwort: Sozialdemokratische Partei Deutschlands
+
+#### Aufgabe 79
+
+Was bedeutet die Abkürzung FDP in Deutschland?
+
+- [ ] Friedliche Demonstrative Partei
+- [ ] Freie Deutschland Partei
+- [ ] Führende Demokratische Partei
+- [x] Freie Demokratische Partei
+
+Richtige Antwort: Freie Demokratische Partei
+
+#### Aufgabe 80
+
+Welches Gericht in Deutschland ist zuständig für die Auslegung des Grundgesetzes?
+
+- [ ] Oberlandesgericht
+- [ ] Amtsgericht
+- [x] Bundesverfassungsgericht
+- [ ] Verwaltungsgericht
+
+Richtige Antwort: Bundesverfassungsgericht
+
+#### Aufgabe 81
+
+Wer wählt die Bundeskanzlerin/den Bundeskanzler in Deutschland?
+
+- [ ] der Bundesrat
+- [ ] die Bundesversammlung
+- [ ] das Volk
+- [x] der Bundestag
+
+Richtige Antwort: der Bundestag
+
+#### Aufgabe 82
+
+Wer leitet das deutsche Bundeskabinett?
+
+- [ ] die Bundestagspräsidentin/der Bundestagspräsident
+- [ ] die Bundespräsidentin/der Bundespräsident
+- [ ] die Bundesratspräsidentin/der Bundesratspräsident
+- [x] die Bundeskanzlerin/der Bundeskanzler
+
+Richtige Antwort: die Bundeskanzlerin/der Bundeskanzler
+
+#### Aufgabe 83
+
+Wer wählt die deutsche Bundeskanzlerin/den deutschen Bundeskanzler?
+
+- [ ] das Volk
+- [ ] die Bundesversammlung
+- [x] der Bundestag
+- [ ] die Bundesregierung
+
+Richtige Antwort: der Bundestag
+
+#### Aufgabe 84
+
+Welche Hauptaufgabe hat die deutsche Bundespräsidentin/der deutsche Bundespräsident? Sie/Er …
+
+- [ ] regiert das Land.
+- [ ] entwirft die Gesetze.
+- [x] repräsentiert das Land.
+- [ ] überwacht die Einhaltung der Gesetze.
+
+Richtige Antwort: repräsentiert das Land.
+
+#### Aufgabe 85
+
+Wer bildet den deutschen Bundesrat?
+
+- [ ] die Abgeordneten des Bundestages
+- [ ] die Ministerinnen und Minister der Bundesregierung
+- [x] die Regierungsvertreter der Bundesländer
+- [ ] die Parteimitglieder
+
+Richtige Antwort: die Regierungsvertreter der Bundesländer
+
+#### Aufgabe 86
+
+Wer wählt in Deutschland die Bundespräsidentin/den Bundespräsidenten?
+
+- [x] die Bundesversammlung
+- [ ] der Bundesrat
+- [ ] das Bundesparlament
+- [ ] das Bundesverfassungsgericht
+
+Richtige Antwort: die Bundesversammlung
+
+#### Aufgabe 87
+
+Wer ist das Staatsoberhaupt der Bundesrepublik Deutschland?
+
+- [ ] die Bundeskanzlerin/der Bundeskanzler
+- [x] die Bundespräsidentin/der Bundespräsident
+- [ ] die Bundesratspräsidentin/der Bundesratspräsident
+- [ ] die Bundestagspräsidentin/der Bundestagspräsident
+
+Richtige Antwort: die Bundespräsidentin/der Bundespräsident
+
+#### Aufgabe 88
+
+Die parlamentarische Opposition im Deutschen Bundestag …
+
+- [x] kontrolliert die Regierung.
+- [ ] entscheidet, wer Bundesministerin/Bundesminister wird.
+- [ ] bestimmt, wer im Bundesrat sitzt.
+- [ ] schlägt die Regierungschefinnen/Regierungschefs der Länder vor.
+
+Richtige Antwort: kontrolliert die Regierung.
+
+#### Aufgabe 89
+
+Wie nennt man in Deutschland die Vereinigung von Abgeordneten einer Partei im Parlament?
+
+- [ ] Verband
+- [ ] Ältestenrat
+- [x] Fraktion
+- [ ] Opposition
+
+Richtige Antwort: Fraktion
+
+#### Aufgabe 90
+
+Die deutschen Bundesländer wirken an der Gesetzgebung des Bundes mit durch …
+
+- [x] den Bundesrat.
+- [ ] die Bundesversammlung.
+- [ ] den Bundestag.
+- [ ] die Bundesregierung.
+
+Richtige Antwort: den Bundesrat.
+
+#### Aufgabe 91
+
+In Deutschland kann ein Regierungswechsel in einem Bundesland Auswirkungen auf die Bundespolitik haben. Das Regieren wird …
+
+- [ ] schwieriger, wenn sich dadurch die Mehrheit im Bundestag ändert.
+- [ ] leichter, wenn dadurch neue Parteien in den Bundesrat kommen.
+- [x] schwieriger, wenn dadurch die Mehrheit im Bundesrat verändert wird.
+- [ ] leichter, wenn es sich um ein reiches Bundesland handelt.
+
+Richtige Antwort: schwieriger, wenn dadurch die Mehrheit im Bundesrat verändert wird.
+
+#### Aufgabe 92
+
+Was bedeutet die Abkürzung CSU in Deutschland?
+
+- [ ] Christlich Sichere Union
+- [ ] Christlich Süddeutsche Union
+- [ ] Christlich Sozialer Unternehmerverband
+- [x] Christlich Soziale Union
+
+Richtige Antwort: Christlich Soziale Union
+
+#### Aufgabe 93
+
+Je mehr "Zweitstimmen" eine Partei bei einer Bundestagswahl bekommt, desto …
+
+- [ ] weniger Erststimmen kann sie haben.
+- [ ] mehr Direktkandidaten der Partei ziehen ins Parlament ein.
+- [ ] größer ist das Risiko, eine Koalition bilden zu müssen.
+- [x] mehr Sitze erhält die Partei im Parlament.
+
+Richtige Antwort: mehr Sitze erhält die Partei im Parlament.
+
+#### Aufgabe 94
+
+Ab welchem Alter darf man in Deutschland an der Wahl zum Deutschen Bundestag teilnehmen?
+
+- [ ] 16
+- [x] 18
+- [ ] 21
+- [ ] 23
+
+Richtige Antwort: 18
+
+#### Aufgabe 95
+
+Was gilt für die meisten Kinder in Deutschland?
+
+- [ ] Wahlpflicht
+- [x] Schulpflicht
+- [ ] Schweigepflicht
+- [ ] Religionspflicht
+
+Richtige Antwort: Schulpflicht
+
+#### Aufgabe 96
+
+Wie kann jemand, der den Holocaust leugnet, bestraft werden?
+
+- [ ] Kürzung sozialer Leistungen
+- [ ] bis zu 100 Sozialstunden
+- [ ] gar nicht, Holocaustleugnung ist erlaubt
+- [x] mit Freiheitsstrafe bis zu fünf Jahren oder mit Geldstrafe
+
+Richtige Antwort: mit Freiheitsstrafe bis zu fünf Jahren oder mit Geldstrafe
+
+#### Aufgabe 97
+
+Was bezahlt man in Deutschland automatisch, wenn man fest angestellt ist?
+
+- [x] Sozialversicherung
+- [ ] Sozialhilfe
+- [ ] Kindergeld
+- [ ] Wohngeld
+
+Richtige Antwort: Sozialversicherung
+
+#### Aufgabe 98
+
+Wenn Abgeordnete im Deutschen Bundestag ihre Fraktion wechseln, …
+
+- [ ] dürfen sie nicht mehr an den Sitzungen des Parlaments teilnehmen.
+- [x] kann die Regierung ihre Mehrheit verlieren.
+- [ ] muss die Bundespräsidentin/der Bundespräsident zuvor ihr/sein Einverständnis geben.
+- [ ] dürfen die Wählerinnen/Wähler dieser Abgeordneten noch einmal wählen.
+
+Richtige Antwort: kann die Regierung ihre Mehrheit verlieren.
+
+#### Aufgabe 99
+
+Wer bezahlt in Deutschland die Sozialversicherungen?
+
+- [x] Arbeitgeberinnen/Arbeitgeber und Arbeitnehmerinnen/Arbeitnehmer
+- [ ] nur Arbeitnehmerinnen/Arbeitnehmer
+- [ ] alle Staatsangehörigen
+- [ ] nur Arbeitgeberinnen/Arbeitgeber
+
+Richtige Antwort: Arbeitgeberinnen/Arbeitgeber und Arbeitnehmerinnen/Arbeitnehmer
+
+#### Aufgabe 100
+
+Was gehört nicht zur gesetzlichen Sozialversicherung?
+
+- [x] die Lebensversicherung
+- [ ] die gesetzliche Rentenversicherung
+- [ ] die Arbeitslosenversicherung
+- [ ] die Pflegeversicherung
+
+Richtige Antwort: die Lebensversicherung
+
+#### Aufgabe 101
+
+Gewerkschaften sind Interessenverbände der …
+
+- [ ] Jugendlichen.
+- [x] Arbeitnehmerinnen und Arbeitnehmer.
+- [ ] Rentnerinnen und Rentner.
+- [ ] Arbeitgeberinnen und Arbeitgeber.
+
+Richtige Antwort: Arbeitnehmerinnen und Arbeitnehmer.
+
+#### Aufgabe 102
+
+Womit kann man in der Bundesrepublik Deutschland geehrt werden, wenn man auf politischem, wirtschaftlichem, kulturellem, geistigem oder sozialem Gebiet eine besondere Leistung erbracht hat? Mit dem …
+
+- [x] Bundesverdienstkreuz
+- [ ] Bundesadler
+- [ ] Vaterländischen Verdienstorden
+- [ ] Ehrentitel "Held der Deutschen Demokratischen Republik"
+
+Richtige Antwort: Bundesverdienstkreuz
+
+#### Aufgabe 103
+
+Was wird in Deutschland als "Ampelkoalition" bezeichnet? Die Zusammenarbeit …
+
+- [ ] der Bundestagsfraktionen von CDU und CSU
+- [x] von SPD, FDP und Bündnis 90/Die Grünen in einer Regierung
+- [ ] von CSU, Die LINKE und Bündnis 90/Die Grünen in einer Regierung
+- [ ] der Bundestagsfraktionen von CDU und SPD
+
+Richtige Antwort: von SPD, FDP und Bündnis 90/Die Grünen in einer Regierung
+
+#### Aufgabe 104
+
+Eine Frau in Deutschland verliert ihre Arbeit. Was darf nicht der Grund für diese Entlassung sein?
+
+- [ ] Die Frau ist lange krank und arbeitsunfähig.
+- [ ] Die Frau kam oft zu spät zur Arbeit.
+- [ ] Die Frau erledigt private Sachen während der Arbeitszeit.
+- [x] Die Frau bekommt ein Kind und ihr Chef weiß das.
+
+Richtige Antwort: Die Frau bekommt ein Kind und ihr Chef weiß das.
+
+#### Aufgabe 105
+
+Was ist eine Aufgabe von Wahlhelferinnen/Wahlhelfern in Deutschland?
+
+- [ ] Sie helfen alten Menschen bei der Stimmabgabe in der Wahlkabine.
+- [ ] Sie schreiben die Wahlbenachrichtigungen vor der Wahl.
+- [ ] Sie geben Zwischenergebnisse an die Medien weiter.
+- [x] Sie zählen die Stimmen nach dem Ende der Wahl.
+
+Richtige Antwort: Sie zählen die Stimmen nach dem Ende der Wahl.
+
+#### Aufgabe 106
+
+In Deutschland helfen ehrenamtliche Wahlhelferinnen und Wahlhelfer bei den Wahlen. Was ist eine Aufgabe von Wahlhelferinnen/Wahlhelfern?
+
+- [ ] Sie helfen Kindern und alten Menschen beim Wählen.
+- [ ] Sie schreiben Karten und Briefe mit der Angabe des Wahllokals.
+- [ ] Sie geben Zwischenergebnisse an Journalisten weiter.
+- [x] Sie zählen die Stimmen nach dem Ende der Wahl.
+
+Richtige Antwort: Sie zählen die Stimmen nach dem Ende der Wahl.
+
+#### Aufgabe 107
+
+Für wie viele Jahre wird der Bundestag in Deutschland gewählt?
+
+- [ ] 2 Jahre
+- [x] 4 Jahre
+- [ ] 6 Jahre
+- [ ] 8 Jahre
+
+Richtige Antwort: 4 Jahre
+
+#### Aufgabe 108
+
+Bei einer Bundestagswahl in Deutschland darf jede/jeder wählen, die/der …
+
+- [ ] in der Bundesrepublik Deutschland wohnt und wählen möchte.
+- [x] Bürgerin/Bürger der Bundesrepublik Deutschland ist und mindestens 18 Jahre alt ist.
+- [ ] seit mindestens 3 Jahren in der Bundesrepublik Deutschland lebt.
+- [ ] Bürgerin/Bürger der Bundesrepublik Deutschland ist und mindestens 21 Jahre alt ist.
+
+Richtige Antwort: Bürgerin/Bürger der Bundesrepublik Deutschland ist und mindestens 18 Jahre alt ist.
+
+#### Aufgabe 109
+
+Wie oft gibt es normalerweise Bundestagswahlen in Deutschland?
+
+- [ ] alle drei Jahre
+- [x] alle vier Jahre
+- [ ] alle fünf Jahre
+- [ ] alle sechs Jahre
+
+Richtige Antwort: alle vier Jahre
+
+#### Aufgabe 110
+
+Für wie viele Jahre wird der Bundestag in Deutschland gewählt?
+
+- [ ] 2 Jahre
+- [ ] 3 Jahre
+- [x] 4 Jahre
+- [ ] 5 Jahre
+
+Richtige Antwort: 4 Jahre
+
+#### Aufgabe 111
+
+Welche Handlungen mit Bezug auf den Staat Israel sind in Deutschland verboten?
+
+- [ ] die Politik Israels öffentlich kritisieren
+- [ ] das Aufhängen einer israelischen Flagge auf dem Privatgrundstück
+- [ ] eine Diskussion über die Politik Israels
+- [x] der öffentliche Aufruf zur Vernichtung Israels
+
+Richtige Antwort: der öffentliche Aufruf zur Vernichtung Israels
+
+#### Aufgabe 112
+
+Die Wahlen in Deutschland sind …
+
+- [ ] speziell.
+- [x] geheim.
+- [ ] berufsbezogen.
+- [ ] geschlechtsabhängig.
+
+Richtige Antwort: geheim.
+
+#### Aufgabe 113
+
+Wahlen in Deutschland gewinnt die Partei, die …
+
+- [x] die meisten Stimmen bekommt.
+- [ ] die meisten Männer mehrheitlich gewählt haben.
+- [ ] die meisten Stimmen bei den Arbeiterinnen/Arbeitern bekommen hat.
+- [ ] die meisten Erststimmen für ihre Kanzlerkandidatin/ihren Kanzlerkandidaten erhalten hat.
+
+Richtige Antwort: die meisten Stimmen bekommt.
+
+#### Aufgabe 114
+
+An demokratischen Wahlen in Deutschland teilzunehmen ist …
+
+- [ ] eine Pflicht.
+- [x] ein Recht.
+- [ ] ein Zwang.
+- [ ] eine Last.
+
+Richtige Antwort: ein Recht.
+
+#### Aufgabe 115
+
+Was bedeutet "aktives Wahlrecht" in Deutschland?
+
+- [ ] Man kann gewählt werden.
+- [ ] Man muss wählen gehen.
+- [x] Man kann wählen.
+- [ ] Man muss zur Auszählung der Stimmen gehen.
+
+Richtige Antwort: Man kann wählen.
+
+#### Aufgabe 116
+
+Wenn Sie bei einer Bundestagswahl in Deutschland wählen dürfen, heißt das …
+
+- [ ] aktive Wahlkampagne.
+- [ ] aktives Wahlverfahren.
+- [ ] aktiver Wahlkampf.
+- [x] aktives Wahlrecht.
+
+Richtige Antwort: aktives Wahlrecht.
+
+#### Aufgabe 117
+
+Wie viel Prozent der Zweitstimmen müssen Parteien mindestens bekommen, um in den Deutschen Bundestag gewählt zu werden?
+
+- [ ] 3%
+- [ ] 4%
+- [x] 5%
+- [ ] 6%
+
+Richtige Antwort: 5%
+
+#### Aufgabe 118
+
+Wer darf bei den rund 40 jüdischen Makkabi-Sportvereinen Mitglied werden?
+
+- [ ] nur Deutsche
+- [ ] nur Israelis
+- [ ] nur religiöse Menschen
+- [x] alle Menschen
+
+Richtige Antwort: alle Menschen
+
+#### Aufgabe 119
+
+Wahlen in Deutschland sind frei. Was bedeutet das?
+
+- [ ] Alle verurteilten Straftäterinnen/Straftäter dürfen nicht wählen.
+- [ ] Wenn ich wählen gehen möchte, muss meine Arbeitgeberin/mein Arbeitgeber mir frei geben.
+- [x] Jede Person kann ohne Zwang entscheiden, ob sie wählen möchte und wen sie wählen möchte.
+- [ ] Ich kann frei entscheiden, wo ich wählen gehen möchte.
+
+Richtige Antwort: Jede Person kann ohne Zwang entscheiden, ob sie wählen möchte und wen sie wählen möchte.
+
+#### Aufgabe 120
+
+Das Wahlsystem in Deutschland ist ein …
+
+- [ ] Zensuswahlrecht.
+- [ ] Dreiklassenwahlrecht.
+- [x] Mehrheits- und Verhältniswahlrecht.
+- [ ] allgemeines Männerwahlrecht.
+
+Richtige Antwort: Mehrheits- und Verhältniswahlrecht.
+
+#### Aufgabe 121
+
+Eine Partei möchte in den Deutschen Bundestag. Sie muss aber einen Mindestanteil an Wählerstimmen haben. Das heißt …
+
+- [x] 5%-Hürde.
+- [ ] Zulassungsgrenze.
+- [ ] Basiswert.
+- [ ] Richtlinie.
+
+Richtige Antwort: 5%-Hürde.
+
+#### Aufgabe 122
+
+Welchem Grundsatz unterliegen Wahlen in Deutschland? Wahlen in Deutschland sind …
+
+- [x] frei, gleich, geheim.
+- [ ] offen, sicher, frei.
+- [ ] geschlossen, gleich, sicher.
+- [ ] sicher, offen, freiwillig.
+
+Richtige Antwort: frei, gleich, geheim.
+
+#### Aufgabe 123
+
+Was ist in Deutschland die "5%-Hürde"?
+
+- [ ] Abstimmungsregelung im Bundestag für kleine Parteien
+- [ ] Anwesenheitskontrolle im Bundestag für Abstimmungen
+- [x] Mindestanteil an Wählerstimmen, um ins Parlament zu kommen
+- [ ] Anwesenheitskontrolle im Bundesrat für Abstimmungen
+
+Richtige Antwort: Mindestanteil an Wählerstimmen, um ins Parlament zu kommen
+
+#### Aufgabe 124
+
+Die Bundestagswahl in Deutschland ist die Wahl …
+
+- [ ] der Bundeskanzlerin/des Bundeskanzlers.
+- [ ] der Parlamente der Länder.
+- [x] des Parlaments für Deutschland.
+- [ ] der Bundespräsidentin/des Bundespräsidenten.
+
+Richtige Antwort: des Parlaments für Deutschland.
+
+#### Aufgabe 125
+
+In einer Demokratie ist eine Funktion von regelmäßigen Wahlen, …
+
+- [ ] die Bürgerinnen und Bürger zu zwingen, ihre Stimme abzugeben.
+- [x] nach dem Willen der Wählermehrheit den Wechsel der Regierung zu ermöglichen.
+- [ ] im Land bestehende Gesetze beizubehalten.
+- [ ] den Armen mehr Macht zu geben.
+
+Richtige Antwort: nach dem Willen der Wählermehrheit den Wechsel der Regierung zu ermöglichen.
+
+#### Aufgabe 126
+
+Was bekommen wahlberechtigte Bürgerinnen und Bürger in Deutschland vor einer Wahl?
+
+- [x] eine Wahlbenachrichtigung von der Gemeinde
+- [ ] eine Wahlerlaubnis von der Bundespräsidentin/von dem Bundespräsidenten
+- [ ] eine Benachrichtigung von der Bundesversammlung
+- [ ] eine Benachrichtigung vom Pfarramt
+
+Richtige Antwort: eine Wahlbenachrichtigung von der Gemeinde
+
+#### Aufgabe 127
+
+Warum gibt es die 5%-Hürde im Wahlgesetz der Bundesrepublik Deutschland? Es gibt sie, weil …
+
+- [ ] die Programme von vielen kleinen Parteien viele Gemeinsamkeiten haben.
+- [ ] die Bürgerinnen und Bürger bei vielen kleinen Parteien die Orientierung verlieren können.
+- [ ] viele kleine Parteien die Regierungsbildung erschweren.
+- [x] die kleinen Parteien nicht so viel Geld haben, um die Politikerinnen und Politiker zu bezahlen.
+
+Richtige Antwort: die kleinen Parteien nicht so viel Geld haben, um die Politikerinnen und Politiker zu bezahlen.
+
+#### Aufgabe 128
+
+Parlamentsmitglieder, die von den Bürgerinnen und Bürgern gewählt werden, nennt man …
+
+- [x] Abgeordnete.
+- [ ] Kanzlerinnen/Kanzler.
+- [ ] Botschafterinnen/Botschafter.
+- [ ] Ministerpräsidentinnen/Ministerpräsidenten.
+
+Richtige Antwort: Abgeordnete.
+
+#### Aufgabe 129
+
+Vom Volk gewählt wird in Deutschland …
+
+- [ ] die Bundeskanzlerin/der Bundeskanzler.
+- [ ] die Ministerpräsidentin/der Ministerpräsident eines Bundeslandes.
+- [x] der Bundestag.
+- [ ] die Bundespräsidentin/der Bundespräsident.
+
+Richtige Antwort: der Bundestag.
+
+#### Aufgabe 130
+
+Welcher Stimmzettel wäre bei einer Bundestagswahl gültig? In Anlehnung an Bundeswahlordnung (BWO), Anlage 26
+
+- [x] 1
+- [ ] 2
+- [ ] 3
+- [ ] 4
+
+Richtige Antwort: 1
+
+#### Aufgabe 131
+
+In Deutschland ist eine Bürgermeisterin/ein Bürgermeister …
+
+- [ ] die Leiterin/der Leiter einer Schule.
+- [ ] die Chefin/der Chef einer Bank.
+- [x] das Oberhaupt einer Gemeinde.
+- [ ] die/der Vorsitzende einer Partei.
+
+Richtige Antwort: das Oberhaupt einer Gemeinde.
+
+#### Aufgabe 132
+
+Viele Menschen in Deutschland arbeiten in ihrer Freizeit ehrenamtlich. Was bedeutet das?
+
+- [ ] Sie arbeiten als Soldatinnen/Soldaten.
+- [x] Sie arbeiten freiwillig und unbezahlt in Vereinen und Verbänden.
+- [ ] Sie arbeiten in der Bundesregierung.
+- [ ] Sie arbeiten in einem Krankenhaus und verdienen dabei Geld.
+
+Richtige Antwort: Sie arbeiten freiwillig und unbezahlt in Vereinen und Verbänden.
+
+#### Aufgabe 133
+
+Was ist bei Bundestags- und Landtagswahlen in Deutschland erlaubt?
+
+- [ ] Der Ehemann wählt für seine Frau mit.
+- [x] Man kann durch Briefwahl seine Stimme abgeben.
+- [ ] Man kann am Wahltag telefonisch seine Stimme abgeben.
+- [ ] Kinder ab dem Alter von 14 Jahren dürfen wählen.
+
+Richtige Antwort: Man kann durch Briefwahl seine Stimme abgeben.
+
+#### Aufgabe 134
+
+Man will die Buslinie abschaffen, mit der Sie immer zur Arbeit fahren. Was können Sie machen, um die Buslinie zu erhalten?
+
+- [x] Ich beteilige mich an einer Bürgerinitiative für die Erhaltung der Buslinie oder gründe selber eine Initiative.
+- [ ] Ich werde Mitglied in einem Sportverein und trainiere Radfahren.
+- [ ] Ich wende mich an das Finanzamt, weil ich als Steuerzahlerin/Steuerzahler ein Recht auf die Buslinie habe.
+- [ ] Ich schreibe einen Brief an das Forstamt der Gemeinde.
+
+Richtige Antwort: Ich beteilige mich an einer Bürgerinitiative für die Erhaltung der Buslinie oder gründe selber eine Initiative.
+
+#### Aufgabe 135
+
+Wen vertreten die Gewerkschaften in Deutschland?
+
+- [ ] große Unternehmen
+- [ ] kleine Unternehmen
+- [ ] Selbstständige
+- [x] Arbeitnehmerinnen und Arbeitnehmer
+
+Richtige Antwort: Arbeitnehmerinnen und Arbeitnehmer
+
+#### Aufgabe 136
+
+Sie gehen in Deutschland zum Arbeitsgericht bei …
+
+- [ ] falscher Nebenkostenabrechnung.
+- [x] ungerechtfertigter Kündigung durch Ihre Chefin/Ihren Chef.
+- [ ] Problemen mit den Nachbarinnen/Nachbarn.
+- [ ] Schwierigkeiten nach einem Verkehrsunfall.
+
+Richtige Antwort: ungerechtfertigter Kündigung durch Ihre Chefin/Ihren Chef.
+
+#### Aufgabe 137
+
+Welches Gericht ist in Deutschland bei Konflikten in der Arbeitswelt zuständig?
+
+- [ ] das Familiengericht
+- [ ] das Strafgericht
+- [x] das Arbeitsgericht
+- [ ] das Amtsgericht
+
+Richtige Antwort: das Arbeitsgericht
+
+#### Aufgabe 138
+
+Was kann ich in Deutschland machen, wenn mir meine Arbeitgeberin/mein Arbeitgeber zu Unrecht gekündigt hat?
+
+- [ ] weiterarbeiten und freundlich zur Chefin/zum Chef sein
+- [ ] ein Mahnverfahren gegen die Arbeitgeberin/den Arbeitgeber führen
+- [x] Kündigungsschutzklage erheben
+- [ ] die Arbeitgeberin/den Arbeitgeber bei der Polizei anzeigen
+
+Richtige Antwort: Kündigungsschutzklage erheben
+
+#### Aufgabe 139
+
+Wann kommt es in Deutschland zu einem Prozess vor Gericht? Wenn jemand …
+
+- [ ] zu einer anderen Religion übertritt.
+- [x] eine Straftat begangen hat und angeklagt wird.
+- [ ] eine andere Meinung als die der Regierung vertritt.
+- [ ] sein Auto falsch geparkt hat und es abgeschleppt wird.
+
+Richtige Antwort: eine Straftat begangen hat und angeklagt wird.
+
+#### Aufgabe 140
+
+Was macht eine Schöffin/ein Schöffe in Deutschland? Sie/Er …
+
+- [x] entscheidet mit Richterinnen/Richtern über Schuld und Strafe.
+- [ ] gibt Bürgerinnen/Bürgern rechtlichen Rat.
+- [ ] stellt Urkunden aus.
+- [ ] verteidigt die Angeklagte/den Angeklagten.
+
+Richtige Antwort: entscheidet mit Richterinnen/Richtern über Schuld und Strafe.
+
+#### Aufgabe 141
+
+Wer berät in Deutschland Personen bei Rechtsfragen und vertritt sie vor Gericht?
+
+- [x] eine Rechtsanwältin/ein Rechtsanwalt
+- [ ] eine Richterin/ein Richter
+- [ ] eine Schöffin/ein Schöffe
+- [ ] eine Staatsanwältin/ein Staatsanwalt
+
+Richtige Antwort: eine Rechtsanwältin/ein Rechtsanwalt
+
+#### Aufgabe 142
+
+Was ist die Hauptaufgabe einer Richterin/eines Richters in Deutschland? Eine Richterin/ein Richter …
+
+- [ ] vertritt Bürgerinnen und Bürger vor einem Gericht.
+- [x] arbeitet an einem Gericht und spricht Urteile.
+- [ ] ändert Gesetze.
+- [ ] betreut Jugendliche vor Gericht.
+
+Richtige Antwort: arbeitet an einem Gericht und spricht Urteile.
+
+#### Aufgabe 143
+
+Eine Richterin/ein Richter in Deutschland gehört zur …
+
+- [x] Judikative.
+- [ ] Exekutive.
+- [ ] Operative.
+- [ ] Legislative.
+
+Richtige Antwort: Judikative.
+
+#### Aufgabe 144
+
+Eine Richterin/ein Richter gehört in Deutschland zur …
+
+- [ ] vollziehenden Gewalt.
+- [x] rechtsprechenden Gewalt.
+- [ ] planenden Gewalt.
+- [ ] gesetzgebenden Gewalt.
+
+Richtige Antwort: rechtsprechenden Gewalt.
+
+#### Aufgabe 145
+
+In Deutschland wird die Staatsgewalt geteilt. Für welche Staatsgewalt arbeitet eine Richterin/ein Richter? Für die …
+
+- [x] Judikative
+- [ ] Exekutive
+- [ ] Presse
+- [ ] Legislative
+
+Richtige Antwort: Judikative
+
+#### Aufgabe 146
+
+Wie nennt man in Deutschland ein Verfahren vor einem Gericht?
+
+- [ ] Programm
+- [ ] Prozedur
+- [ ] Protokoll
+- [x] Prozess
+
+Richtige Antwort: Prozess
+
+#### Aufgabe 147
+
+Was ist die Arbeit einer Richterin/eines Richters in Deutschland?
+
+- [ ] Deutschland regieren
+- [x] Recht sprechen
+- [ ] Pläne erstellen
+- [ ] Gesetze erlassen
+
+Richtige Antwort: Recht sprechen
+
+#### Aufgabe 148
+
+Was ist eine Aufgabe der Polizei in Deutschland?
+
+- [ ] das Land zu verteidigen
+- [ ] die Bürgerinnen und Bürger abzuhören
+- [ ] die Gesetze zu beschließen
+- [x] die Einhaltung von Gesetzen zu überwachen
+
+Richtige Antwort: die Einhaltung von Gesetzen zu überwachen
+
+#### Aufgabe 149
+
+Was ist ein Beispiel für antisemitisches Verhalten?
+
+- [ ] ein jüdisches Fest besuchen
+- [ ] die israelische Regierung kritisieren
+- [x] den Holocaust leugnen
+- [ ] gegen Juden Fußball spielen.
+
+Richtige Antwort: den Holocaust leugnen
+
+#### Aufgabe 150
+
+Eine Gerichtsschöffin/ein Gerichtsschöffe in Deutschland ist …
+
+- [ ] die Stellvertreterin/der Stellvertreter des Stadtoberhaupts.
+- [x] eine ehrenamtliche Richterin/ein ehrenamtlicher Richter.
+- [ ] ein Mitglied eines Gemeinderats.
+- [ ] eine Person, die Jura studiert hat.
+
+Richtige Antwort: eine ehrenamtliche Richterin/ein ehrenamtlicher Richter.
+
+#### Aufgabe 151
+
+Wer baute die Mauer in Berlin?
+
+- [ ] Großbritannien
+- [x] die DDR
+- [ ] die Bundesrepublik Deutschland
+- [ ] die USA
+
+Richtige Antwort: die DDR
+
+#### Aufgabe 152
+
+Wann waren die Nationalsozialisten mit Adolf Hitler in Deutschland an der Macht?
+
+- [ ] 1918 bis 1923
+- [ ] 1932 bis 1950
+- [x] 1933 bis 1945
+- [ ] 1945 bis 1989
+
+Richtige Antwort: 1933 bis 1945
+
+#### Aufgabe 153
+
+Was war am 8. Mai 1945?
+
+- [ ] Tod Adolf Hitlers
+- [ ] Beginn des Berliner Mauerbaus
+- [ ] Wahl von Konrad Adenauer zum Bundeskanzler
+- [x] Ende des Zweiten Weltkriegs in Europa
+
+Richtige Antwort: Ende des Zweiten Weltkriegs in Europa
+
+#### Aufgabe 154
+
+Wann war der Zweite Weltkrieg zu Ende?
+
+- [ ] 1933
+- [x] 1945
+- [ ] 1949
+- [ ] 1961
+
+Richtige Antwort: 1945
+
+#### Aufgabe 155
+
+Wann waren die Nationalsozialisten in Deutschland an der Macht?
+
+- [ ] 1888 bis 1918
+- [ ] 1921 bis 1934
+- [x] 1933 bis 1945
+- [ ] 1949 bis 1963
+
+Richtige Antwort: 1933 bis 1945
+
+#### Aufgabe 156
+
+In welchem Jahr wurde Hitler Reichskanzler?
+
+- [ ] 1923
+- [ ] 1927
+- [x] 1933
+- [ ] 1936
+
+Richtige Antwort: 1933
+
+#### Aufgabe 157
+
+Die Nationalsozialisten mit Adolf Hitler errichteten 1933 in Deutschland …
+
+- [x] eine Diktatur.
+- [ ] einen demokratischen Staat.
+- [ ] eine Monarchie.
+- [ ] ein Fürstentum.
+
+Richtige Antwort: eine Diktatur.
+
+#### Aufgabe 158
+
+Das "Dritte Reich" war eine …
+
+- [x] Diktatur.
+- [ ] Demokratie.
+- [ ] Monarchie.
+- [ ] Räterepublik.
+
+Richtige Antwort: Diktatur.
+
+#### Aufgabe 159
+
+Was gab es in Deutschland nicht während der Zeit des Nationalsozialismus?
+
+- [x] freie Wahlen
+- [ ] Pressezensur
+- [ ] willkürliche Verhaftungen
+- [ ] Verfolgung von Juden
+
+Richtige Antwort: freie Wahlen
+
+#### Aufgabe 160
+
+Welcher Krieg dauerte von 1939 bis 1945?
+
+- [ ] der Erste Weltkrieg
+- [x] der Zweite Weltkrieg
+- [ ] der Vietnamkrieg
+- [ ] der Golfkrieg
+
+Richtige Antwort: der Zweite Weltkrieg
+
+#### Aufgabe 161
+
+Was kennzeichnete den NS-Staat? Eine Politik …
+
+- [x] des staatlichen Rassismus
+- [ ] der Meinungsfreiheit
+- [ ] der allgemeinen Religionsfreiheit
+- [ ] der Entwicklung der Demokratie
+
+Richtige Antwort: des staatlichen Rassismus
+
+#### Aufgabe 162
+
+Claus Schenk Graf von Stauffenberg wurde bekannt durch …
+
+- [ ] eine Goldmedaille bei den Olympischen Spielen 1936.
+- [ ] den Bau des Reichstagsgebäudes.
+- [ ] den Aufbau der Wehrmacht.
+- [x] das Attentat auf Hitler am 20. Juli 1944.
+
+Richtige Antwort: das Attentat auf Hitler am 20. Juli 1944.
+
+#### Aufgabe 163
+
+In welchem Jahr zerstörten die Nationalsozialisten Synagogen und jüdische Geschäfte in Deutschland?
+
+- [ ] 1925
+- [ ] 1930
+- [x] 1938
+- [ ] 1945
+
+Richtige Antwort: 1938
+
+#### Aufgabe 164
+
+Was passierte am 9. November 1938 in Deutschland?
+
+- [ ] Mit dem Angriff auf Polen beginnt der Zweite Weltkrieg.
+- [ ] Die Nationalsozialisten verlieren eine Wahl und lösen den Reichstag auf.
+- [x] Jüdische Geschäfte und Synagogen werden durch Nationalsozialisten und ihre Anhänger zerstört.
+- [ ] Hitler wird Reichspräsident und lässt alle Parteien verbieten.
+
+Richtige Antwort: Jüdische Geschäfte und Synagogen werden durch Nationalsozialisten und ihre Anhänger zerstört.
+
+#### Aufgabe 165
+
+Wie hieß der erste Bundeskanzler der Bundesrepublik Deutschland?
+
+- [x] Konrad Adenauer
+- [ ] Kurt Georg Kiesinger
+- [ ] Helmut Schmidt
+- [ ] Willy Brandt
+
+Richtige Antwort: Konrad Adenauer
+
+#### Aufgabe 166
+
+Bei welchen Demonstrationen in Deutschland riefen die Menschen "Wir sind das Volk"?
+
+- [ ] beim Arbeiteraufstand 1953 in der DDR
+- [ ] bei den Demonstrationen 1968 in der Bundesrepublik Deutschland
+- [ ] bei den Anti-Atomkraft-Demonstrationen 1985 in der Bundesrepublik Deutschland
+- [x] bei den Montagsdemonstrationen 1989 in der DDR
+
+Richtige Antwort: bei den Montagsdemonstrationen 1989 in der DDR
+
+#### Aufgabe 167
+
+Welche Länder wurden nach dem Zweiten Weltkrieg in Deutschland als "Alliierte Besatzungsmächte" bezeichnet?
+
+- [ ] Sowjetunion, Großbritannien, Polen, Schweden
+- [ ] Frankreich, Sowjetunion, Italien, Japan
+- [ ] USA, Sowjetunion, Spanien, Portugal
+- [x] USA, Sowjetunion, Großbritannien, Frankreich
+
+Richtige Antwort: USA, Sowjetunion, Großbritannien, Frankreich
+
+#### Aufgabe 168
+
+Welches Land war keine "Alliierte Besatzungsmacht" in Deutschland?
+
+- [ ] USA
+- [ ] Sowjetunion
+- [ ] Frankreich
+- [x] Japan
+
+Richtige Antwort: Japan
+
+#### Aufgabe 169
+
+Wann wurde die Bundesrepublik Deutschland gegründet?
+
+- [ ] 1939
+- [ ] 1945
+- [x] 1949
+- [ ] 1951
+
+Richtige Antwort: 1949
+
+#### Aufgabe 170
+
+Was gab es während der Zeit des Nationalsozialismus in Deutschland?
+
+- [x] das Verbot von Parteien
+- [ ] das Recht zur freien Entfaltung der Persönlichkeit
+- [ ] Pressefreiheit
+- [ ] den Schutz der Menschenwürde
+
+Richtige Antwort: das Verbot von Parteien
+
+#### Aufgabe 171
+
+Soziale Marktwirtschaft bedeutet, die Wirtschaft …
+
+- [ ] steuert sich allein nach Angebot und Nachfrage.
+- [ ] wird vom Staat geplant und gesteuert, Angebot und Nachfrage werden nicht berücksichtigt.
+- [ ] richtet sich nach der Nachfrage im Ausland.
+- [x] richtet sich nach Angebot und Nachfrage, aber der Staat sorgt für einen sozialen Ausgleich.
+
+Richtige Antwort: richtet sich nach Angebot und Nachfrage, aber der Staat sorgt für einen sozialen Ausgleich.
+
+#### Aufgabe 172
+
+In welcher Besatzungszone wurde die DDR gegründet? In der …
+
+- [ ] amerikanischen Besatzungszone
+- [ ] französischen Besatzungszone
+- [ ] britischen Besatzungszone
+- [x] sowjetischen Besatzungszone
+
+Richtige Antwort: sowjetischen Besatzungszone
+
+#### Aufgabe 173
+
+Die Bundesrepublik Deutschland ist ein Gründungsmitglied …
+
+- [ ] des Nordatlantikpakts (NATO).
+- [ ] der Vereinten Nationen (VN).
+- [x] der Europäischen Union (EU).
+- [ ] des Warschauer Pakts.
+
+Richtige Antwort: der Europäischen Union (EU).
+
+#### Aufgabe 174
+
+Wann wurde die DDR gegründet?
+
+- [ ] 1947
+- [x] 1949
+- [ ] 1953
+- [ ] 1956
+
+Richtige Antwort: 1949
+
+#### Aufgabe 175
+
+Wie viele Besatzungszonen gab es in Deutschland nach dem Zweiten Weltkrieg?
+
+- [ ] 3
+- [ ] 4
+- [ ] 5
+- [x] 6
+
+Richtige Antwort: 6
+
+#### Aufgabe 176
+
+Wie waren die Besatzungszonen Deutschlands nach 1945 verteilt?
+
+- [ ] 1=Großbritannien, 2=Sowjetunion, 3=Frankreich, 4=USA
+- [ ] 1=Sowjetunion, 2=Großbritannien, 3=USA, 4=Frankreich
+- [x] 1=Großbritannien, 2=Sowjetunion, 3=USA, 4=Frankreich
+- [ ] 1=Großbritannien, 2=USA, 3=Sowjetunion, 4=Frankreich
+
+Richtige Antwort: 1=Großbritannien, 2=Sowjetunion, 3=USA, 4=Frankreich
+
+#### Aufgabe 177
+
+Welche deutsche Stadt wurde nach dem Zweiten Weltkrieg in vier Sektoren aufgeteilt?
+
+- [ ] München
+- [x] Berlin
+- [ ] Dresden
+- [ ] Frankfurt/Oder
+
+Richtige Antwort: Berlin
+
+#### Aufgabe 178
+
+Vom Juni 1948 bis zum Mai 1949 wurden die Bürgerinnen und Bürger von West-Berlin durch eine Luftbrücke versorgt. Welcher Umstand war dafür verantwortlich?
+
+- [ ] Für Frankreich war eine Versorgung der West-Berliner Bevölkerung mit dem Flugzeug kostengünstiger.
+- [ ] Die amerikanischen Soldatinnen und Soldaten hatten beim Landtransport Angst vor Überfällen.
+- [ ] Für Großbritannien war die Versorgung über die Luftbrücke schneller.
+- [x] Die Sowjetunion unterbrach den gesamten Verkehr auf dem Landwege.
+
+Richtige Antwort: Die Sowjetunion unterbrach den gesamten Verkehr auf dem Landwege.
+
+#### Aufgabe 179
+
+Wie endete der Zweite Weltkrieg in Europa offiziell?
+
+- [ ] mit dem Tod Adolf Hitlers
+- [x] durch die bedingungslose Kapitulation Deutschlands
+- [ ] mit dem Rückzug der Deutschen aus den besetzten Gebieten
+- [ ] durch eine Revolution in Deutschland
+
+Richtige Antwort: durch die bedingungslose Kapitulation Deutschlands
+
+#### Aufgabe 180
+
+Der erste Bundeskanzler der Bundesrepublik Deutschland war …
+
+- [ ] Ludwig Erhard.
+- [ ] Willy Brandt.
+- [x] Konrad Adenauer.
+- [ ] Gerhard Schröder.
+
+Richtige Antwort: Konrad Adenauer.
+
+#### Aufgabe 181
+
+Was wollte Willy Brandt mit seinem Kniefall 1970 im ehemaligen jüdischen Ghetto in Warschau ausdrücken? © Bundesregierung/Engelbert Reineke
+
+- [ ] Er hat sich den ehemaligen Alliierten unterworfen.
+- [x] Er bat Polen und die polnischen Juden um Vergebung.
+- [ ] Er zeigte seine Demut vor dem Warschauer Pakt.
+- [ ] Er sprach ein Gebet am Grab des Unbekannten Soldaten.
+
+Richtige Antwort: Er bat Polen und die polnischen Juden um Vergebung.
+
+#### Aufgabe 182
+
+Wie heißt das jüdische Gebetshaus?
+
+- [ ] Basilika
+- [ ] Moschee
+- [x] Synagoge
+- [ ] Kirche
+
+Richtige Antwort: Synagoge
+
+#### Aufgabe 183
+
+Wann war in der Bundesrepublik Deutschland das "Wirtschaftswunder"?
+
+- [ ] 40er Jahre
+- [x] 50er Jahre
+- [ ] 70er Jahre
+- [ ] 80er Jahre
+
+Richtige Antwort: 50er Jahre
+
+#### Aufgabe 184
+
+Auf welcher rechtlichen Grundlage wurde der Staat Israel gegründet?
+
+- [x] eine Resolution der Vereinten Nationen
+- [ ] ein Beschluss des Zionistenkongresses
+- [ ] ein Vorschlag der Bundesregierung
+- [ ] ein Vorschlag der UdSSR
+
+Richtige Antwort: eine Resolution der Vereinten Nationen
+
+#### Aufgabe 185
+
+Wofür stand der Ausdruck "Eiserner Vorhang"? Für die Abschottung …
+
+- [x] des Warschauer Pakts gegen den Westen
+- [ ] Norddeutschlands gegen Süddeutschland
+- [ ] Nazi-Deutschlands gegen die Alliierten
+- [ ] Europas gegen die USA
+
+Richtige Antwort: des Warschauer Pakts gegen den Westen
+
+#### Aufgabe 186
+
+Im Jahr 1953 gab es in der DDR einen Aufstand, an den lange Zeit in der Bundesrepublik Deutschland ein Feiertag erinnerte. Wann war das?
+
+- [ ] 1. Mai
+- [x] 17. Juni
+- [ ] 20. Juli
+- [ ] 9. November
+
+Richtige Antwort: 17. Juni
+
+#### Aufgabe 187
+
+Welcher deutsche Staat hatte eine schwarz-rot-goldene Flagge mit Hammer, Zirkel und Ährenkranz?
+
+- [ ] Preußen
+- [ ] Bundesrepublik Deutschland
+- [ ] "Drittes Reich"
+- [x] DDR
+
+Richtige Antwort: DDR
+
+#### Aufgabe 188
+
+In welchem Jahr wurde die Mauer in Berlin gebaut?
+
+- [ ] 1953
+- [ ] 1956
+- [ ] 1959
+- [x] 1961
+
+Richtige Antwort: 1961
+
+#### Aufgabe 189
+
+Wann baute die DDR die Mauer in Berlin?
+
+- [ ] 1919
+- [ ] 1933
+- [x] 1961
+- [ ] 1990
+
+Richtige Antwort: 1961
+
+#### Aufgabe 190
+
+Was bedeutet die Abkürzung DDR?
+
+- [ ] Dritter Deutscher Rundfunk
+- [ ] Die Deutsche Republik
+- [ ] Dritte Deutsche Republik
+- [x] Deutsche Demokratische Republik
+
+Richtige Antwort: Deutsche Demokratische Republik
+
+#### Aufgabe 191
+
+Wann wurde die Mauer in Berlin für alle geöffnet?
+
+- [ ] 1987
+- [x] 1989
+- [ ] 1992
+- [ ] 1995
+
+Richtige Antwort: 1989
+
+#### Aufgabe 192
+
+Welches heutige deutsche Bundesland gehörte früher zum Gebiet der DDR?
+
+- [x] Brandenburg
+- [ ] Bayern
+- [ ] Saarland
+- [ ] Hessen
+
+Richtige Antwort: Brandenburg
+
+#### Aufgabe 193
+
+Von 1961 bis 1989 war Berlin …
+
+- [ ] ohne Bürgermeister.
+- [ ] ein eigener Staat.
+- [x] durch eine Mauer geteilt.
+- [ ] nur mit dem Flugzeug erreichbar.
+
+Richtige Antwort: durch eine Mauer geteilt.
+
+#### Aufgabe 194
+
+Am 3. Oktober feiert man in Deutschland den Tag der Deutschen …
+
+- [x] Einheit.
+- [ ] Nation.
+- [ ] Bundesländer.
+- [ ] Städte.
+
+Richtige Antwort: Einheit.
+
+#### Aufgabe 195
+
+Welches heutige deutsche Bundesland gehörte früher zum Gebiet der DDR?
+
+- [ ] Hessen
+- [x] Sachsen-Anhalt
+- [ ] Nordrhein-Westfalen
+- [ ] Saarland
+
+Richtige Antwort: Sachsen-Anhalt
+
+#### Aufgabe 196
+
+Warum nennt man die Zeit im Herbst 1989 in der DDR "Die Wende"? In dieser Zeit veränderte sich die DDR politisch …
+
+- [x] von einer Diktatur zur Demokratie.
+- [ ] von einer liberalen Marktwirtschaft zum Sozialismus.
+- [ ] von einer Monarchie zur Sozialdemokratie.
+- [ ] von einem religiösen Staat zu einem kommunistischen Staat.
+
+Richtige Antwort: von einer Diktatur zur Demokratie.
+
+#### Aufgabe 197
+
+Welches heutige deutsche Bundesland gehörte früher zum Gebiet der DDR?
+
+- [x] Thüringen
+- [ ] Hessen
+- [ ] Bayern
+- [ ] Bremen
+
+Richtige Antwort: Thüringen
+
+#### Aufgabe 198
+
+Welches heutige deutsche Bundesland gehörte früher zum Gebiet der DDR?
+
+- [ ] Bayern
+- [x] Niedersachsen
+- [ ] Sachsen
+- [ ] Baden-Württemberg
+
+Richtige Antwort: Sachsen
+
+#### Aufgabe 199
+
+Mit der Abkürzung "Stasi" meinte man in der DDR …
+
+- [ ] das Parlament.
+- [x] das Ministerium für Staatssicherheit.
+- [ ] eine regierende Partei.
+- [ ] das Ministerium für Volksbildung.
+
+Richtige Antwort: das Ministerium für Staatssicherheit.
+
+#### Aufgabe 200
+
+Welches heutige deutsche Bundesland gehörte früher zum Gebiet der DDR?
+
+- [ ] Hessen
+- [ ] Schleswig-Holstein
+- [x] Mecklenburg-Vorpommern
+- [ ] Saarland
+
+Richtige Antwort: Mecklenburg-Vorpommern
+
+#### Aufgabe 201
+
+Welche der folgenden Auflistungen enthält nur Bundesländer, die zum Gebiet der früheren DDR gehörten?
+
+- [ ] Niedersachsen, Nordrhein-Westfalen, Hessen, Schleswig-Holstein, Brandenburg
+- [x] Mecklenburg-Vorpommern, Brandenburg, Sachsen, Sachsen-Anhalt, Thüringen
+- [ ] Bayern, Baden-Württemberg, Rheinland-Pfalz, Thüringen, Sachsen
+- [ ] Sachsen, Thüringen, Hessen, Niedersachen, Brandenburg
+
+Richtige Antwort: Mecklenburg-Vorpommern, Brandenburg, Sachsen, Sachsen-Anhalt, Thüringen
+
+#### Aufgabe 202
+
+Zu wem gehörte die DDR im "Kalten Krieg"?
+
+- [ ] zu den Westmächten
+- [x] zum Warschauer Pakt
+- [ ] zur NATO
+- [ ] zu den blockfreien Staaten
+
+Richtige Antwort: zum Warschauer Pakt
+
+#### Aufgabe 203
+
+Wie hieß das Wirtschaftssystem der DDR?
+
+- [ ] Marktwirtschaft
+- [x] Planwirtschaft
+- [ ] Angebot und Nachfrage
+- [ ] Kapitalismus
+
+Richtige Antwort: Planwirtschaft
+
+#### Aufgabe 204
+
+Wie wurden die Bundesrepublik Deutschland und die DDR zu einem Staat?
+
+- [ ] Die Bundesrepublik hat die DDR besetzt.
+- [x] Die heutigen fünf östlichen Bundesländer sind der Bundesrepublik Deutschland beigetreten.
+- [ ] Die westlichen Bundesländer sind der DDR beigetreten.
+- [ ] Die DDR hat die Bundesrepublik Deutschland besetzt.
+
+Richtige Antwort: Die heutigen fünf östlichen Bundesländer sind der Bundesrepublik Deutschland beigetreten.
+
+#### Aufgabe 205
+
+Mit dem Beitritt der DDR zur Bundesrepublik Deutschland gehören die neuen Bundesländer nun auch …
+
+- [x] zur Europäischen Union.
+- [ ] zum Warschauer Pakt.
+- [ ] zur OPEC.
+- [ ] zur Europäischen Verteidigungsgemeinschaft.
+
+Richtige Antwort: zur Europäischen Union.
+
+#### Aufgabe 206
+
+Woran erinnern die sogenannten „Stolpersteine“ in Deutschland?
+
+- [ ] an berühmte deutsche Politikerinnen und Politiker
+- [x] an die Opfer des Nationalsozialismus
+- [ ] an Verkehrstote
+- [ ] an bekannte jüdische Musiker
+
+Richtige Antwort: an die Opfer des Nationalsozialismus
+
+#### Aufgabe 207
+
+In welchem Militärbündnis war die DDR Mitglied?
+
+- [ ] in der NATO
+- [ ] im Rheinbund
+- [x] im Warschauer Pakt
+- [ ] im Europabündnis
+
+Richtige Antwort: im Warschauer Pakt
+
+#### Aufgabe 208
+
+Was war die "Stasi"?
+
+- [ ] der Geheimdienst im "Dritten Reich"
+- [ ] eine berühmte deutsche Gedenkstätte
+- [x] der Geheimdienst der DDR
+- [ ] ein deutscher Sportverein während des Zweiten Weltkrieges
+
+Richtige Antwort: der Geheimdienst der DDR
+
+#### Aufgabe 209
+
+Welches war das Wappen der Deutschen Demokratischen Republik? Bild 1 Bild 2 Bild 3 Bild 4
+
+| Bild 1 | Bild 2 | Bild 3 | Bild 4 |
+|---|---|---|---|
+| ![[lid-v2-images/lid-q209-bild-1.png|120]] | ![[lid-v2-images/lid-q209-bild-2.png|120]] | ![[lid-v2-images/lid-q209-bild-3.png|120]] | ![[lid-v2-images/lid-q209-bild-4.png|120]] |
+
+- [ ] Bild 1
+- [ ] Bild 2
+- [ ] Bild 3
+- [x] Bild 4
+
+Richtige Antwort: Bild 4
+
+#### Aufgabe 210
+
+Was ereignete sich am 17. Juni 1953 in der DDR?
+
+- [ ] der feierliche Beitritt zum Warschauer Pakt
+- [x] landesweite Streiks und ein Volksaufstand
+- [ ] der 1. SED-Parteitag
+- [ ] der erste Besuch Fidel Castros
+
+Richtige Antwort: landesweite Streiks und ein Volksaufstand
+
+#### Aufgabe 211
+
+Welcher Politiker steht für die "Ostverträge"?
+
+- [ ] Helmut Kohl
+- [x] Willy Brandt
+- [ ] Michail Gorbatschow
+- [ ] Ludwig Erhard
+
+Richtige Antwort: Willy Brandt
+
+#### Aufgabe 212
+
+Wie heißt Deutschland mit vollem Namen?
+
+- [ ] Bundesstaat Deutschland
+- [ ] Bundesländer Deutschland
+- [x] Bundesrepublik Deutschland
+- [ ] Bundesbezirk Deutschland
+
+Richtige Antwort: Bundesrepublik Deutschland
+
+#### Aufgabe 213
+
+Wie viele Einwohner hat Deutschland?
+
+- [ ] 70 Millionen
+- [ ] 78 Millionen
+- [x] 84 Millionen
+- [ ] 90 Millionen
+
+Richtige Antwort: 84 Millionen
+
+#### Aufgabe 214
+
+Welche Farben hat die deutsche Flagge?
+
+- [x] schwarz-rot-gold
+- [ ] rot-weiß-schwarz
+- [ ] schwarz-rot-grün
+- [ ] schwarz-gelb-rot
+
+Richtige Antwort: schwarz-rot-gold
+
+#### Aufgabe 215
+
+Wer wird als "Kanzler der Deutschen Einheit" bezeichnet?
+
+- [ ] Gerhard Schröder
+- [x] Helmut Kohl
+- [ ] Konrad Adenauer
+- [ ] Helmut Schmidt
+
+Richtige Antwort: Helmut Kohl
+
+#### Aufgabe 216
+
+Welches Symbol ist im Plenarsaal des Deutschen Bundestages zu sehen? © Deutscher Bundestag/Janine Schmitz
+
+- [x] der Bundesadler
+- [ ] die Fahne der Stadt Berlin
+- [ ] der Reichsadler
+- [ ] die Reichskrone
+
+Richtige Antwort: der Bundesadler
+
+#### Aufgabe 217
+
+In welchem Zeitraum gab es die Deutsche Demokratische Republik (DDR)?
+
+- [ ] 1919 bis 1927
+- [ ] 1933 bis 1945
+- [ ] 1945 bis 1961
+- [x] 1949 bis 1990
+
+Richtige Antwort: 1949 bis 1990
+
+#### Aufgabe 218
+
+Wie viele Bundesländer kamen bei der Wiedervereinigung 1990 zur Bundesrepublik Deutschland hinzu?
+
+- [ ] 4
+- [x] 5
+- [ ] 6
+- [ ] 7
+
+Richtige Antwort: 5
+
+#### Aufgabe 219
+
+Die Bundesrepublik Deutschland hat die Grenzen von heute seit …
+
+- [ ] 1933
+- [ ] 1949
+- [ ] 1971
+- [x] 1990
+
+Richtige Antwort: 1990
+
+#### Aufgabe 220
+
+Der 27. Januar ist in Deutschland ein offizieller Gedenktag. Woran erinnert dieser Tag?
+
+- [ ] an das Ende des Zweiten Weltkrieges
+- [ ] an die Verabschiedung des Grundgesetzes
+- [ ] an die Wiedervereinigung Deutschlands
+- [x] an die Opfer des Nationalsozialismus (Tag der Befreiung des Vernichtungslagers Auschwitz)
+
+Richtige Antwort: an die Opfer des Nationalsozialismus (Tag der Befreiung des Vernichtungslagers Auschwitz)
+
+#### Aufgabe 221
+
+Deutschland ist Mitglied des Schengener Abkommens. Was bedeutet das?
+
+- [x] Deutsche können in viele Länder Europas ohne Passkontrolle reisen.
+- [ ] Alle Menschen können ohne Personenkontrolle in Deutschland einreisen.
+- [ ] Deutsche können ohne Passkontrolle in jedes Land reisen.
+- [ ] Deutsche können in jedem Land mit dem Euro bezahlen.
+
+Richtige Antwort: Deutsche können in viele Länder Europas ohne Passkontrolle reisen.
+
+#### Aufgabe 222
+
+Welches Land ist ein Nachbarland von Deutschland?
+
+- [ ] Ungarn
+- [ ] Portugal
+- [ ] Spanien
+- [x] Schweiz
+
+Richtige Antwort: Schweiz
+
+#### Aufgabe 223
+
+Welches Land ist ein Nachbarland von Deutschland?
+
+- [ ] Rumänien
+- [ ] Bulgarien
+- [x] Polen
+- [ ] Griechenland
+
+Richtige Antwort: Polen
+
+#### Aufgabe 224
+
+Was bedeutet die Abkürzung EU?
+
+- [ ] Europäische Unternehmen
+- [x] Europäische Union
+- [ ] Einheitliche Union
+- [ ] Euro Union
+
+Richtige Antwort: Europäische Union
+
+#### Aufgabe 225
+
+In welchem anderen Land gibt es eine große deutschsprachige Bevölkerung?
+
+- [ ] Tschechien
+- [ ] Norwegen
+- [ ] Spanien
+- [x] Österreich
+
+Richtige Antwort: Österreich
+
+#### Aufgabe 226
+
+Welche ist die Flagge der Europäischen Union? Bild 1 Bild 2 Bild 3 Bild 4
+
+| Bild 1 | Bild 2 | Bild 3 | Bild 4 |
+|---|---|---|---|
+| ![[lid-v2-images/lid-q226-bild-1.png|140]] | ![[lid-v2-images/lid-q226-bild-2.png|140]] | ![[lid-v2-images/lid-q226-bild-3.png|140]] | ![[lid-v2-images/lid-q226-bild-4.png|140]] |
+
+- [ ] Bild 1
+- [x] Bild 2
+- [ ] Bild 3
+- [ ] Bild 4
+
+Richtige Antwort: Bild 2
+
+#### Aufgabe 227
+
+Welches Land ist ein Nachbarland von Deutschland?
+
+- [ ] Finnland
+- [x] Dänemark
+- [ ] Norwegen
+- [ ] Schweden
+
+Richtige Antwort: Dänemark
+
+#### Aufgabe 228
+
+Wie wird der Beitritt der DDR zur Bundesrepublik Deutschland im Jahr 1990 allgemein genannt?
+
+- [ ] NATO-Osterweiterung
+- [ ] EU-Osterweiterung
+- [x] Deutsche Wiedervereinigung
+- [ ] Europäische Gemeinschaft
+
+Richtige Antwort: Deutsche Wiedervereinigung
+
+#### Aufgabe 229
+
+Welches Land ist ein Nachbarland von Deutschland?
+
+- [ ] Spanien
+- [ ] Bulgarien
+- [ ] Norwegen
+- [x] Luxemburg
+
+Richtige Antwort: Luxemburg
+
+#### Aufgabe 230
+
+Das Europäische Parlament wird regelmäßig gewählt, nämlich alle …
+
+- [x] 5 Jahre.
+- [ ] 6 Jahre.
+- [ ] 7 Jahre.
+- [ ] 8 Jahre.
+
+Richtige Antwort: 5 Jahre.
+
+#### Aufgabe 231
+
+Was bedeutet der Begriff "europäische Integration"?
+
+- [ ] Damit sind amerikanische Einwanderinnen und Einwanderer in Europa gemeint.
+- [ ] Der Begriff meint den Einwanderungsstopp nach Europa.
+- [ ] Damit sind europäische Auswanderinnen und Auswanderer in den USA gemeint.
+- [x] Der Begriff meint den Zusammenschluss europäischer Staaten zur EU.
+
+Richtige Antwort: Der Begriff meint den Zusammenschluss europäischer Staaten zur EU.
+
+#### Aufgabe 232
+
+Wer wird bei der Europawahl gewählt?
+
+- [ ] die Europäische Kommission
+- [ ] die Länder, die in die EU eintreten dürfen
+- [x] die Abgeordneten des Europäischen Parlaments
+- [ ] die europäische Verfassung
+
+Richtige Antwort: die Abgeordneten des Europäischen Parlaments
+
+#### Aufgabe 233
+
+Welches Land ist ein Nachbarland von Deutschland?
+
+- [x] Tschechien
+- [ ] Bulgarien
+- [ ] Griechenland
+- [ ] Portugal
+
+Richtige Antwort: Tschechien
+
+#### Aufgabe 234
+
+Wo ist ein Sitz des Europäischen Parlaments?
+
+- [ ] London
+- [ ] Paris
+- [ ] Berlin
+- [x] Straßburg
+
+Richtige Antwort: Straßburg
+
+#### Aufgabe 235
+
+Der damalige französische Staatspräsident François Mitterrand und der damalige deutsche Bundeskanzler Helmut Kohl gedenken in Verdun gemeinsam der Toten beider Weltkriege. Welches Ziel der Europäischen Union wird bei diesem Treffen deutlich? © Bundesregierung/Richard Schulze-Vorberg
+
+- [ ] Freundschaft zwischen England und Deutschland
+- [ ] Reisefreiheit in alle Länder der EU
+- [x] Frieden und Sicherheit in den Ländern der EU
+- [ ] einheitliche Feiertage in den Ländern der EU
+
+Richtige Antwort: Frieden und Sicherheit in den Ländern der EU
+
+#### Aufgabe 236
+
+Wie viele Mitgliedstaaten hat die EU heute?
+
+- [ ] 21
+- [ ] 23
+- [ ] 25
+- [x] 27
+
+Richtige Antwort: 27
+
+#### Aufgabe 237
+
+2007 wurde das 50-jährige Jubiläum der "Römischen Verträge" gefeiert. Was war der Inhalt der Verträge?
+
+- [ ] Beitritt Deutschlands zur NATO
+- [x] Gründung der Europäischen Wirtschaftsgemeinschaft (EWG)
+- [ ] Verpflichtung Deutschlands zu Reparationsleistungen
+- [ ] Festlegung der Oder-Neiße-Linie als Ostgrenze
+
+Richtige Antwort: Gründung der Europäischen Wirtschaftsgemeinschaft (EWG)
+
+#### Aufgabe 238
+
+An welchen Orten arbeitet das Europäische Parlament?
+
+- [ ] Paris, London und Den Haag
+- [x] Straßburg, Luxemburg und Brüssel
+- [ ] Rom, Bern und Wien
+- [ ] Bonn, Zürich und Mailand
+
+Richtige Antwort: Straßburg, Luxemburg und Brüssel
+
+#### Aufgabe 239
+
+Durch welche Verträge schloss sich die Bundesrepublik Deutschland mit anderen Staaten zur Europäischen Wirtschaftsgemeinschaft zusammen?
+
+- [ ] durch die "Hamburger Verträge"
+- [x] durch die "Römischen Verträge"
+- [ ] durch die "Pariser Verträge"
+- [ ] durch die "Londoner Verträge"
+
+Richtige Antwort: durch die "Römischen Verträge"
+
+#### Aufgabe 240
+
+Seit wann bezahlt man in Deutschland mit dem Euro in bar?
+
+- [ ] 1995
+- [ ] 1998
+- [x] 2002
+- [ ] 2005
+
+Richtige Antwort: 2002
+
+#### Aufgabe 241
+
+Frau Seger bekommt ein Kind. Was muss sie tun, um Elterngeld zu erhalten?
+
+- [ ] Sie muss an ihre Krankenkasse schreiben.
+- [x] Sie muss einen Antrag bei der Elterngeldstelle stellen.
+- [ ] Sie muss nichts tun, denn sie bekommt automatisch Elterngeld.
+- [ ] Sie muss das Arbeitsamt um Erlaubnis bitten.
+
+Richtige Antwort: Sie muss einen Antrag bei der Elterngeldstelle stellen.
+
+#### Aufgabe 242
+
+Wer entscheidet, ob ein Kind in Deutschland in den Kindergarten geht?
+
+- [ ] der Staat
+- [ ] die Bundesländer
+- [x] die Eltern/die Erziehungsberechtigten
+- [ ] die Schulen
+
+Richtige Antwort: die Eltern/die Erziehungsberechtigten
+
+#### Aufgabe 243
+
+Maik und Sybille wollen mit Freunden an ihrem deutschen Wohnort eine Demonstration auf der Straße abhalten. Was müssen sie vorher tun?
+
+- [x] Sie müssen die Demonstration anmelden.
+- [ ] Sie müssen nichts tun. Man darf in Deutschland jederzeit überall demonstrieren.
+- [ ] Sie können gar nichts tun, denn Demonstrationen sind in Deutschland grundsätzlich verboten.
+- [ ] Maik und Sybille müssen einen neuen Verein gründen, weil nur Vereine demonstrieren dürfen.
+
+Richtige Antwort: Sie müssen die Demonstration anmelden.
+
+#### Aufgabe 244
+
+Welchen Schulabschluss braucht man normalerweise, um an einer Universität in Deutschland ein Studium zu beginnen?
+
+- [x] das Abitur
+- [ ] ein Diplom
+- [ ] die Prokura
+- [ ] eine Gesellenprüfung
+
+Richtige Antwort: das Abitur
+
+#### Aufgabe 245
+
+Wer darf in Deutschland nicht als Paar zusammenleben?
+
+- [ ] Hans (20 Jahre) und Marie (19 Jahre)
+- [ ] Tom (20 Jahre) und Klaus (45 Jahre)
+- [ ] Sofie (35 Jahre) und Lisa (40 Jahre)
+- [x] Anne (13 Jahre) und Tim (25 Jahre)
+
+Richtige Antwort: Anne (13 Jahre) und Tim (25 Jahre)
+
+#### Aufgabe 246
+
+Ab welchem Alter ist man in Deutschland volljährig?
+
+- [ ] 16
+- [x] 18
+- [ ] 19
+- [ ] 21
+
+Richtige Antwort: 18
+
+#### Aufgabe 247
+
+Eine Frau ist schwanger. Sie ist kurz vor und nach der Geburt ihres Kindes vom Gesetz besonders beschützt. Wie heißt dieser Schutz?
+
+- [ ] Elternzeit
+- [x] Mutterschutz
+- [ ] Geburtsvorbereitung
+- [ ] Wochenbett
+
+Richtige Antwort: Mutterschutz
+
+#### Aufgabe 248
+
+Die Erziehung der Kinder ist in Deutschland vor allem Aufgabe …
+
+- [ ] des Staates.
+- [x] der Eltern.
+- [ ] der Großeltern.
+- [ ] der Schulen.
+
+Richtige Antwort: der Eltern.
+
+#### Aufgabe 249
+
+Wer ist in Deutschland hauptsächlich verantwortlich für die Kindererziehung?
+
+- [ ] der Staat
+- [x] die Eltern
+- [ ] die Verwandten
+- [ ] die Schulen
+
+Richtige Antwort: die Eltern
+
+#### Aufgabe 250
+
+In Deutschland hat man die besten Chancen auf einen gut bezahlten Arbeitsplatz, wenn man …
+
+- [ ] katholisch ist.
+- [x] gut ausgebildet ist.
+- [ ] eine Frau ist.
+- [ ] Mitglied einer Partei ist.
+
+Richtige Antwort: gut ausgebildet ist.
+
+#### Aufgabe 251
+
+Wenn man in Deutschland ein Kind schlägt, …
+
+- [ ] geht das niemanden etwas an.
+- [ ] geht das nur die Familie etwas an.
+- [ ] kann man dafür nicht bestraft werden.
+- [x] kann man dafür bestraft werden.
+
+Richtige Antwort: kann man dafür bestraft werden.
+
+#### Aufgabe 252
+
+In Deutschland …
+
+- [x] darf man zur gleichen Zeit nur mit einer Partnerin/einem Partner verheiratet sein.
+- [ ] kann man mehrere Ehepartnerinnen/Ehepartner gleichzeitig haben.
+- [ ] darf man nicht wieder heiraten, wenn man einmal verheiratet war.
+- [ ] darf eine Frau nicht wieder heiraten, wenn ihr Mann gestorben ist.
+
+Richtige Antwort: darf man zur gleichen Zeit nur mit einer Partnerin/einem Partner verheiratet sein.
+
+#### Aufgabe 253
+
+Wo müssen Sie sich anmelden, wenn Sie in Deutschland umziehen?
+
+- [x] beim Einwohnermeldeamt
+- [ ] beim Standesamt
+- [ ] beim Ordnungsamt
+- [ ] beim Gewerbeamt
+
+Richtige Antwort: beim Einwohnermeldeamt
+
+#### Aufgabe 254
+
+In Deutschland dürfen Ehepaare sich scheiden lassen. Meistens müssen sie dazu das "Trennungsjahr" einhalten. Was bedeutet das?
+
+- [ ] Der Scheidungsprozess dauert ein Jahr.
+- [ ] Die Ehegatten sind ein Jahr verheiratet, dann ist die Scheidung möglich.
+- [ ] Das Besuchsrecht für die Kinder gilt ein Jahr.
+- [x] Die Ehegatten führen mindestens ein Jahr getrennt ihr eigenes Leben. Danach ist die Scheidung möglich.
+
+Richtige Antwort: Die Ehegatten führen mindestens ein Jahr getrennt ihr eigenes Leben. Danach ist die Scheidung möglich.
+
+#### Aufgabe 255
+
+Bei Erziehungsproblemen können Eltern in Deutschland Hilfe erhalten vom …
+
+- [ ] Ordnungsamt.
+- [ ] Schulamt.
+- [x] Jugendamt.
+- [ ] Gesundheitsamt.
+
+Richtige Antwort: Jugendamt.
+
+#### Aufgabe 256
+
+Ein Ehepaar möchte in Deutschland ein Restaurant eröffnen. Was braucht es dazu unbedingt?
+
+- [ ] eine Erlaubnis der Polizei
+- [ ] eine Genehmigung einer Partei
+- [ ] eine Genehmigung des Einwohnermeldeamts
+- [x] eine Gaststättenerlaubnis von der zuständigen Behörde
+
+Richtige Antwort: eine Gaststättenerlaubnis von der zuständigen Behörde
+
+#### Aufgabe 257
+
+Eine erwachsene Frau möchte in Deutschland das Abitur nachholen. Das kann sie an …
+
+- [ ] einer Hochschule.
+- [x] einem Abendgymnasium.
+- [ ] einer Hauptschule.
+- [ ] einer Privatuniversität.
+
+Richtige Antwort: einem Abendgymnasium.
+
+#### Aufgabe 258
+
+Was darf das Jugendamt in Deutschland?
+
+- [ ] Es entscheidet, welche Schule das Kind besucht.
+- [x] Es kann ein Kind, das geschlagen wird oder hungern muss, aus der Familie nehmen.
+- [ ] Es bezahlt das Kindergeld an die Eltern.
+- [ ] Es kontrolliert, ob das Kind einen Kindergarten besucht.
+
+Richtige Antwort: Es kann ein Kind, das geschlagen wird oder hungern muss, aus der Familie nehmen.
+
+#### Aufgabe 259
+
+Das Berufsinformationszentrum BIZ bei der Bundesagentur für Arbeit in Deutschland hilft bei der …
+
+- [ ] Rentenberechnung.
+- [x] Lehrstellensuche.
+- [ ] Steuererklärung.
+- [ ] Krankenversicherung.
+
+Richtige Antwort: Lehrstellensuche.
+
+#### Aufgabe 260
+
+In Deutschland hat ein Kind in der Schule …
+
+- [ ] Recht auf unbegrenzte Freizeit.
+- [ ] Wahlfreiheit für alle Fächer.
+- [ ] Anspruch auf Schulgeld.
+- [x] Anwesenheitspflicht.
+
+Richtige Antwort: Anwesenheitspflicht.
+
+#### Aufgabe 261
+
+Ein Mann möchte mit 30 Jahren in Deutschland sein Abitur nachholen. Wo kann er das tun? An …
+
+- [ ] einer Hochschule.
+- [x] einem Abendgymnasium.
+- [ ] einer Hauptschule.
+- [ ] einer Privatuniversität.
+
+Richtige Antwort: einem Abendgymnasium.
+
+#### Aufgabe 262
+
+Was bedeutet in Deutschland der Grundsatz der Gleichbehandlung?
+
+- [x] Niemand darf z.B. wegen einer Behinderung benachteiligt werden.
+- [ ] Man darf andere Personen benachteiligen, wenn ausreichende persönliche Gründe hierfür vorliegen.
+- [ ] Niemand darf gegen Personen klagen, wenn sie benachteiligt wurden.
+- [ ] Es ist für alle Gesetz, benachteiligten Gruppen jährlich Geld zu spenden.
+
+Richtige Antwort: Niemand darf z.B. wegen einer Behinderung benachteiligt werden.
+
+#### Aufgabe 263
+
+In Deutschland sind Jugendliche ab 14 Jahren strafmündig. Das bedeutet: Jugendliche, die 14 Jahre und älter sind und gegen Strafgesetze verstoßen, …
+
+- [x] werden bestraft.
+- [ ] werden wie Erwachsene behandelt.
+- [ ] teilen die Strafe mit ihren Eltern.
+- [ ] werden nicht bestraft.
+
+Richtige Antwort: werden bestraft.
+
+#### Aufgabe 264
+
+Zu welchem Fest tragen Menschen in Deutschland bunte Kostüme und Masken?
+
+- [x] am Rosenmontag
+- [ ] am Maifeiertag
+- [ ] beim Oktoberfest
+- [ ] an Pfingsten
+
+Richtige Antwort: am Rosenmontag
+
+#### Aufgabe 265
+
+Wohin muss man in Deutschland zuerst gehen, wenn man heiraten möchte?
+
+- [ ] zum Einwohnermeldeamt
+- [ ] zum Ordnungsamt
+- [ ] zur Agentur für Arbeit
+- [x] zum Standesamt
+
+Richtige Antwort: zum Standesamt
+
+#### Aufgabe 266
+
+Wann beginnt die gesetzliche Nachtruhe in Deutschland?
+
+- [ ] wenn die Sonne untergeht
+- [ ] wenn die Nachbarn schlafen gehen
+- [ ] um 0 Uhr, Mitternacht
+- [x] um 22 Uhr
+
+Richtige Antwort: um 22 Uhr
+
+#### Aufgabe 267
+
+Eine junge Frau in Deutschland, 22 Jahre alt, lebt mit ihrem Freund zusammen. Die Eltern der Frau finden das nicht gut, weil ihnen der Freund nicht gefällt. Was können die Eltern tun?
+
+- [x] Sie müssen die Entscheidung der volljährigen Tochter respektieren.
+- [ ] Sie haben das Recht, die Tochter in die elterliche Wohnung zurückzuholen.
+- [ ] Sie können zur Polizei gehen und die Tochter anzeigen.
+- [ ] Sie suchen einen anderen Mann für die Tochter.
+
+Richtige Antwort: Sie müssen die Entscheidung der volljährigen Tochter respektieren.
+
+#### Aufgabe 268
+
+Eine junge Frau will den Führerschein machen. Sie hat Angst vor der Prüfung, weil ihre Muttersprache nicht Deutsch ist. Was ist richtig?
+
+- [ ] Sie muss mindestens zehn Jahre in Deutschland leben, bevor sie den Führerschein machen kann.
+- [ ] Wenn sie kein Deutsch kann, darf sie keinen Führerschein haben.
+- [ ] Sie muss den Führerschein in dem Land machen, in dem man ihre Sprache spricht.
+- [x] Sie kann die Theorie-Prüfung vielleicht in ihrer Muttersprache machen. Es gibt mehr als zehn Sprachen zur Auswahl.
+
+Richtige Antwort: Sie kann die Theorie-Prüfung vielleicht in ihrer Muttersprache machen. Es gibt mehr als zehn Sprachen zur Auswahl.
+
+#### Aufgabe 269
+
+In Deutschland haben Kinder ab dem Alter von drei Jahren bis zur Ersteinschulung einen Anspruch auf …
+
+- [ ] monatliches Taschengeld.
+- [ ] einen Platz in einem Sportverein.
+- [x] einen Kindergartenplatz.
+- [ ] einen Ferienpass.
+
+Richtige Antwort: einen Kindergartenplatz.
+
+#### Aufgabe 270
+
+Die Volkshochschule in Deutschland ist eine Einrichtung …
+
+- [ ] für den Religionsunterricht.
+- [ ] nur für Jugendliche.
+- [x] zur Weiterbildung.
+- [ ] nur für Rentnerinnen und Rentner.
+
+Richtige Antwort: zur Weiterbildung.
+
+#### Aufgabe 271
+
+Was ist in Deutschland ein Brauch zu Weihnachten?
+
+- [ ] bunte Eier verstecken
+- [x] einen Tannenbaum schmücken
+- [ ] sich mit Masken und Kostümen verkleiden
+- [ ] Kürbisse vor die Tür stellen
+
+Richtige Antwort: einen Tannenbaum schmücken
+
+#### Aufgabe 272
+
+Welche Lebensform ist in Deutschland nicht erlaubt?
+
+- [ ] Mann und Frau sind geschieden und leben mit neuen Partnern zusammen.
+- [ ] Zwei Frauen leben zusammen.
+- [ ] Ein alleinerziehender Vater lebt mit seinen zwei Kindern zusammen.
+- [x] Ein Mann ist mit zwei Frauen zur selben Zeit verheiratet.
+
+Richtige Antwort: Ein Mann ist mit zwei Frauen zur selben Zeit verheiratet.
+
+#### Aufgabe 273
+
+Bei Erziehungsproblemen gehen Sie in Deutschland …
+
+- [ ] zur Ärztin/zum Arzt.
+- [ ] zum Gesundheitsamt.
+- [ ] zum Einwohnermeldeamt.
+- [x] zum Jugendamt.
+
+Richtige Antwort: zum Jugendamt.
+
+#### Aufgabe 274
+
+Sie haben in Deutschland absichtlich einen Brief geöffnet, der an eine andere Person adressiert ist. Was haben Sie nicht beachtet?
+
+- [ ] das Schweigerecht
+- [x] das Briefgeheimnis
+- [ ] die Schweigepflicht
+- [ ] die Meinungsfreiheit
+
+Richtige Antwort: das Briefgeheimnis
+
+#### Aufgabe 275
+
+Was braucht man in Deutschland für eine Ehescheidung?
+
+- [ ] die Einwilligung der Eltern
+- [ ] ein Attest einer Ärztin/eines Arztes
+- [ ] die Einwilligung der Kinder
+- [x] die Unterstützung einer Anwältin/eines Anwalts
+
+Richtige Antwort: die Unterstützung einer Anwältin/eines Anwalts
+
+#### Aufgabe 276
+
+Was sollten Sie tun, wenn Sie von Ihrer Ansprechpartnerin/Ihrem Ansprechpartner in einer deutschen Behörde schlecht behandelt werden?
+
+- [ ] Ich kann nichts tun.
+- [ ] Ich muss mir diese Behandlung gefallen lassen.
+- [ ] Ich drohe der Person.
+- [x] Ich kann mich bei der Behördenleiterin/beim Behördenleiter beschweren.
+
+Richtige Antwort: Ich kann mich bei der Behördenleiterin/beim Behördenleiter beschweren.
+
+#### Aufgabe 277
+
+Eine Frau, die ein zweijähriges Kind hat, bewirbt sich in Deutschland um eine Stelle. Was ist ein Beispiel für Diskriminierung? Sie bekommt die Stelle nur deshalb nicht, weil sie …
+
+- [ ] kein Englisch spricht.
+- [ ] zu hohe Gehaltsvorstellungen hat.
+- [ ] keine Erfahrungen in diesem Beruf hat.
+- [x] Mutter ist.
+
+Richtige Antwort: Mutter ist.
+
+#### Aufgabe 278
+
+Ein Mann im Rollstuhl hat sich auf eine Stelle als Buchhalter beworben. Was ist ein Beispiel für Diskriminierung? Er bekommt die Stelle nur deshalb nicht, weil er …
+
+- [x] im Rollstuhl sitzt.
+- [ ] keine Erfahrung hat.
+- [ ] zu hohe Gehaltsvorstellungen hat.
+- [ ] kein Englisch spricht.
+
+Richtige Antwort: im Rollstuhl sitzt.
+
+#### Aufgabe 279
+
+In den meisten Mietshäusern in Deutschland gibt es eine "Hausordnung". Was steht in einer solchen "Hausordnung"? Sie nennt …
+
+- [ ] Regeln für die Benutzung öffentlicher Verkehrsmittel.
+- [ ] alle Mieterinnen und Mieter im Haus.
+- [x] Regeln, an die sich alle Bewohnerinnen und Bewohner halten müssen.
+- [ ] die Adresse des nächsten Ordnungsamtes.
+
+Richtige Antwort: Regeln, an die sich alle Bewohnerinnen und Bewohner halten müssen.
+
+#### Aufgabe 280
+
+Wenn Sie sich in Deutschland gegen einen falschen Steuerbescheid wehren wollen, müssen Sie …
+
+- [ ] nichts machen.
+- [ ] den Bescheid wegwerfen.
+- [x] Einspruch einlegen.
+- [ ] warten, bis ein anderer Bescheid kommt.
+
+Richtige Antwort: Einspruch einlegen.
+
+#### Aufgabe 281
+
+Zwei Freunde wollen in ein öffentliches Schwimmbad in Deutschland. Beide haben eine dunkle Hautfarbe und werden deshalb nicht hineingelassen. Welches Recht wird in dieser Situation verletzt? Das Recht auf …
+
+- [ ] Meinungsfreiheit
+- [x] Gleichbehandlung
+- [ ] Versammlungsfreiheit
+- [ ] Freizügigkeit
+
+Richtige Antwort: Gleichbehandlung
+
+#### Aufgabe 282
+
+Welches Ehrenamt müssen deutsche Staatsbürgerinnen und Staatsbürger übernehmen, wenn sie dazu aufgefordert werden?
+
+- [ ] Vereinstrainerin/Vereinstrainer
+- [x] Wahlhelferin/Wahlhelfer
+- [ ] Bibliotheksaufsicht
+- [ ] Lehrerin/Lehrer
+
+Richtige Antwort: Wahlhelferin/Wahlhelfer
+
+#### Aufgabe 283
+
+Was tun Sie, wenn Sie eine falsche Rechnung von einer deutschen Behörde bekommen?
+
+- [ ] Ich lasse die Rechnung liegen.
+- [x] Ich lege Widerspruch bei der Behörde ein.
+- [ ] Ich schicke die Rechnung an die Behörde zurück.
+- [ ] Ich gehe mit der Rechnung zum Finanzamt.
+
+Richtige Antwort: Ich lege Widerspruch bei der Behörde ein.
+
+#### Aufgabe 284
+
+Was man für die Arbeit können muss, ändert sich in Zukunft sehr schnell. Was kann man tun?
+
+- [ ] Es ist egal, was man lernt.
+- [x] Erwachsene müssen auch nach der Ausbildung immer weiter lernen.
+- [ ] Kinder lernen in der Schule alles, was im Beruf wichtig ist. Nach der Schule muss man nicht weiter lernen.
+- [ ] Alle müssen früher aufhören zu arbeiten, weil sich alles ändert.
+
+Richtige Antwort: Erwachsene müssen auch nach der Ausbildung immer weiter lernen.
+
+#### Aufgabe 285
+
+Frau Frost arbeitet als fest angestellte Mitarbeiterin in einem Büro. Was muss sie nicht von ihrem Gehalt bezahlen?
+
+- [ ] Lohnsteuer
+- [ ] Beiträge zur Arbeitslosenversicherung
+- [ ] Beiträge zur Renten- und Krankenversicherung
+- [x] Umsatzsteuer
+
+Richtige Antwort: Umsatzsteuer
+
+#### Aufgabe 286
+
+Welche Organisation in einer Firma hilft den Arbeitnehmerinnen und Arbeitnehmern bei Problemen mit der Arbeitgeberin/dem Arbeitgeber?
+
+- [x] der Betriebsrat
+- [ ] die Betriebsprüferin/der Betriebsprüfer
+- [ ] die Betriebsgruppe
+- [ ] das Betriebsmanagement
+
+Richtige Antwort: der Betriebsrat
+
+#### Aufgabe 287
+
+Sie möchten bei einer Firma in Deutschland ihr Arbeitsverhältnis beenden. Was müssen Sie beachten?
+
+- [ ] die Gehaltszahlungen
+- [ ] die Arbeitszeit
+- [x] die Kündigungsfrist
+- [ ] die Versicherungspflicht
+
+Richtige Antwort: die Kündigungsfrist
+
+#### Aufgabe 288
+
+Woraus begründet sich Deutschlands besondere Verantwortung für Israel?
+
+- [ ] aus der Mitgliedschaft in der Europäischen Union (EU)
+- [x] aus den nationalsozialistischen Verbrechen gegen Juden
+- [ ] aus dem Grundgesetz der Bundesrepublik Deutschland
+- [ ] aus der christlichen Tradition
+
+Richtige Antwort: aus den nationalsozialistischen Verbrechen gegen Juden
+
+#### Aufgabe 289
+
+Ein Mann mit dunkler Hautfarbe bewirbt sich um eine Stelle als Kellner in einem Restaurant in Deutschland. Was ist ein Beispiel für Diskriminierung? Er bekommt die Stelle nur deshalb nicht, weil …
+
+- [ ] seine Deutschkenntnisse zu gering sind.
+- [ ] er zu hohe Gehaltsvorstellungen hat.
+- [x] er eine dunkle Haut hat.
+- [ ] er keine Erfahrungen im Beruf hat.
+
+Richtige Antwort: er eine dunkle Haut hat.
+
+#### Aufgabe 290
+
+Sie haben in Deutschland einen Fernseher gekauft. Zu Hause packen Sie den Fernseher aus, doch er funktioniert nicht. Der Fernseher ist kaputt. Was können Sie machen?
+
+- [ ] eine Anzeige schreiben
+- [x] den Fernseher reklamieren
+- [ ] das Gerät ungefragt austauschen
+- [ ] die Garantie verlängern
+
+Richtige Antwort: den Fernseher reklamieren
+
+#### Aufgabe 291
+
+Warum muss man in Deutschland bei der Steuererklärung aufschreiben, ob man zu einer Kirche gehört oder nicht? Weil …
+
+- [x] es eine Kirchensteuer gibt, die an die Einkommen- und Lohnsteuer geknüpft ist.
+- [ ] das für die Statistik in Deutschland wichtig ist.
+- [ ] man mehr Steuern zahlen muss, wenn man nicht zu einer Kirche gehört.
+- [ ] die Kirche für die Steuererklärung verantwortlich ist.
+
+Richtige Antwort: es eine Kirchensteuer gibt, die an die Einkommen- und Lohnsteuer geknüpft ist.
+
+#### Aufgabe 292
+
+Die Menschen in Deutschland leben nach dem Grundsatz der religiösen Toleranz. Was bedeutet das?
+
+- [ ] Es dürfen keine Moscheen gebaut werden.
+- [ ] Alle Menschen glauben an Gott.
+- [x] Jeder kann glauben, was er möchte.
+- [ ] Der Staat entscheidet, an welchen Gott die Menschen glauben.
+
+Richtige Antwort: Jeder kann glauben, was er möchte.
+
+#### Aufgabe 293
+
+Was ist in Deutschland ein Brauch zu Ostern?
+
+- [ ] Kürbisse vor die Tür stellen
+- [ ] einen Tannenbaum schmücken
+- [x] Eier bemalen
+- [ ] Raketen in die Luft schießen
+
+Richtige Antwort: Eier bemalen
+
+#### Aufgabe 294
+
+Pfingsten ist ein …
+
+- [x] christlicher Feiertag.
+- [ ] deutscher Gedenktag.
+- [ ] internationaler Trauertag.
+- [ ] bayerischer Brauch.
+
+Richtige Antwort: christlicher Feiertag.
+
+#### Aufgabe 295
+
+Welche Religion hat die europäische und deutsche Kultur geprägt?
+
+- [ ] der Hinduismus
+- [x] das Christentum
+- [ ] der Buddhismus
+- [ ] der Islam
+
+Richtige Antwort: das Christentum
+
+#### Aufgabe 296
+
+In Deutschland nennt man die letzten vier Wochen vor Weihnachten …
+
+- [ ] den Buß- und Bettag.
+- [ ] das Erntedankfest.
+- [x] die Adventszeit.
+- [ ] Allerheiligen.
+
+Richtige Antwort: die Adventszeit.
+
+#### Aufgabe 297
+
+Aus welchem Land sind die meisten Migrantinnen und Migranten nach Deutschland gekommen?
+
+- [ ] Italien
+- [ ] Polen
+- [ ] Marokko
+- [x] Türkei
+
+Richtige Antwort: Türkei
+
+#### Aufgabe 298
+
+In der DDR lebten vor allem Migrantinnen und Migranten aus …
+
+- [x] Vietnam, Polen, Mosambik.
+- [ ] Frankreich, Rumänien, Somalia.
+- [ ] Chile, Ungarn, Simbabwe.
+- [ ] Nordkorea, Mexiko, Ägypten.
+
+Richtige Antwort: Vietnam, Polen, Mosambik.
+
+#### Aufgabe 299
+
+Ausländische Arbeitnehmerinnen und Arbeitnehmer, die in den 50er und 60er Jahren von der Bundesrepublik Deutschland angeworben wurden, nannte man …
+
+- [ ] Schwarzarbeiterinnen/Schwarzarbeiter.
+- [x] Gastarbeiterinnen/Gastarbeiter.
+- [ ] Zeitarbeiterinnen/Zeitarbeiter.
+- [ ] Schichtarbeiterinnen/Schichtarbeiter.
+
+Richtige Antwort: Gastarbeiterinnen/Gastarbeiter.
+
+#### Aufgabe 300
+
+Aus welchem Land kamen die ersten Gastarbeiterinnen und Gastarbeiter in die Bundesrepublik Deutschland?
+
+- [x] Italien
+- [ ] Spanien
+- [ ] Portugal
+- [ ] Türkei
+
+Richtige Antwort: Italien
+
+## Teil II: Berlin
+
+### Fragen für das Bundesland Berlin
+
+#### Aufgabe 321 (Berlin, Frage 1)
+
+Welches Wappen gehört zum Bundesland Berlin? Bild 1 Bild 2 Bild 3 Bild 4
+
+| Bild 1 | Bild 2 | Bild 3 | Bild 4 |
+|---|---|---|---|
+| ![[lid-v2-images/lid-q321-bild-1.png|120]] | ![[lid-v2-images/lid-q321-bild-2.png|120]] | ![[lid-v2-images/lid-q321-bild-3.png|120]] | ![[lid-v2-images/lid-q321-bild-4.png|120]] |
+
+- [ ] Bild 1
+- [ ] Bild 2
+- [ ] Bild 3
+- [x] Bild 4
+
+Richtige Antwort: Bild 4
+
+#### Aufgabe 322 (Berlin, Frage 2)
+
+Welches ist ein Bezirk von Berlin?
+
+- [ ] Altona
+- [ ] Prignitz
+- [x] Pankow
+- [ ] Mecklenburgische Seenplatte
+
+Richtige Antwort: Pankow
+
+#### Aufgabe 323 (Berlin, Frage 3)
+
+Für wie viele Jahre wird das Landesparlament in Berlin gewählt?
+
+- [ ] 3
+- [ ] 4
+- [x] 5
+- [ ] 6
+
+Richtige Antwort: 5
+
+#### Aufgabe 324 (Berlin, Frage 4)
+
+Ab welchem Alter darf man in Berlin bei Kommunalwahlen (Wahl der Bezirksverordnetenversammlung) wählen?
+
+- [ ] 14
+- [x] 16
+- [ ] 18
+- [ ] 20
+
+Richtige Antwort: 16
+
+#### Aufgabe 325 (Berlin, Frage 5)
+
+Welche Farben hat die Landesflagge von Berlin?
+
+- [ ] blau-weiß-rot
+- [x] weiß-rot
+- [ ] grün-weiß-rot
+- [ ] schwarz-gold
+
+Richtige Antwort: weiß-rot
+
+#### Aufgabe 326 (Berlin, Frage 6)
+
+Wo können Sie sich in Berlin über politische Themen informieren?
+
+- [ ] beim Ordnungsamt der Gemeinde
+- [ ] bei den Kirchen
+- [ ] bei der Verbraucherzentrale
+- [x] bei der Landeszentrale für politische Bildung
+
+Richtige Antwort: bei der Landeszentrale für politische Bildung
+
+#### Aufgabe 327 (Berlin, Frage 7)
+
+Welches Bundesland ist ein Stadtstaat?
+
+- [x] Berlin
+- [ ] Saarland
+- [ ] Brandenburg
+- [ ] Hessen
+
+Richtige Antwort: Berlin
+
+#### Aufgabe 328 (Berlin, Frage 8)
+
+Welches Bundesland ist Berlin?
+
+![[lid-v2-images/lid-q328-bild.png|420]]
+
+- [ ] 1
+- [ ] 2
+- [ ] 3
+- [x] 4
+
+Richtige Antwort: 4
+
+#### Aufgabe 329 (Berlin, Frage 9)
+
+Wie nennt man die Regierungschefin/den Regierungschef des Stadtstaates Berlin?
+
+- [ ] Ministerpräsidentin/Ministerpräsident
+- [ ] Oberbürgermeisterin/Oberbürgermeister
+- [ ] Präsidentin/Präsident des Senates
+- [x] Regierende Bürgermeisterin/Regierender Bürgermeister
+
+Richtige Antwort: Regierende Bürgermeisterin/Regierender Bürgermeister
+
+#### Aufgabe 330 (Berlin, Frage 10)
+
+Welche Senatorin/welchen Senator hat Berlin nicht?
+
+- [ ] Finanzsenatorin/Finanzsenator
+- [ ] Innensenatorin/Innensenator
+- [x] Senatorin/Senator für Außenbeziehungen
+- [ ] Justizsenatorin/Justizsenator
+
+Richtige Antwort: Senatorin/Senator für Außenbeziehungen
