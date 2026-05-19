@@ -127,6 +127,52 @@
         font-weight: 700;
       }
 
+      .translation-toggle {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--soft);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 0.92rem;
+        font-weight: 760;
+      }
+
+      .translation-toggle:hover,
+      .translation-toggle:focus-visible {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgb(79 179 165 / 0.14);
+        outline: none;
+      }
+
+      .translation-toggle[aria-pressed="true"] {
+        border-color: var(--accent);
+        background: rgb(79 179 165 / 0.16);
+        color: var(--accent-strong);
+      }
+
+      .translation-panel {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid rgb(79 179 165 / 0.38);
+        border-radius: 8px;
+        background: rgb(79 179 165 / 0.09);
+        color: #d7fff9;
+        line-height: 1.5;
+      }
+
+      .translation-panel p {
+        margin: 0;
+      }
+
+      .translation-panel a {
+        color: var(--accent-strong);
+        font-weight: 760;
+      }
+
       .progress {
         overflow: hidden;
         height: 8px;
@@ -197,6 +243,17 @@
         background: var(--soft);
         color: var(--muted);
         font-weight: 800;
+      }
+
+      .option-copy {
+        display: grid;
+        gap: 5px;
+      }
+
+      .option-translation {
+        color: var(--muted);
+        font-size: 0.94rem;
+        line-height: 1.4;
       }
 
       .answer-option.is-correct .option-letter {
@@ -385,9 +442,11 @@
           <div>
             <p id="question-kicker" class="eyebrow">Question</p>
             <h1 id="question-title"></h1>
+            <div id="question-translation" class="translation-panel is-hidden" aria-live="polite"></div>
           </div>
           <div class="quiz-actions">
             <span id="score-counter" class="counter">0 correct</span>
+            <button id="translation-toggle" class="translation-toggle" type="button" aria-pressed="false" title="Show English translations">EN</button>
             <button id="restart-button" class="icon-action" type="button" title="Restart test" aria-label="Restart test">&#8635;</button>
           </div>
         </header>
@@ -415,6 +474,7 @@
     </main>
 
     <script src="questions.js"></script>
+    <script src="translations-en.js"></script>
     <script>
       (() => {
         "use strict";
@@ -425,12 +485,14 @@
         const LETTERS = ["A", "B", "C", "D"];
 
         const questions = window.LID_QUESTIONS || [];
+        const translations = window.LID_TRANSLATIONS_EN || {};
         const state = {
           run: [],
           index: 0,
           selected: null,
           score: 0,
-          answers: []
+          answers: [],
+          translationsEnabled: false
         };
 
         const $ = (id) => document.getElementById(id);
@@ -441,8 +503,10 @@
         const restartButton = $("restart-button");
         const newTestButton = $("new-test-button");
         const nextButton = $("next-button");
+        const translationToggle = $("translation-toggle");
         const questionKicker = $("question-kicker");
         const questionTitle = $("question-title");
+        const questionTranslation = $("question-translation");
         const scoreCounter = $("score-counter");
         const progressBar = $("progress-bar");
         const imageGrid = $("image-grid");
@@ -484,6 +548,13 @@
           show("quiz");
         }
 
+        function toggleTranslations() {
+          state.translationsEnabled = !state.translationsEnabled;
+          translationToggle.setAttribute("aria-pressed", String(state.translationsEnabled));
+          translationToggle.title = state.translationsEnabled ? "Hide English translations" : "Show English translations";
+          renderTranslations();
+        }
+
         function renderImages(question) {
           imageGrid.replaceChildren();
           imageGrid.className = `image-grid image-count-${question.images.length}`;
@@ -511,12 +582,15 @@
           scoreCounter.textContent = `${state.score} correct`;
           progressBar.style.width = `${((progress - 1) / total) * 100}%`;
           questionHint.textContent = "Choose one answer.";
+          questionTranslation.replaceChildren();
+          questionTranslation.classList.add("is-hidden");
           nextButton.classList.add("is-hidden");
           nextButton.textContent = progress === total ? "Finish" : "Next";
           state.selected = null;
 
           renderImages(question);
           renderAnswers(question);
+          renderTranslations();
         }
 
         function renderAnswers(question) {
@@ -525,18 +599,73 @@
           question.options.forEach((option, index) => {
             const button = document.createElement("button");
             const letter = document.createElement("span");
+            const copy = document.createElement("span");
             const text = document.createElement("span");
+            const translation = document.createElement("span");
 
             button.className = "answer-option";
             button.type = "button";
             button.dataset.index = String(index);
             letter.className = "option-letter";
             letter.textContent = LETTERS[index];
+            copy.className = "option-copy";
             text.textContent = option.text;
+            translation.className = "option-translation is-hidden";
+            translation.dataset.translationIndex = String(index);
 
-            button.append(letter, text);
+            copy.append(text, translation);
+            button.append(letter, copy);
             button.addEventListener("click", () => chooseAnswer(index));
             answers.append(button);
+          });
+        }
+
+        function renderTranslations() {
+          const question = state.run[state.index];
+          if (!question) return;
+
+          if (!state.translationsEnabled) {
+            questionTranslation.classList.add("is-hidden");
+            answers.querySelectorAll(".option-translation").forEach((item) => {
+              item.classList.add("is-hidden");
+              item.textContent = "";
+            });
+            return;
+          }
+
+          const translation = translations[question.id];
+          if (translation) {
+            showTranslation(question, translation);
+          } else {
+            showTranslationFallback();
+          }
+        }
+
+        function showTranslation(question, translation) {
+          questionTranslation.replaceChildren();
+          const prompt = document.createElement("p");
+          prompt.textContent = translation.prompt;
+          questionTranslation.append(prompt);
+          questionTranslation.classList.remove("is-hidden");
+
+          question.options.forEach((option, index) => {
+            const item = answers.querySelector(`[data-translation-index="${index}"]`);
+            if (!item) return;
+            item.textContent = translation.options[index] || option.text;
+            item.classList.remove("is-hidden");
+          });
+        }
+
+        function showTranslationFallback() {
+          questionTranslation.replaceChildren();
+          const message = document.createElement("p");
+          message.textContent = "English translation is not available for this question yet.";
+          questionTranslation.append(message);
+          questionTranslation.classList.remove("is-hidden");
+
+          answers.querySelectorAll(".option-translation").forEach((item) => {
+            item.classList.add("is-hidden");
+            item.textContent = "";
           });
         }
 
@@ -629,6 +758,7 @@
         restartButton.addEventListener("click", startRun);
         newTestButton.addEventListener("click", startRun);
         nextButton.addEventListener("click", nextQuestion);
+        translationToggle.addEventListener("click", toggleTranslations);
 
         if (!questions.length) {
           startButton.disabled = true;
