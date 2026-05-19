@@ -17,7 +17,7 @@
   - Add canonical URL support once the production domain is known. Production domain is not available in the repo yet, so no canonical URL was added.
   - Add structured data where useful, such as `WebApplication` or FAQ schema.
 
-- [ ] Improve result review.
+- [x] Improve result review.
   - Show all missed questions, not only the first six.
   - Add links from result items back into practice mode.
   - Show selected answer, correct answer, and explanation when available.

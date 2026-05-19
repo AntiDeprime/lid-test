@@ -623,7 +623,15 @@
         margin-top: 18px;
       }
 
+      .review-heading {
+        margin: 24px 0 0;
+        font-size: 1.1rem;
+        line-height: 1.3;
+      }
+
       .review-item {
+        display: grid;
+        gap: 10px;
         padding: 12px;
         border: 1px solid var(--line);
         border-radius: 8px;
@@ -632,7 +640,33 @@
 
       .review-item strong {
         display: block;
-        margin-bottom: 6px;
+      }
+
+      .review-answer {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .review-answer b {
+        color: var(--text);
+      }
+
+      .review-explanation {
+        margin: 0;
+        padding: 10px;
+        border: 1px solid rgb(79 179 165 / 0.3);
+        border-radius: 8px;
+        background: rgb(79 179 165 / 0.08);
+        color: #d7fff9;
+        line-height: 1.45;
+      }
+
+      .review-practice {
+        justify-self: start;
+        width: auto;
+        min-height: 40px;
+        padding: 0 14px;
       }
 
       @media (min-width: 640px) {
@@ -803,6 +837,7 @@
         <div id="result-status" class="result-status">
           <p class="meta">Einbürgerung threshold: 17 correct answers.</p>
         </div>
+        <h2 id="review-heading" class="review-heading">Missed questions</h2>
         <div id="review-list" class="review-list"></div>
         <div class="quiz-bottom">
           <button id="new-test-button" class="primary-action" type="button">Start new test</button>
@@ -853,6 +888,7 @@
         const resultTitle = $("result-title");
         const resultScore = $("result-score");
         const resultStatus = $("result-status");
+        const reviewHeading = $("review-heading");
         const reviewList = $("review-list");
 
         function show(screen) {
@@ -878,12 +914,26 @@
           const general = sampleByCategory("general", TOTAL_GENERAL);
           const stateQuestions = sampleByCategory("state", TOTAL_STATE);
           state.run = shuffle([...general, ...stateQuestions]);
+          resetRunState();
+          renderQuestion();
+          show("quiz");
+        }
+
+        function startPracticeQuestion(questionId) {
+          const question = questions.find((item) => item.id === questionId);
+          if (!question) return;
+
+          state.run = [question];
+          resetRunState();
+          renderQuestion();
+          show("quiz");
+        }
+
+        function resetRunState() {
           state.index = 0;
           state.selected = null;
           state.score = 0;
           state.answers = [];
-          renderQuestion();
-          show("quiz");
         }
 
         function toggleTranslations() {
@@ -1060,36 +1110,70 @@
         function renderReview() {
           reviewList.replaceChildren();
           const missed = state.answers.filter((entry) => !entry.isCorrect);
+          reviewHeading.textContent = missed.length === 1 ? "1 missed question" : `${missed.length} missed questions`;
 
           if (missed.length === 0) {
             const item = document.createElement("div");
             item.className = "review-item";
-            item.innerHTML = "<strong>No mistakes</strong><p class=\"meta\">All answers in this run were correct.</p>";
+            reviewHeading.textContent = "Missed questions";
+            item.append(createReviewTitle("No mistakes"));
+            item.append(createReviewText("All answers in this run were correct."));
             reviewList.append(item);
             return;
           }
 
-          missed.slice(0, 6).forEach((entry) => {
+          missed.forEach((entry) => {
             const item = document.createElement("div");
-            const selected = entry.question.options[entry.selectedIndex].text;
-            const correct = entry.question.options[entry.correctIndex].text;
+            const selected = formatAnswer(entry.question, entry.selectedIndex);
+            const correct = formatAnswer(entry.question, entry.correctIndex);
+            const practiceButton = document.createElement("button");
             item.className = "review-item";
-            item.innerHTML = `
-              <strong>${escapeHtml(entry.question.prompt)}</strong>
-              <p class="meta">Your answer: ${escapeHtml(selected)}</p>
-              <p class="meta">Correct answer: ${escapeHtml(correct)}</p>
-            `;
+            item.append(createReviewTitle(entry.question.prompt));
+            item.append(createReviewAnswer("Your answer", selected));
+            item.append(createReviewAnswer("Correct answer", correct));
+
+            if (entry.question.explanation) {
+              const explanation = document.createElement("p");
+              explanation.className = "review-explanation";
+              explanation.textContent = entry.question.explanation;
+              item.append(explanation);
+            }
+
+            practiceButton.className = "secondary-action review-practice";
+            practiceButton.type = "button";
+            practiceButton.textContent = "Practice this question";
+            practiceButton.addEventListener("click", () => startPracticeQuestion(entry.question.id));
+            item.append(practiceButton);
             reviewList.append(item);
           });
         }
 
-        function escapeHtml(value) {
-          return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
+        function createReviewTitle(text) {
+          const title = document.createElement("strong");
+          title.textContent = text;
+          return title;
+        }
+
+        function createReviewText(text) {
+          const paragraph = document.createElement("p");
+          paragraph.className = "meta";
+          paragraph.textContent = text;
+          return paragraph;
+        }
+
+        function createReviewAnswer(label, answer) {
+          const paragraph = document.createElement("p");
+          const labelElement = document.createElement("b");
+          paragraph.className = "review-answer";
+          labelElement.textContent = `${label}: `;
+          paragraph.append(labelElement, answer);
+          return paragraph;
+        }
+
+        function formatAnswer(question, optionIndex) {
+          const letter = LETTERS[optionIndex] || "";
+          const option = question.options[optionIndex];
+          return `${letter}. ${option ? option.text : "No answer selected"}`;
         }
 
         startButton.addEventListener("click", startRun);
