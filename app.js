@@ -25,7 +25,8 @@
     startedAt: null,
     completedAt: null,
     timeRemaining: EXAM_DURATION_SECONDS,
-    endedByTimeout: false
+    endedByTimeout: false,
+    studyFilter: "all"
   };
 
   const $ = (id) => document.getElementById(id);
@@ -39,6 +40,8 @@
   const newTestButton = $("new-test-button");
   const resetProgressButton = $("reset-progress-button");
   const nextButton = $("next-button");
+  const previousButton = $("previous-button");
+  const studyFilter = $("study-filter");
   const translationToggle = $("translation-toggle");
   const questionKicker = $("question-kicker");
   const questionTitle = $("question-title");
@@ -211,6 +214,19 @@
     return shuffle(questions.filter((question) => question.category === category)).slice(0, count);
   }
 
+  function getStudyQuestions(filter) {
+    const [category, selectedState] = filter.split(":");
+
+    if (filter === "all") {
+      return questions.slice();
+    }
+
+    return questions.filter((question) => {
+      if (question.category !== category) return false;
+      return !selectedState || question.state === selectedState;
+    });
+  }
+
   function getWeakQuestionIds() {
     return Object.keys(progress.weakQuestions).filter((questionId) => {
       return questions.some((question) => String(question.id) === questionId);
@@ -242,8 +258,29 @@
   function startPracticeRun() {
     if (!confirmDiscardActiveRun()) return;
 
-    state.mode = "practice";
-    state.run = shuffle(questions);
+    const studyQuestions = getStudyQuestions(studyFilter.value);
+    if (!studyQuestions.length) return;
+
+    state.mode = "study";
+    state.studyFilter = studyFilter.value;
+    state.run = studyQuestions;
+    resetRunState();
+    stopTimer();
+    renderTimer();
+    renderQuestion();
+    show("quiz");
+  }
+
+  function restartCurrentRun() {
+    if (state.mode !== "study") {
+      startRun();
+      return;
+    }
+
+    const studyQuestions = getStudyQuestions(state.studyFilter);
+    if (!studyQuestions.length) return;
+
+    state.run = studyQuestions;
     resetRunState();
     stopTimer();
     renderTimer();
@@ -377,14 +414,35 @@
     questionTranslation.classList.add("is-hidden");
     questionExplanation.textContent = "";
     questionExplanation.classList.add("is-hidden");
+    previousButton.classList.add("is-hidden");
     nextButton.classList.add("is-hidden");
     nextButton.textContent = progress === total ? "Finish" : "Next";
     state.selected = null;
 
     renderTimer();
+    renderModeChrome(question, progress, total);
     renderImages(question);
     renderAnswers(question);
     renderTranslations();
+  }
+
+  function renderModeChrome(question, progress, total) {
+    if (state.mode !== "study") return;
+
+    const label = question.category === "state" ? `${question.state} question` : "General question";
+    questionKicker.textContent = `${label} ${progress} / ${total}`;
+    scoreCounter.textContent = "Study mode";
+    progressBar.style.width = `${(progress / total) * 100}%`;
+    questionHint.textContent = "Correct answer is highlighted. Use Previous and Next to browse.";
+    previousButton.classList.toggle("is-hidden", total <= 1);
+    previousButton.disabled = state.index === 0;
+    nextButton.classList.remove("is-hidden");
+    nextButton.textContent = progress === total ? "Back to start" : "Next";
+
+    if (question.explanation) {
+      questionExplanation.textContent = question.explanation;
+      questionExplanation.classList.remove("is-hidden");
+    }
   }
 
   function renderAnswers(question) {
@@ -411,6 +469,10 @@
       copy.append(text, translation);
       button.append(letter, copy);
       button.addEventListener("click", () => chooseAnswer(index));
+      if (state.mode === "study") {
+        button.disabled = true;
+        if (option.correct) button.classList.add("is-correct");
+      }
       answers.append(button);
     });
   }
@@ -465,6 +527,7 @@
   }
 
   function chooseAnswer(selectedIndex) {
+    if (state.mode === "study") return;
     if (state.selected !== null) return;
 
     const question = state.run[state.index];
@@ -499,6 +562,17 @@
   }
 
   function nextQuestion() {
+    if (state.mode === "study") {
+      if (state.index === state.run.length - 1) {
+        show("start");
+        return;
+      }
+
+      state.index += 1;
+      renderQuestion();
+      return;
+    }
+
     if (state.selected === null) return;
 
     if (state.index === state.run.length - 1) {
@@ -507,6 +581,13 @@
     }
 
     state.index += 1;
+    renderQuestion();
+  }
+
+  function previousQuestion() {
+    if (state.mode !== "study" || state.index === 0) return;
+
+    state.index -= 1;
     renderQuestion();
   }
 
@@ -659,9 +740,10 @@
   startButton.addEventListener("click", startRun);
   practiceButton.addEventListener("click", startPracticeRun);
   weakReviewButton.addEventListener("click", startWeakReview);
-  restartButton.addEventListener("click", startRun);
+  restartButton.addEventListener("click", restartCurrentRun);
   newTestButton.addEventListener("click", startRun);
   resetProgressButton.addEventListener("click", resetProgress);
+  previousButton.addEventListener("click", previousQuestion);
   nextButton.addEventListener("click", nextQuestion);
   translationToggle.addEventListener("click", toggleTranslations);
   renderProgressSummary();

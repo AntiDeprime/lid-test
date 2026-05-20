@@ -79,9 +79,17 @@
               </p>
               <div class="start-actions">
                 <button id="start-button" class="primary-action" type="button">Start mock test</button>
-                <button id="practice-button" class="secondary-action" type="button">Practice questions</button>
+                <button id="practice-button" class="secondary-action" type="button">Study questions</button>
                 <button id="weak-review-button" class="secondary-action" type="button">Review weak questions</button>
               </div>
+              <label class="study-picker" for="study-filter">
+                <span>Study set</span>
+                <select id="study-filter">
+                  <option value="all">All questions</option>
+                  <option value="general">General questions</option>
+                  <option value="state:Berlin">Berlin Bundesland questions</option>
+                </select>
+              </label>
             </div>
 
             <section class="format-section" aria-labelledby="format-title">
@@ -108,7 +116,7 @@
                 <ul class="feature-list">
                   <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
                   <li><span class="feature-mark">✓</span><span>Use a 60-minute countdown for realistic exam timing.</span></li>
-                  <li><span class="feature-mark">✓</span><span>Draw questions from all 300 general items plus the Berlin state set.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus the Berlin state set in study mode.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
                   <li><span class="feature-mark">✓</span><span>Practice weak questions until they are answered correctly twice in a row.</span></li>
                   <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
@@ -143,7 +151,7 @@
               <section class="start-detail" aria-labelledby="planned-title">
                 <h2 id="planned-title">Planned next</h2>
                 <ul class="feature-list">
-                  <li><span class="feature-mark is-muted">•</span><span>Bookmarked questions and richer catalogue browsing.</span></li>
+                  <li><span class="feature-mark is-muted">•</span><span>Bookmarked questions and searchable catalogue browsing.</span></li>
                 </ul>
               </section>
             </div>
@@ -203,7 +211,10 @@
         <p id="question-explanation" class="review-explanation question-explanation is-hidden"></p>
         <footer class="quiz-bottom">
           <p id="question-hint" class="hint">Choose one answer.</p>
-          <button id="next-button" class="primary-action is-hidden" type="button">Next</button>
+          <div class="navigation-actions">
+            <button id="previous-button" class="secondary-action is-hidden" type="button">Previous</button>
+            <button id="next-button" class="primary-action is-hidden" type="button">Next</button>
+          </div>
         </footer>
       </section>
 

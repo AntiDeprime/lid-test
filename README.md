@@ -4,6 +4,8 @@ Static, mobile-first practice app for the German **Leben in Deutschland** / **Ei
 
 The app samples 33 questions per run: 30 general questions and 3 Berlin questions. The final result uses the Einbürgerung threshold of 17 correct answers out of 33.
 
+Study mode lets users browse the catalogue in order, showing the correct answer for all questions, only general questions, or the Berlin Bundesland question set.
+
 ## Run Locally
 
 Run a local static server from the repository root:
@@ -38,7 +40,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 
 ## Files
 
-- `index.html` contains the complete one-page UI, CSS, and vanilla JavaScript app logic.
+- `index.html` contains the one-page UI structure and metadata.
 - `styles.css` contains the app styling.
 - `app.js` contains the vanilla JavaScript app logic.
 - `questions.js` contains the question catalogue loaded by the page.

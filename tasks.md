@@ -44,7 +44,7 @@
 
 ## Medium Priority
 
-- [ ] Expand practice into full study mode.
+- [x] Expand practice into full study mode.
   - Let users browse questions without a randomized run.
   - Support practice by category, all general questions, and selected Bundesland questions.
   - Allow previous/next navigation.

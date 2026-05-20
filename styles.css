@@ -110,6 +110,33 @@ h1 {
   gap: 10px;
 }
 
+.study-picker {
+  display: grid;
+  gap: 8px;
+  max-width: 360px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.study-picker select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--text);
+  font: inherit;
+}
+
+.study-picker select:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(79 179 165 / 0.14);
+  outline: none;
+}
+
 .format-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -549,6 +576,11 @@ h1 {
   margin-top: 24px;
 }
 
+.navigation-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .image-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -697,6 +729,12 @@ figcaption {
   .quiz-bottom {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+  }
+
+  .navigation-actions {
+    display: flex;
+    justify-content: flex-end;
     align-items: center;
   }
 
