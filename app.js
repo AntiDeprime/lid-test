@@ -36,8 +36,10 @@
   const startButton = $("start-button");
   const practiceButton = $("practice-button");
   const weakReviewButton = $("weak-review-button");
+  const homeButton = $("home-button");
   const restartButton = $("restart-button");
   const newTestButton = $("new-test-button");
+  const resultHomeButton = $("result-home-button");
   const resetProgressButton = $("reset-progress-button");
   const nextButton = $("next-button");
   const previousButton = $("previous-button");
@@ -242,6 +244,13 @@
     return window.confirm("Discard the current run and start over?");
   }
 
+  function goHome() {
+    if (!confirmDiscardActiveRun()) return;
+
+    stopTimer();
+    show("start");
+  }
+
   function startRun() {
     if (!confirmDiscardActiveRun()) return;
 
@@ -417,7 +426,7 @@
     previousButton.classList.add("is-hidden");
     nextButton.classList.add("is-hidden");
     nextButton.textContent = progress === total ? "Finish" : "Next";
-    state.selected = null;
+    state.selected = getCurrentAnswerEntry(question)?.selectedIndex ?? null;
 
     renderTimer();
     renderModeChrome(question, progress, total);
@@ -433,13 +442,15 @@
     questionKicker.textContent = `${label} ${progress} / ${total}`;
     scoreCounter.textContent = "Study mode";
     progressBar.style.width = `${(progress / total) * 100}%`;
-    questionHint.textContent = "Correct answer is highlighted. Use Previous and Next to browse.";
+    questionHint.textContent = state.selected === null
+      ? "Choose one answer, or use Previous and Next to browse."
+      : "Answer saved for this study session. Use Previous and Next to browse.";
     previousButton.classList.toggle("is-hidden", total <= 1);
     previousButton.disabled = state.index === 0;
     nextButton.classList.remove("is-hidden");
     nextButton.textContent = progress === total ? "Back to start" : "Next";
 
-    if (question.explanation) {
+    if (state.selected !== null && question.explanation) {
       questionExplanation.textContent = question.explanation;
       questionExplanation.classList.remove("is-hidden");
     }
@@ -447,6 +458,7 @@
 
   function renderAnswers(question) {
     answers.replaceChildren();
+    const answeredEntry = getCurrentAnswerEntry(question);
 
     question.options.forEach((option, index) => {
       const button = document.createElement("button");
@@ -469,12 +481,19 @@
       copy.append(text, translation);
       button.append(letter, copy);
       button.addEventListener("click", () => chooseAnswer(index));
-      if (state.mode === "study") {
+
+      if (answeredEntry) {
         button.disabled = true;
-        if (option.correct) button.classList.add("is-correct");
+        if (index === answeredEntry.correctIndex) button.classList.add("is-correct");
+        if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) button.classList.add("is-wrong");
       }
       answers.append(button);
     });
+  }
+
+  function getCurrentAnswerEntry(question = state.run[state.index]) {
+    if (!question) return null;
+    return state.answers.find((entry) => entry.question.id === question.id) || null;
   }
 
   function renderTranslations() {
@@ -527,8 +546,7 @@
   }
 
   function chooseAnswer(selectedIndex) {
-    if (state.mode === "study") return;
-    if (state.selected !== null) return;
+    if (getCurrentAnswerEntry()) return;
 
     const question = state.run[state.index];
     const correctIndex = question.options.findIndex((option) => option.correct);
@@ -550,7 +568,9 @@
       if (index === selectedIndex && !isCorrect) button.classList.add("is-wrong");
     });
 
-    scoreCounter.textContent = `${state.score} correct`;
+    if (state.mode !== "study") {
+      scoreCounter.textContent = `${state.score} correct`;
+    }
     progressBar.style.width = `${((state.index + 1) / state.run.length) * 100}%`;
     questionHint.textContent = isCorrect ? "Correct answer." : "Wrong answer.";
     if (question.explanation) {
@@ -740,8 +760,10 @@
   startButton.addEventListener("click", startRun);
   practiceButton.addEventListener("click", startPracticeRun);
   weakReviewButton.addEventListener("click", startWeakReview);
+  homeButton.addEventListener("click", goHome);
   restartButton.addEventListener("click", restartCurrentRun);
   newTestButton.addEventListener("click", startRun);
+  resultHomeButton.addEventListener("click", goHome);
   resetProgressButton.addEventListener("click", resetProgress);
   previousButton.addEventListener("click", previousQuestion);
   nextButton.addEventListener("click", nextQuestion);

@@ -202,6 +202,7 @@
             <span id="timer-counter" class="counter timer-counter">60:00</span>
             <span id="score-counter" class="counter">0 correct</span>
             <button id="translation-toggle" class="translation-toggle" type="button" aria-pressed="false" title="Show English translations">EN</button>
+            <button id="home-button" class="icon-action" type="button" title="Back to start" aria-label="Back to start">&#8962;</button>
             <button id="restart-button" class="icon-action" type="button" title="Restart test" aria-label="Restart test">&#8635;</button>
           </div>
         </header>
@@ -219,7 +220,10 @@
       </section>
 
       <section id="result-screen" class="app-panel is-hidden" aria-labelledby="result-title">
-        <p class="eyebrow">Result</p>
+        <div class="result-topbar">
+          <p class="eyebrow">Result</p>
+          <button id="result-home-button" class="icon-action" type="button" title="Back to start" aria-label="Back to start">&#8962;</button>
+        </div>
         <h1 id="result-title">Result</h1>
         <p id="result-score" class="score">0 / 33</p>
         <div id="result-status" class="result-status">

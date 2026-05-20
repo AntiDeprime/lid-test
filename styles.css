@@ -356,9 +356,10 @@ h1 {
 
 .quiz-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .counter {
@@ -637,6 +638,18 @@ figcaption {
 
 .result-time {
   margin-top: 10px;
+}
+
+.result-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.result-topbar .eyebrow {
+  margin: 0;
 }
 
 .review-list {

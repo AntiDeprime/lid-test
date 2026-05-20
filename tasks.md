@@ -48,6 +48,11 @@
   - Let users browse questions without a randomized run.
   - Support practice by category, all general questions, and selected Bundesland questions.
   - Allow previous/next navigation.
+  - Keep answers hidden until the user selects an option.
+
+- [x] Add home navigation from quiz and result screens.
+  - Let users return to the start page without restarting the browser session.
+  - Confirm before discarding an answered active run.
 
 - [ ] Add bookmarks or pinned questions.
   - Let users mark difficult questions for later review.

@@ -4,7 +4,7 @@ Static, mobile-first practice app for the German **Leben in Deutschland** / **Ei
 
 The app samples 33 questions per run: 30 general questions and 3 Berlin questions. The final result uses the Einbürgerung threshold of 17 correct answers out of 33.
 
-Study mode lets users browse the catalogue in order, showing the correct answer for all questions, only general questions, or the Berlin Bundesland question set.
+Study mode lets users browse the catalogue in order for all questions, only general questions, or the Berlin Bundesland question set. Answers stay hidden until the user selects an option.
 
 ## Run Locally
 
