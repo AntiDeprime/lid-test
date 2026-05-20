@@ -414,6 +414,16 @@
         font-weight: 700;
       }
 
+      .timer-counter {
+        color: var(--accent-strong);
+      }
+
+      .timer-counter.is-warning {
+        border-color: var(--warn-border);
+        background: var(--warn-bg);
+        color: #ffd98f;
+      }
+
       .translation-toggle {
         display: inline-flex;
         align-items: center;
@@ -660,6 +670,10 @@
         border-color: var(--warn-border);
       }
 
+      .result-time {
+        margin-top: 10px;
+      }
+
       .review-list {
         display: grid;
         gap: 10px;
@@ -808,6 +822,7 @@
                 <h2 id="included-title">Practice features</h2>
                 <ul class="feature-list">
                   <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Use a 60-minute countdown for realistic exam timing.</span></li>
                   <li><span class="feature-mark">✓</span><span>Draw questions from all 300 general items plus the Berlin state set.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
                   <li><span class="feature-mark">✓</span><span>Practice weak questions until they are answered correctly twice in a row.</span></li>
@@ -891,6 +906,7 @@
             <div id="question-translation" class="translation-panel is-hidden" aria-live="polite"></div>
           </div>
           <div class="quiz-actions">
+            <span id="timer-counter" class="counter timer-counter">60:00</span>
             <span id="score-counter" class="counter">0 correct</span>
             <button id="translation-toggle" class="translation-toggle" type="button" aria-pressed="false" title="Show English translations">EN</button>
             <button id="restart-button" class="icon-action" type="button" title="Restart test" aria-label="Restart test">&#8635;</button>
@@ -913,6 +929,7 @@
         <div id="result-status" class="result-status">
           <p class="meta">Einbürgerung threshold: 17 correct answers.</p>
         </div>
+        <p id="result-time" class="meta result-time"></p>
         <h2 id="review-heading" class="review-heading">Missed questions</h2>
         <div id="review-list" class="review-list"></div>
         <div class="quiz-bottom">
@@ -931,6 +948,7 @@
         const TOTAL_GENERAL = 30;
         const TOTAL_STATE = 3;
         const PASS_THRESHOLD = 17;
+        const EXAM_DURATION_SECONDS = 60 * 60;
         const STORAGE_KEY = "lidTestPrepProgress";
         const STORAGE_VERSION = 1;
         const WEAK_CLEAR_STREAK = 2;
@@ -946,7 +964,12 @@
           selected: null,
           score: 0,
           answers: [],
-          translationsEnabled: false
+          translationsEnabled: false,
+          timerId: null,
+          startedAt: null,
+          completedAt: null,
+          timeRemaining: EXAM_DURATION_SECONDS,
+          endedByTimeout: false
         };
 
         const $ = (id) => document.getElementById(id);
@@ -964,6 +987,7 @@
         const questionKicker = $("question-kicker");
         const questionTitle = $("question-title");
         const questionTranslation = $("question-translation");
+        const timerCounter = $("timer-counter");
         const scoreCounter = $("score-counter");
         const progressBar = $("progress-bar");
         const imageGrid = $("image-grid");
@@ -973,6 +997,7 @@
         const resultTitle = $("result-title");
         const resultScore = $("result-score");
         const resultStatus = $("result-status");
+        const resultTime = $("result-time");
         const reviewHeading = $("review-heading");
         const reviewList = $("review-list");
         const answeredStat = $("answered-stat");
@@ -1133,6 +1158,7 @@
           state.mode = "test";
           state.run = shuffle([...general, ...stateQuestions]);
           resetRunState();
+          startTimer();
           renderQuestion();
           show("quiz");
         }
@@ -1144,6 +1170,8 @@
           state.mode = "practice";
           state.run = [question];
           resetRunState();
+          stopTimer();
+          renderTimer();
           renderQuestion();
           show("quiz");
         }
@@ -1157,15 +1185,66 @@
           state.mode = "weak-review";
           state.run = shuffle(weakQuestions);
           resetRunState();
+          stopTimer();
+          renderTimer();
           renderQuestion();
           show("quiz");
         }
 
         function resetRunState() {
+          stopTimer();
           state.index = 0;
           state.selected = null;
           state.score = 0;
           state.answers = [];
+          state.startedAt = null;
+          state.completedAt = null;
+          state.timeRemaining = state.mode === "test" ? EXAM_DURATION_SECONDS : 0;
+          state.endedByTimeout = false;
+        }
+
+        function startTimer() {
+          state.startedAt = Date.now();
+          state.completedAt = null;
+          state.timeRemaining = EXAM_DURATION_SECONDS;
+          state.endedByTimeout = false;
+          renderTimer();
+          state.timerId = window.setInterval(tickTimer, 1000);
+        }
+
+        function stopTimer() {
+          if (!state.timerId) return;
+          window.clearInterval(state.timerId);
+          state.timerId = null;
+        }
+
+        function tickTimer() {
+          if (state.mode !== "test" || !state.startedAt) {
+            stopTimer();
+            return;
+          }
+
+          const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
+          state.timeRemaining = Math.max(EXAM_DURATION_SECONDS - elapsed, 0);
+          renderTimer();
+
+          if (state.timeRemaining === 0) {
+            finishTest(true);
+          }
+        }
+
+        function renderTimer() {
+          const isTimedTest = state.mode === "test";
+          timerCounter.classList.toggle("is-hidden", !isTimedTest);
+          timerCounter.classList.toggle("is-warning", isTimedTest && state.timeRemaining <= 5 * 60);
+          timerCounter.textContent = formatDuration(isTimedTest ? state.timeRemaining : 0);
+        }
+
+        function formatDuration(totalSeconds) {
+          const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+          const minutes = Math.floor(safeSeconds / 60);
+          const seconds = safeSeconds % 60;
+          return `${minutes}:${String(seconds).padStart(2, "0")}`;
         }
 
         function toggleTranslations() {
@@ -1210,6 +1289,7 @@
           nextButton.textContent = progress === total ? "Finish" : "Next";
           state.selected = null;
 
+          renderTimer();
           renderImages(question);
           renderAnswers(question);
           renderTranslations();
@@ -1329,14 +1409,42 @@
           if (state.selected === null) return;
 
           if (state.index === state.run.length - 1) {
-            recordCompletedTest();
-            renderResult();
-            show("result");
+            finishTest(false);
             return;
           }
 
           state.index += 1;
           renderQuestion();
+        }
+
+        function finishTest(endedByTimeout) {
+          stopTimer();
+          state.completedAt = Date.now();
+          state.endedByTimeout = endedByTimeout;
+
+          if (state.mode === "test") {
+            completeUnansweredQuestions();
+            recordCompletedTest();
+          }
+
+          renderResult();
+          show("result");
+        }
+
+        function completeUnansweredQuestions() {
+          const answeredQuestionIds = new Set(state.answers.map((entry) => String(entry.question.id)));
+          state.run.forEach((question) => {
+            if (answeredQuestionIds.has(String(question.id))) return;
+
+            const answerEntry = {
+              question,
+              selectedIndex: null,
+              correctIndex: question.options.findIndex((option) => option.correct),
+              isCorrect: false
+            };
+            state.answers.push(answerEntry);
+            recordAnswer(answerEntry);
+          });
         }
 
         function renderResult() {
@@ -1345,6 +1453,7 @@
             resultScore.textContent = `${state.score} / ${state.run.length}`;
             resultStatus.className = "result-status";
             resultStatus.innerHTML = `<p class="meta">Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.</p>`;
+            resultTime.textContent = "";
             renderReview();
             return;
           }
@@ -1353,8 +1462,27 @@
           resultTitle.textContent = passed ? "Passed" : "Not passed";
           resultScore.textContent = `${state.score} / ${state.run.length}`;
           resultStatus.className = `result-status ${passed ? "is-pass" : "is-fail"}`;
-          resultStatus.innerHTML = `<p class="meta">Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.</p>`;
+          resultStatus.innerHTML = state.endedByTimeout
+            ? `<p class="meta">Time expired. Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.</p>`
+            : `<p class="meta">Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.</p>`;
+          resultTime.textContent = formatResultTime();
           renderReview();
+        }
+
+        function formatResultTime() {
+          if (!state.startedAt || !state.completedAt) return "";
+
+          const elapsed = Math.min(
+            EXAM_DURATION_SECONDS,
+            Math.max(0, Math.floor((state.completedAt - state.startedAt) / 1000))
+          );
+          const remaining = Math.max(EXAM_DURATION_SECONDS - elapsed, 0);
+
+          if (state.endedByTimeout) {
+            return `Time expired after ${formatDuration(EXAM_DURATION_SECONDS)}.`;
+          }
+
+          return `Finished in ${formatDuration(elapsed)} with ${formatDuration(remaining)} remaining.`;
         }
 
         function renderReview() {
@@ -1421,6 +1549,8 @@
         }
 
         function formatAnswer(question, optionIndex) {
+          if (!Number.isInteger(optionIndex)) return "No answer selected";
+
           const letter = LETTERS[optionIndex] || "";
           const option = question.options[optionIndex];
           return `${letter}. ${option ? option.text : "No answer selected"}`;

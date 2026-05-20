@@ -32,7 +32,7 @@
   - Let users practice only weak or missed questions.
   - Remove a question from the weak list after repeated correct answers.
 
-- [ ] Add timed exam mode.
+- [x] Add timed exam mode.
   - Add a 60-minute countdown timer for realistic exam simulation.
   - Auto-finish the test when time expires.
   - Show elapsed or remaining time on the result screen.
