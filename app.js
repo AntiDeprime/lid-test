@@ -1,0 +1,631 @@
+(() => {
+  "use strict";
+
+  const TOTAL_GENERAL = 30;
+  const TOTAL_STATE = 3;
+  const PASS_THRESHOLD = 17;
+  const EXAM_DURATION_SECONDS = 60 * 60;
+  const STORAGE_KEY = "lidTestPrepProgress";
+  const STORAGE_VERSION = 1;
+  const WEAK_CLEAR_STREAK = 2;
+  const LETTERS = ["A", "B", "C", "D"];
+
+  const questions = window.LID_QUESTIONS || [];
+  const translations = window.LID_TRANSLATIONS_EN || {};
+  const progress = loadProgress();
+  const state = {
+    mode: "test",
+    run: [],
+    index: 0,
+    selected: null,
+    score: 0,
+    answers: [],
+    translationsEnabled: false,
+    timerId: null,
+    startedAt: null,
+    completedAt: null,
+    timeRemaining: EXAM_DURATION_SECONDS,
+    endedByTimeout: false
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const startScreen = $("start-screen");
+  const quizScreen = $("quiz-screen");
+  const resultScreen = $("result-screen");
+  const startButton = $("start-button");
+  const practiceButton = $("practice-button");
+  const weakReviewButton = $("weak-review-button");
+  const restartButton = $("restart-button");
+  const newTestButton = $("new-test-button");
+  const resetProgressButton = $("reset-progress-button");
+  const nextButton = $("next-button");
+  const translationToggle = $("translation-toggle");
+  const questionKicker = $("question-kicker");
+  const questionTitle = $("question-title");
+  const questionTranslation = $("question-translation");
+  const timerCounter = $("timer-counter");
+  const scoreCounter = $("score-counter");
+  const progressBar = $("progress-bar");
+  const imageGrid = $("image-grid");
+  const answers = $("answers");
+  const questionExplanation = $("question-explanation");
+  const questionHint = $("question-hint");
+  const resultTitle = $("result-title");
+  const resultScore = $("result-score");
+  const resultStatus = $("result-status");
+  const resultTime = $("result-time");
+  const reviewHeading = $("review-heading");
+  const reviewList = $("review-list");
+  const answeredStat = $("answered-stat");
+  const accuracyStat = $("accuracy-stat");
+  const testsStat = $("tests-stat");
+  const passRateStat = $("pass-rate-stat");
+  const weakStat = $("weak-stat");
+
+  function createEmptyProgress() {
+    return {
+      version: STORAGE_VERSION,
+      questionStats: {},
+      weakQuestions: {},
+      testHistory: []
+    };
+  }
+
+  function loadProgress() {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY));
+      if (!saved || saved.version !== STORAGE_VERSION) return createEmptyProgress();
+      return {
+        version: STORAGE_VERSION,
+        questionStats: saved.questionStats && typeof saved.questionStats === "object" ? saved.questionStats : {},
+        weakQuestions: saved.weakQuestions && typeof saved.weakQuestions === "object" ? saved.weakQuestions : {},
+        testHistory: Array.isArray(saved.testHistory) ? saved.testHistory : []
+      };
+    } catch (error) {
+      return createEmptyProgress();
+    }
+  }
+
+  function saveProgress() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    } catch (error) {
+      // Progress is helpful, but the quiz should still work if storage is blocked.
+    }
+  }
+
+  function resetProgress() {
+    progress.questionStats = {};
+    progress.weakQuestions = {};
+    progress.testHistory = [];
+    saveProgress();
+    renderProgressSummary();
+  }
+
+  function recordAnswer(entry) {
+    const questionId = String(entry.question.id);
+    const current = progress.questionStats[questionId] || {
+      answered: 0,
+      correct: 0,
+      wrong: 0
+    };
+
+    current.answered += 1;
+    if (entry.isCorrect) {
+      current.correct += 1;
+    } else {
+      current.wrong += 1;
+    }
+
+    progress.questionStats[questionId] = current;
+    updateWeakQuestion(entry, questionId);
+    saveProgress();
+    renderProgressSummary();
+  }
+
+  function updateWeakQuestion(entry, questionId) {
+    const current = progress.weakQuestions[questionId];
+    if (!entry.isCorrect) {
+      progress.weakQuestions[questionId] = {
+        wrong: current ? (current.wrong || 0) + 1 : 1,
+        correctStreak: 0,
+        lastMissedAt: new Date().toISOString()
+      };
+      return;
+    }
+
+    if (!current) return;
+
+    const correctStreak = (current.correctStreak || 0) + 1;
+    if (correctStreak >= WEAK_CLEAR_STREAK) {
+      delete progress.weakQuestions[questionId];
+      return;
+    }
+
+    progress.weakQuestions[questionId] = {
+      ...current,
+      correctStreak
+    };
+  }
+
+  function recordCompletedTest() {
+    if (state.mode !== "test" || state.run.length !== TOTAL_GENERAL + TOTAL_STATE) return;
+
+    progress.testHistory.push({
+      completedAt: new Date().toISOString(),
+      correct: state.score,
+      total: state.run.length,
+      passed: state.score >= PASS_THRESHOLD,
+      questionIds: state.run.map((question) => question.id),
+      wrongQuestionIds: state.answers.filter((entry) => !entry.isCorrect).map((entry) => entry.question.id)
+    });
+    saveProgress();
+    renderProgressSummary();
+  }
+
+  function renderProgressSummary() {
+    const stats = Object.values(progress.questionStats);
+    const answered = stats.reduce((total, item) => total + item.answered, 0);
+    const correct = stats.reduce((total, item) => total + item.correct, 0);
+    const tests = progress.testHistory.length;
+    const passedTests = progress.testHistory.filter((test) => test.passed).length;
+    const weakQuestionIds = getWeakQuestionIds();
+
+    answeredStat.textContent = String(answered);
+    accuracyStat.textContent = answered ? `${Math.round((correct / answered) * 100)}%` : "0%";
+    testsStat.textContent = String(tests);
+    passRateStat.textContent = tests ? `${Math.round((passedTests / tests) * 100)}%` : "0%";
+    weakStat.textContent = String(weakQuestionIds.length);
+    weakReviewButton.disabled = weakQuestionIds.length === 0;
+    weakReviewButton.textContent = weakQuestionIds.length
+      ? `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`
+      : "No weak questions yet";
+    resetProgressButton.disabled = answered === 0 && tests === 0 && weakQuestionIds.length === 0;
+  }
+
+  function show(screen) {
+    startScreen.classList.toggle("is-hidden", screen !== "start");
+    quizScreen.classList.toggle("is-hidden", screen !== "quiz");
+    resultScreen.classList.toggle("is-hidden", screen !== "result");
+  }
+
+  function shuffle(items) {
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function sampleByCategory(category, count) {
+    return shuffle(questions.filter((question) => question.category === category)).slice(0, count);
+  }
+
+  function getWeakQuestionIds() {
+    return Object.keys(progress.weakQuestions).filter((questionId) => {
+      return questions.some((question) => String(question.id) === questionId);
+    });
+  }
+
+  function startRun() {
+    const general = sampleByCategory("general", TOTAL_GENERAL);
+    const stateQuestions = sampleByCategory("state", TOTAL_STATE);
+    state.mode = "test";
+    state.run = shuffle([...general, ...stateQuestions]);
+    resetRunState();
+    startTimer();
+    renderQuestion();
+    show("quiz");
+  }
+
+  function startPracticeQuestion(questionId) {
+    const question = questions.find((item) => item.id === questionId);
+    if (!question) return;
+
+    state.mode = "practice";
+    state.run = [question];
+    resetRunState();
+    stopTimer();
+    renderTimer();
+    renderQuestion();
+    show("quiz");
+  }
+
+  function startWeakReview() {
+    const weakQuestions = getWeakQuestionIds()
+      .map((questionId) => questions.find((item) => String(item.id) === questionId))
+      .filter(Boolean);
+    if (!weakQuestions.length) return;
+
+    state.mode = "weak-review";
+    state.run = shuffle(weakQuestions);
+    resetRunState();
+    stopTimer();
+    renderTimer();
+    renderQuestion();
+    show("quiz");
+  }
+
+  function resetRunState() {
+    stopTimer();
+    state.index = 0;
+    state.selected = null;
+    state.score = 0;
+    state.answers = [];
+    state.startedAt = null;
+    state.completedAt = null;
+    state.timeRemaining = state.mode === "test" ? EXAM_DURATION_SECONDS : 0;
+    state.endedByTimeout = false;
+  }
+
+  function startTimer() {
+    state.startedAt = Date.now();
+    state.completedAt = null;
+    state.timeRemaining = EXAM_DURATION_SECONDS;
+    state.endedByTimeout = false;
+    renderTimer();
+    state.timerId = window.setInterval(tickTimer, 1000);
+  }
+
+  function stopTimer() {
+    if (!state.timerId) return;
+    window.clearInterval(state.timerId);
+    state.timerId = null;
+  }
+
+  function tickTimer() {
+    if (state.mode !== "test" || !state.startedAt) {
+      stopTimer();
+      return;
+    }
+
+    const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
+    state.timeRemaining = Math.max(EXAM_DURATION_SECONDS - elapsed, 0);
+    renderTimer();
+
+    if (state.timeRemaining === 0) {
+      finishTest(true);
+    }
+  }
+
+  function renderTimer() {
+    const isTimedTest = state.mode === "test";
+    timerCounter.classList.toggle("is-hidden", !isTimedTest);
+    timerCounter.classList.toggle("is-warning", isTimedTest && state.timeRemaining <= 5 * 60);
+    timerCounter.textContent = formatDuration(isTimedTest ? state.timeRemaining : 0);
+  }
+
+  function formatDuration(totalSeconds) {
+    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function toggleTranslations() {
+    state.translationsEnabled = !state.translationsEnabled;
+    translationToggle.setAttribute("aria-pressed", String(state.translationsEnabled));
+    translationToggle.title = state.translationsEnabled ? "Hide English translations" : "Show English translations";
+    renderTranslations();
+  }
+
+  function renderImages(question) {
+    imageGrid.replaceChildren();
+    imageGrid.className = `image-grid image-count-${question.images.length}`;
+    imageGrid.classList.toggle("is-hidden", question.images.length === 0);
+
+    question.images.forEach((image) => {
+      const figure = document.createElement("figure");
+      const img = document.createElement("img");
+      const caption = document.createElement("figcaption");
+      img.src = image.src;
+      img.alt = image.label;
+      caption.textContent = image.label;
+      figure.append(img, caption);
+      imageGrid.append(figure);
+    });
+  }
+
+  function renderQuestion() {
+    const question = state.run[state.index];
+    const progress = state.index + 1;
+    const total = state.run.length;
+
+    questionKicker.textContent = `Question ${progress} / ${total}`;
+    questionTitle.textContent = question.prompt;
+    scoreCounter.textContent = `${state.score} correct`;
+    progressBar.style.width = `${((progress - 1) / total) * 100}%`;
+    questionHint.textContent = "Choose one answer.";
+    questionTranslation.replaceChildren();
+    questionTranslation.classList.add("is-hidden");
+    questionExplanation.textContent = "";
+    questionExplanation.classList.add("is-hidden");
+    nextButton.classList.add("is-hidden");
+    nextButton.textContent = progress === total ? "Finish" : "Next";
+    state.selected = null;
+
+    renderTimer();
+    renderImages(question);
+    renderAnswers(question);
+    renderTranslations();
+  }
+
+  function renderAnswers(question) {
+    answers.replaceChildren();
+
+    question.options.forEach((option, index) => {
+      const button = document.createElement("button");
+      const letter = document.createElement("span");
+      const copy = document.createElement("span");
+      const text = document.createElement("span");
+      const translation = document.createElement("span");
+
+      button.className = "answer-option";
+      button.type = "button";
+      button.dataset.index = String(index);
+      letter.className = "option-letter";
+      letter.textContent = LETTERS[index];
+      copy.className = "option-copy";
+      text.textContent = option.text;
+      translation.className = "option-translation is-hidden";
+      translation.dataset.translationIndex = String(index);
+
+      copy.append(text, translation);
+      button.append(letter, copy);
+      button.addEventListener("click", () => chooseAnswer(index));
+      answers.append(button);
+    });
+  }
+
+  function renderTranslations() {
+    const question = state.run[state.index];
+    if (!question) return;
+
+    if (!state.translationsEnabled) {
+      questionTranslation.classList.add("is-hidden");
+      answers.querySelectorAll(".option-translation").forEach((item) => {
+        item.classList.add("is-hidden");
+        item.textContent = "";
+      });
+      return;
+    }
+
+    const translation = translations[question.id];
+    if (translation) {
+      showTranslation(question, translation);
+    } else {
+      showTranslationFallback();
+    }
+  }
+
+  function showTranslation(question, translation) {
+    questionTranslation.replaceChildren();
+    const prompt = document.createElement("p");
+    prompt.textContent = translation.prompt;
+    questionTranslation.append(prompt);
+    questionTranslation.classList.remove("is-hidden");
+
+    question.options.forEach((option, index) => {
+      const item = answers.querySelector(`[data-translation-index="${index}"]`);
+      if (!item) return;
+      item.textContent = translation.options[index] || option.text;
+      item.classList.remove("is-hidden");
+    });
+  }
+
+  function showTranslationFallback() {
+    questionTranslation.replaceChildren();
+    const message = document.createElement("p");
+    message.textContent = "English translation is not available for this question yet.";
+    questionTranslation.append(message);
+    questionTranslation.classList.remove("is-hidden");
+
+    answers.querySelectorAll(".option-translation").forEach((item) => {
+      item.classList.add("is-hidden");
+      item.textContent = "";
+    });
+  }
+
+  function chooseAnswer(selectedIndex) {
+    if (state.selected !== null) return;
+
+    const question = state.run[state.index];
+    const correctIndex = question.options.findIndex((option) => option.correct);
+    const isCorrect = selectedIndex === correctIndex;
+    const answerEntry = {
+      question,
+      selectedIndex,
+      correctIndex,
+      isCorrect
+    };
+    state.selected = selectedIndex;
+    state.score += isCorrect ? 1 : 0;
+    state.answers.push(answerEntry);
+    recordAnswer(answerEntry);
+
+    [...answers.children].forEach((button, index) => {
+      button.disabled = true;
+      if (index === correctIndex) button.classList.add("is-correct");
+      if (index === selectedIndex && !isCorrect) button.classList.add("is-wrong");
+    });
+
+    scoreCounter.textContent = `${state.score} correct`;
+    progressBar.style.width = `${((state.index + 1) / state.run.length) * 100}%`;
+    questionHint.textContent = isCorrect ? "Correct answer." : "Wrong answer.";
+    if (question.explanation) {
+      questionExplanation.textContent = question.explanation;
+      questionExplanation.classList.remove("is-hidden");
+    }
+    nextButton.classList.remove("is-hidden");
+    nextButton.focus();
+  }
+
+  function nextQuestion() {
+    if (state.selected === null) return;
+
+    if (state.index === state.run.length - 1) {
+      finishTest(false);
+      return;
+    }
+
+    state.index += 1;
+    renderQuestion();
+  }
+
+  function finishTest(endedByTimeout) {
+    stopTimer();
+    state.completedAt = Date.now();
+    state.endedByTimeout = endedByTimeout;
+
+    if (state.mode === "test") {
+      completeUnansweredQuestions();
+      recordCompletedTest();
+    }
+
+    renderResult();
+    show("result");
+  }
+
+  function completeUnansweredQuestions() {
+    const answeredQuestionIds = new Set(state.answers.map((entry) => String(entry.question.id)));
+    state.run.forEach((question) => {
+      if (answeredQuestionIds.has(String(question.id))) return;
+
+      const answerEntry = {
+        question,
+        selectedIndex: null,
+        correctIndex: question.options.findIndex((option) => option.correct),
+        isCorrect: false
+      };
+      state.answers.push(answerEntry);
+      recordAnswer(answerEntry);
+    });
+  }
+
+  function renderResult() {
+    if (state.mode !== "test") {
+      resultTitle.textContent = state.mode === "weak-review" ? "Weak review complete" : "Practice complete";
+      resultScore.textContent = `${state.score} / ${state.run.length}`;
+      resultStatus.className = "result-status";
+      resultStatus.innerHTML = `<p class="meta">Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.</p>`;
+      resultTime.textContent = "";
+      renderReview();
+      return;
+    }
+
+    const passed = state.score >= PASS_THRESHOLD;
+    resultTitle.textContent = passed ? "Passed" : "Not passed";
+    resultScore.textContent = `${state.score} / ${state.run.length}`;
+    resultStatus.className = `result-status ${passed ? "is-pass" : "is-fail"}`;
+    resultStatus.innerHTML = state.endedByTimeout
+      ? `<p class="meta">Time expired. Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.</p>`
+      : `<p class="meta">Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.</p>`;
+    resultTime.textContent = formatResultTime();
+    renderReview();
+  }
+
+  function formatResultTime() {
+    if (!state.startedAt || !state.completedAt) return "";
+
+    const elapsed = Math.min(
+      EXAM_DURATION_SECONDS,
+      Math.max(0, Math.floor((state.completedAt - state.startedAt) / 1000))
+    );
+    const remaining = Math.max(EXAM_DURATION_SECONDS - elapsed, 0);
+
+    if (state.endedByTimeout) {
+      return `Time expired after ${formatDuration(EXAM_DURATION_SECONDS)}.`;
+    }
+
+    return `Finished in ${formatDuration(elapsed)} with ${formatDuration(remaining)} remaining.`;
+  }
+
+  function renderReview() {
+    reviewList.replaceChildren();
+    const missed = state.answers.filter((entry) => !entry.isCorrect);
+    reviewHeading.textContent = missed.length === 1 ? "1 missed question" : `${missed.length} missed questions`;
+
+    if (missed.length === 0) {
+      const item = document.createElement("div");
+      item.className = "review-item";
+      reviewHeading.textContent = "Missed questions";
+      item.append(createReviewTitle("No mistakes"));
+      item.append(createReviewText("All answers in this run were correct."));
+      reviewList.append(item);
+      return;
+    }
+
+    missed.forEach((entry) => {
+      const item = document.createElement("div");
+      const selected = formatAnswer(entry.question, entry.selectedIndex);
+      const correct = formatAnswer(entry.question, entry.correctIndex);
+      const practiceButton = document.createElement("button");
+      item.className = "review-item";
+      item.append(createReviewTitle(entry.question.prompt));
+      item.append(createReviewAnswer("Your answer", selected));
+      item.append(createReviewAnswer("Correct answer", correct));
+
+      if (entry.question.explanation) {
+        const explanation = document.createElement("p");
+        explanation.className = "review-explanation";
+        explanation.textContent = entry.question.explanation;
+        item.append(explanation);
+      }
+
+      practiceButton.className = "secondary-action review-practice";
+      practiceButton.type = "button";
+      practiceButton.textContent = "Practice this question";
+      practiceButton.addEventListener("click", () => startPracticeQuestion(entry.question.id));
+      item.append(practiceButton);
+      reviewList.append(item);
+    });
+  }
+
+  function createReviewTitle(text) {
+    const title = document.createElement("strong");
+    title.textContent = text;
+    return title;
+  }
+
+  function createReviewText(text) {
+    const paragraph = document.createElement("p");
+    paragraph.className = "meta";
+    paragraph.textContent = text;
+    return paragraph;
+  }
+
+  function createReviewAnswer(label, answer) {
+    const paragraph = document.createElement("p");
+    const labelElement = document.createElement("b");
+    paragraph.className = "review-answer";
+    labelElement.textContent = `${label}: `;
+    paragraph.append(labelElement, answer);
+    return paragraph;
+  }
+
+  function formatAnswer(question, optionIndex) {
+    if (!Number.isInteger(optionIndex)) return "No answer selected";
+
+    const letter = LETTERS[optionIndex] || "";
+    const option = question.options[optionIndex];
+    return `${letter}. ${option ? option.text : "No answer selected"}`;
+  }
+
+  startButton.addEventListener("click", startRun);
+  practiceButton.addEventListener("click", startRun);
+  weakReviewButton.addEventListener("click", startWeakReview);
+  restartButton.addEventListener("click", startRun);
+  newTestButton.addEventListener("click", startRun);
+  resetProgressButton.addEventListener("click", resetProgress);
+  nextButton.addEventListener("click", nextQuestion);
+  translationToggle.addEventListener("click", toggleTranslations);
+  renderProgressSummary();
+
+  if (!questions.length) {
+    startButton.disabled = true;
+    practiceButton.disabled = true;
+    weakReviewButton.disabled = true;
+    startButton.textContent = "Question data missing";
+  }
+})();

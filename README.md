@@ -6,9 +6,23 @@ The app samples 33 questions per run: 30 general questions and 3 Berlin question
 
 ## Run Locally
 
-Open `index.html` directly in a browser.
+Run a local static server from the repository root:
 
-No Python, build step, package manager, or local server is required.
+```sh
+python3 -m http.server 8000
+```
+
+Then open `http://127.0.0.1:8000/`.
+
+The app is static and has no package manager or build step. A local server keeps local checks consistent with GitHub Pages and the repository agent workflow.
+
+## Checks
+
+Validate the bundled question, translation, and image data:
+
+```sh
+node scripts/validate-data.js
+```
 
 ## GitHub Pages
 
@@ -25,10 +39,13 @@ GitHub Pages will serve `index.html` as the app entry point.
 ## Files
 
 - `index.html` contains the complete one-page UI, CSS, and vanilla JavaScript app logic.
+- `styles.css` contains the app styling.
+- `app.js` contains the vanilla JavaScript app logic.
 - `questions.js` contains the question catalogue loaded by the page.
 - `explanations.js` adds learner-facing explanations to the question catalogue without changing the official answer data.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
+- `scripts/validate-data.js` validates catalogue structure, translation coverage, and image references.
 
 ## Catalogue Notes
 

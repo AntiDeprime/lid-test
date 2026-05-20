@@ -76,9 +76,13 @@
   - Show explanations after answering and during review.
   - Keep official answer text separate from explanatory text.
 
-- [ ] Add translations or learner hints.
-  - Add optional English hints for difficult German civic terms.
-  - Consider multilingual translations for question prompts and answers.
+- [x] Add English translations for bundled questions.
+  - Add optional English translations for German prompts and answers.
+  - Keep German as the default and official test language.
+
+- [ ] Add richer learner hints and multilingual support.
+  - Add optional learner hints for difficult German civic terms.
+  - Consider multilingual translations beyond English.
   - Keep German as the default and official test language.
 
 - [ ] Make the app installable as a PWA.
