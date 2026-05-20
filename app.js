@@ -95,6 +95,8 @@
   }
 
   function resetProgress() {
+    if (!window.confirm("Reset all saved progress for this browser?")) return;
+
     progress.questionStats = {};
     progress.weakQuestions = {};
     progress.testHistory = [];
@@ -102,23 +104,30 @@
     renderProgressSummary();
   }
 
-  function recordAnswer(entry) {
-    const questionId = String(entry.question.id);
-    const current = progress.questionStats[questionId] || {
-      answered: 0,
-      correct: 0,
-      wrong: 0
-    };
+  function recordAnswer(entry, options = {}) {
+    const { countStats = true, trackWeak = true } = options;
+    if (!countStats && !trackWeak) return;
 
-    current.answered += 1;
-    if (entry.isCorrect) {
-      current.correct += 1;
-    } else {
-      current.wrong += 1;
+    const questionId = String(entry.question.id);
+
+    if (countStats) {
+      const current = progress.questionStats[questionId] || {
+        answered: 0,
+        correct: 0,
+        wrong: 0
+      };
+
+      current.answered += 1;
+      if (entry.isCorrect) {
+        current.correct += 1;
+      } else {
+        current.wrong += 1;
+      }
+
+      progress.questionStats[questionId] = current;
     }
 
-    progress.questionStats[questionId] = current;
-    updateWeakQuestion(entry, questionId);
+    if (trackWeak) updateWeakQuestion(entry, questionId);
     saveProgress();
     renderProgressSummary();
   }
@@ -208,7 +217,18 @@
     });
   }
 
+  function hasActiveRun() {
+    return !quizScreen.classList.contains("is-hidden") && state.run.length > 0 && state.answers.length > 0;
+  }
+
+  function confirmDiscardActiveRun() {
+    if (!hasActiveRun()) return true;
+    return window.confirm("Discard the current run and start over?");
+  }
+
   function startRun() {
+    if (!confirmDiscardActiveRun()) return;
+
     const general = sampleByCategory("general", TOTAL_GENERAL);
     const stateQuestions = sampleByCategory("state", TOTAL_STATE);
     state.mode = "test";
@@ -219,7 +239,21 @@
     show("quiz");
   }
 
+  function startPracticeRun() {
+    if (!confirmDiscardActiveRun()) return;
+
+    state.mode = "practice";
+    state.run = shuffle(questions);
+    resetRunState();
+    stopTimer();
+    renderTimer();
+    renderQuestion();
+    show("quiz");
+  }
+
   function startPracticeQuestion(questionId) {
+    if (!confirmDiscardActiveRun()) return;
+
     const question = questions.find((item) => item.id === questionId);
     if (!question) return;
 
@@ -233,6 +267,8 @@
   }
 
   function startWeakReview() {
+    if (!confirmDiscardActiveRun()) return;
+
     const weakQuestions = getWeakQuestionIds()
       .map((questionId) => questions.find((item) => String(item.id) === questionId))
       .filter(Boolean);
@@ -363,6 +399,7 @@
 
       button.className = "answer-option";
       button.type = "button";
+      button.lang = "de";
       button.dataset.index = String(index);
       letter.className = "option-letter";
       letter.textContent = LETTERS[index];
@@ -496,10 +533,11 @@
         question,
         selectedIndex: null,
         correctIndex: question.options.findIndex((option) => option.correct),
-        isCorrect: false
+        isCorrect: false,
+        isUnanswered: true
       };
       state.answers.push(answerEntry);
-      recordAnswer(answerEntry);
+      recordAnswer(answerEntry, { countStats: false, trackWeak: false });
     });
   }
 
@@ -508,7 +546,11 @@
       resultTitle.textContent = state.mode === "weak-review" ? "Weak review complete" : "Practice complete";
       resultScore.textContent = `${state.score} / ${state.run.length}`;
       resultStatus.className = "result-status";
-      resultStatus.innerHTML = `<p class="meta">Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.</p>`;
+      resultStatus.replaceChildren(createReviewText(
+        state.mode === "weak-review"
+          ? `Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.`
+          : "Practice mode is untimed and separate from mock-test history."
+      ));
       resultTime.textContent = "";
       renderReview();
       return;
@@ -518,9 +560,11 @@
     resultTitle.textContent = passed ? "Passed" : "Not passed";
     resultScore.textContent = `${state.score} / ${state.run.length}`;
     resultStatus.className = `result-status ${passed ? "is-pass" : "is-fail"}`;
-    resultStatus.innerHTML = state.endedByTimeout
-      ? `<p class="meta">Time expired. Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.</p>`
-      : `<p class="meta">Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.</p>`;
+    resultStatus.replaceChildren(createReviewText(
+      state.endedByTimeout
+        ? `Time expired. Unanswered questions count against this test result but are not saved as weak questions. Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.`
+        : `Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.`
+    ));
     resultTime.textContent = formatResultTime();
     renderReview();
   }
@@ -613,7 +657,7 @@
   }
 
   startButton.addEventListener("click", startRun);
-  practiceButton.addEventListener("click", startRun);
+  practiceButton.addEventListener("click", startPracticeRun);
   weakReviewButton.addEventListener("click", startWeakReview);
   restartButton.addEventListener("click", startRun);
   newTestButton.addEventListener("click", startRun);

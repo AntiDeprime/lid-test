@@ -37,12 +37,17 @@
   - Auto-finish the test when time expires.
   - Show elapsed or remaining time on the result screen.
 
+- [x] Separate untimed practice from timed mock tests.
+  - Make "Practice questions" start an untimed practice run instead of another 33-question exam.
+  - Keep practice results separate from completed mock-test history.
+  - Keep unanswered timeout items out of weak-question progress.
+
 ## Medium Priority
 
-- [ ] Add study mode separate from exam mode.
-  - Let users browse and answer questions without a 33-question exam session.
+- [ ] Expand practice into full study mode.
+  - Let users browse questions without a randomized run.
   - Support practice by category, all general questions, and selected Bundesland questions.
-  - Allow previous/next navigation without forcing a randomized run.
+  - Allow previous/next navigation.
 
 - [ ] Add bookmarks or pinned questions.
   - Let users mark difficult questions for later review.
