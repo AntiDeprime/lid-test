@@ -705,6 +705,10 @@
         line-height: 1.45;
       }
 
+      .question-explanation {
+        margin-top: 18px;
+      }
+
       .review-practice {
         justify-self: start;
         width: auto;
@@ -895,6 +899,7 @@
         <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
         <div id="image-grid" class="image-grid is-hidden"></div>
         <div id="answers" class="answers"></div>
+        <p id="question-explanation" class="review-explanation question-explanation is-hidden"></p>
         <footer class="quiz-bottom">
           <p id="question-hint" class="hint">Choose one answer.</p>
           <button id="next-button" class="primary-action is-hidden" type="button">Next</button>
@@ -917,6 +922,7 @@
     </main>
 
     <script src="questions.js"></script>
+    <script src="explanations.js"></script>
     <script src="translations-en.js"></script>
     <script>
       (() => {
@@ -962,6 +968,7 @@
         const progressBar = $("progress-bar");
         const imageGrid = $("image-grid");
         const answers = $("answers");
+        const questionExplanation = $("question-explanation");
         const questionHint = $("question-hint");
         const resultTitle = $("result-title");
         const resultScore = $("result-score");
@@ -1197,6 +1204,8 @@
           questionHint.textContent = "Choose one answer.";
           questionTranslation.replaceChildren();
           questionTranslation.classList.add("is-hidden");
+          questionExplanation.textContent = "";
+          questionExplanation.classList.add("is-hidden");
           nextButton.classList.add("is-hidden");
           nextButton.textContent = progress === total ? "Finish" : "Next";
           state.selected = null;
@@ -1308,6 +1317,10 @@
           scoreCounter.textContent = `${state.score} correct`;
           progressBar.style.width = `${((state.index + 1) / state.run.length) * 100}%`;
           questionHint.textContent = isCorrect ? "Correct answer." : "Wrong answer.";
+          if (question.explanation) {
+            questionExplanation.textContent = question.explanation;
+            questionExplanation.classList.remove("is-hidden");
+          }
           nextButton.classList.remove("is-hidden");
           nextButton.focus();
         }

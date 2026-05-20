@@ -26,6 +26,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 
 - `index.html` contains the complete one-page UI, CSS, and vanilla JavaScript app logic.
 - `questions.js` contains the question catalogue loaded by the page.
+- `explanations.js` adds learner-facing explanations to the question catalogue without changing the official answer data.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
 

@@ -71,7 +71,7 @@
 
 ## Lower Priority
 
-- [ ] Add answer explanations.
+- [x] Add answer explanations.
   - Add short explanations for important or confusing questions.
   - Show explanations after answering and during review.
   - Keep official answer text separate from explanatory text.
