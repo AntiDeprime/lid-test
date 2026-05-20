@@ -49,10 +49,11 @@
   - Support practice by category, all general questions, and selected Bundesland questions.
   - Allow previous/next navigation.
   - Keep answers hidden until the user selects an option.
+  - Start with questions that have no saved attempts before showing already studied questions.
 
 - [x] Add home navigation from quiz and result screens.
   - Let users return to the start page without restarting the browser session.
-  - Confirm before discarding an answered active run.
+  - Confirm before leaving an answered active run, while making clear that selected answers are already saved.
 
 - [ ] Add bookmarks or pinned questions.
   - Let users mark difficult questions for later review.

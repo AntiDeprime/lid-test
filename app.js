@@ -218,15 +218,37 @@
 
   function getStudyQuestions(filter) {
     const [category, selectedState] = filter.split(":");
+    let filteredQuestions;
 
     if (filter === "all") {
-      return questions.slice();
+      filteredQuestions = questions.slice();
+    } else {
+      filteredQuestions = questions.filter((question) => {
+        if (question.category !== category) return false;
+        return !selectedState || question.state === selectedState;
+      });
     }
 
-    return questions.filter((question) => {
-      if (question.category !== category) return false;
-      return !selectedState || question.state === selectedState;
+    return orderStudyQuestionsByProgress(filteredQuestions);
+  }
+
+  function orderStudyQuestionsByProgress(studyQuestions) {
+    const fresh = [];
+    const studied = [];
+
+    studyQuestions.forEach((question) => {
+      if (hasSavedAnswer(question)) {
+        studied.push(question);
+      } else {
+        fresh.push(question);
+      }
     });
+
+    return [...fresh, ...studied];
+  }
+
+  function hasSavedAnswer(question) {
+    return (progress.questionStats[String(question.id)]?.answered || 0) > 0;
   }
 
   function getWeakQuestionIds() {
@@ -241,7 +263,9 @@
 
   function confirmDiscardActiveRun() {
     if (!hasActiveRun()) return true;
-    return window.confirm("Discard the current run and start over?");
+    return window.confirm(
+      "Leave the current run? Answers you already selected are saved, but unanswered questions in this run will be skipped."
+    );
   }
 
   function goHome() {
