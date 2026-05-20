@@ -576,6 +576,12 @@
         outline: none;
       }
 
+      .primary-action:disabled,
+      .secondary-action:disabled {
+        cursor: not-allowed;
+        opacity: 0.62;
+      }
+
       .secondary-action,
       .icon-action {
         border: 1px solid var(--line);
@@ -771,6 +777,7 @@
               <div class="start-actions">
                 <button id="start-button" class="primary-action" type="button">Start mock test</button>
                 <button id="practice-button" class="secondary-action" type="button">Practice questions</button>
+                <button id="weak-review-button" class="secondary-action" type="button">Review weak questions</button>
               </div>
             </div>
 
@@ -799,6 +806,7 @@
                   <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
                   <li><span class="feature-mark">✓</span><span>Draw questions from all 300 general items plus the Berlin state set.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Practice weak questions until they are answered correctly twice in a row.</span></li>
                   <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
                 </ul>
               </section>
@@ -821,13 +829,17 @@
                     <b id="pass-rate-stat">0%</b>
                     <span>test pass rate</span>
                   </div>
+                  <div class="progress-stat">
+                    <b id="weak-stat">0</b>
+                    <span>weak questions</span>
+                  </div>
                 </div>
                 <button id="reset-progress-button" class="secondary-action reset-progress" type="button">Reset progress</button>
               </section>
               <section class="start-detail" aria-labelledby="planned-title">
                 <h2 id="planned-title">Planned next</h2>
                 <ul class="feature-list">
-                  <li><span class="feature-mark is-muted">•</span><span>Focused review for repeated mistakes and bookmarked questions.</span></li>
+                  <li><span class="feature-mark is-muted">•</span><span>Bookmarked questions and richer catalogue browsing.</span></li>
                 </ul>
               </section>
             </div>
@@ -844,7 +856,7 @@
               </dl>
               <dl class="faq-item">
                 <dt>Can I review mistakes?</dt>
-                <dd>Yes. The result screen shows missed questions with your selected answer and the correct answer.</dd>
+                <dd>Yes. The result screen shows missed questions, and the start page keeps a weak-question review set across sessions.</dd>
               </dl>
             </section>
           </div>
@@ -915,6 +927,7 @@
         const PASS_THRESHOLD = 17;
         const STORAGE_KEY = "lidTestPrepProgress";
         const STORAGE_VERSION = 1;
+        const WEAK_CLEAR_STREAK = 2;
         const LETTERS = ["A", "B", "C", "D"];
 
         const questions = window.LID_QUESTIONS || [];
@@ -936,6 +949,7 @@
         const resultScreen = $("result-screen");
         const startButton = $("start-button");
         const practiceButton = $("practice-button");
+        const weakReviewButton = $("weak-review-button");
         const restartButton = $("restart-button");
         const newTestButton = $("new-test-button");
         const resetProgressButton = $("reset-progress-button");
@@ -958,11 +972,13 @@
         const accuracyStat = $("accuracy-stat");
         const testsStat = $("tests-stat");
         const passRateStat = $("pass-rate-stat");
+        const weakStat = $("weak-stat");
 
         function createEmptyProgress() {
           return {
             version: STORAGE_VERSION,
             questionStats: {},
+            weakQuestions: {},
             testHistory: []
           };
         }
@@ -974,6 +990,7 @@
             return {
               version: STORAGE_VERSION,
               questionStats: saved.questionStats && typeof saved.questionStats === "object" ? saved.questionStats : {},
+              weakQuestions: saved.weakQuestions && typeof saved.weakQuestions === "object" ? saved.weakQuestions : {},
               testHistory: Array.isArray(saved.testHistory) ? saved.testHistory : []
             };
           } catch (error) {
@@ -991,6 +1008,7 @@
 
         function resetProgress() {
           progress.questionStats = {};
+          progress.weakQuestions = {};
           progress.testHistory = [];
           saveProgress();
           renderProgressSummary();
@@ -1012,8 +1030,34 @@
           }
 
           progress.questionStats[questionId] = current;
+          updateWeakQuestion(entry, questionId);
           saveProgress();
           renderProgressSummary();
+        }
+
+        function updateWeakQuestion(entry, questionId) {
+          const current = progress.weakQuestions[questionId];
+          if (!entry.isCorrect) {
+            progress.weakQuestions[questionId] = {
+              wrong: current ? (current.wrong || 0) + 1 : 1,
+              correctStreak: 0,
+              lastMissedAt: new Date().toISOString()
+            };
+            return;
+          }
+
+          if (!current) return;
+
+          const correctStreak = (current.correctStreak || 0) + 1;
+          if (correctStreak >= WEAK_CLEAR_STREAK) {
+            delete progress.weakQuestions[questionId];
+            return;
+          }
+
+          progress.weakQuestions[questionId] = {
+            ...current,
+            correctStreak
+          };
         }
 
         function recordCompletedTest() {
@@ -1037,12 +1081,18 @@
           const correct = stats.reduce((total, item) => total + item.correct, 0);
           const tests = progress.testHistory.length;
           const passedTests = progress.testHistory.filter((test) => test.passed).length;
+          const weakQuestionIds = getWeakQuestionIds();
 
           answeredStat.textContent = String(answered);
           accuracyStat.textContent = answered ? `${Math.round((correct / answered) * 100)}%` : "0%";
           testsStat.textContent = String(tests);
           passRateStat.textContent = tests ? `${Math.round((passedTests / tests) * 100)}%` : "0%";
-          resetProgressButton.disabled = answered === 0 && tests === 0;
+          weakStat.textContent = String(weakQuestionIds.length);
+          weakReviewButton.disabled = weakQuestionIds.length === 0;
+          weakReviewButton.textContent = weakQuestionIds.length
+            ? `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`
+            : "No weak questions yet";
+          resetProgressButton.disabled = answered === 0 && tests === 0 && weakQuestionIds.length === 0;
         }
 
         function show(screen) {
@@ -1064,6 +1114,12 @@
           return shuffle(questions.filter((question) => question.category === category)).slice(0, count);
         }
 
+        function getWeakQuestionIds() {
+          return Object.keys(progress.weakQuestions).filter((questionId) => {
+            return questions.some((question) => String(question.id) === questionId);
+          });
+        }
+
         function startRun() {
           const general = sampleByCategory("general", TOTAL_GENERAL);
           const stateQuestions = sampleByCategory("state", TOTAL_STATE);
@@ -1080,6 +1136,19 @@
 
           state.mode = "practice";
           state.run = [question];
+          resetRunState();
+          renderQuestion();
+          show("quiz");
+        }
+
+        function startWeakReview() {
+          const weakQuestions = getWeakQuestionIds()
+            .map((questionId) => questions.find((item) => String(item.id) === questionId))
+            .filter(Boolean);
+          if (!weakQuestions.length) return;
+
+          state.mode = "weak-review";
+          state.run = shuffle(weakQuestions);
           resetRunState();
           renderQuestion();
           show("quiz");
@@ -1258,6 +1327,15 @@
         }
 
         function renderResult() {
+          if (state.mode !== "test") {
+            resultTitle.textContent = state.mode === "weak-review" ? "Weak review complete" : "Practice complete";
+            resultScore.textContent = `${state.score} / ${state.run.length}`;
+            resultStatus.className = "result-status";
+            resultStatus.innerHTML = `<p class="meta">Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.</p>`;
+            renderReview();
+            return;
+          }
+
           const passed = state.score >= PASS_THRESHOLD;
           resultTitle.textContent = passed ? "Passed" : "Not passed";
           resultScore.textContent = `${state.score} / ${state.run.length}`;
@@ -1337,6 +1415,7 @@
 
         startButton.addEventListener("click", startRun);
         practiceButton.addEventListener("click", startRun);
+        weakReviewButton.addEventListener("click", startWeakReview);
         restartButton.addEventListener("click", startRun);
         newTestButton.addEventListener("click", startRun);
         resetProgressButton.addEventListener("click", resetProgress);
@@ -1347,6 +1426,7 @@
         if (!questions.length) {
           startButton.disabled = true;
           practiceButton.disabled = true;
+          weakReviewButton.disabled = true;
           startButton.textContent = "Question data missing";
         }
       })();

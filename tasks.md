@@ -27,7 +27,7 @@
   - Track progress across browser sessions.
   - Add a reset-progress action.
 
-- [ ] Add a wrong-answer review mode.
+- [x] Add a wrong-answer review mode.
   - Save incorrectly answered questions across runs.
   - Let users practice only weak or missed questions.
   - Remove a question from the weak list after repeated correct answers.
