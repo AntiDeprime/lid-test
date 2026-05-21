@@ -87,6 +87,11 @@
   - Show explanations after answering and during review.
   - Keep official answer text separate from explanatory text.
 
+- [x] Improve answer explanation quality.
+  - Rewrite repetitive generated explanations into clearer learner-facing explanations.
+  - Explain German-specific institutions, parties, rights, offices, elections, history, and Berlin terms where relevant.
+  - Keep the official question and answer data unchanged.
+
 - [x] Add English translations for bundled questions.
   - Add optional English translations for German prompts and answers.
   - Keep German as the default and official test language.
