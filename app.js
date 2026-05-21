@@ -36,6 +36,7 @@
   const startButton = $("start-button");
   const practiceButton = $("practice-button");
   const weakReviewButton = $("weak-review-button");
+  const bookmarkReviewButton = $("bookmark-review-button");
   const homeButton = $("home-button");
   const restartButton = $("restart-button");
   const newTestButton = $("new-test-button");
@@ -45,6 +46,7 @@
   const previousButton = $("previous-button");
   const studyFilter = $("study-filter");
   const translationToggle = $("translation-toggle");
+  const bookmarkToggle = $("bookmark-toggle");
   const questionKicker = $("question-kicker");
   const questionTitle = $("question-title");
   const questionTranslation = $("question-translation");
@@ -66,12 +68,14 @@
   const testsStat = $("tests-stat");
   const passRateStat = $("pass-rate-stat");
   const weakStat = $("weak-stat");
+  const bookmarkStat = $("bookmark-stat");
 
   function createEmptyProgress() {
     return {
       version: STORAGE_VERSION,
       questionStats: {},
       weakQuestions: {},
+      bookmarkedQuestions: {},
       testHistory: []
     };
   }
@@ -84,6 +88,7 @@
         version: STORAGE_VERSION,
         questionStats: saved.questionStats && typeof saved.questionStats === "object" ? saved.questionStats : {},
         weakQuestions: saved.weakQuestions && typeof saved.weakQuestions === "object" ? saved.weakQuestions : {},
+        bookmarkedQuestions: saved.bookmarkedQuestions && typeof saved.bookmarkedQuestions === "object" ? saved.bookmarkedQuestions : {},
         testHistory: Array.isArray(saved.testHistory) ? saved.testHistory : []
       };
     } catch (error) {
@@ -104,6 +109,7 @@
 
     progress.questionStats = {};
     progress.weakQuestions = {};
+    progress.bookmarkedQuestions = {};
     progress.testHistory = [];
     saveProgress();
     renderProgressSummary();
@@ -184,17 +190,23 @@
     const tests = progress.testHistory.length;
     const passedTests = progress.testHistory.filter((test) => test.passed).length;
     const weakQuestionIds = getWeakQuestionIds();
+    const bookmarkedQuestionIds = getBookmarkedQuestionIds();
 
     answeredStat.textContent = String(answered);
     accuracyStat.textContent = answered ? `${Math.round((correct / answered) * 100)}%` : "0%";
     testsStat.textContent = String(tests);
     passRateStat.textContent = tests ? `${Math.round((passedTests / tests) * 100)}%` : "0%";
     weakStat.textContent = String(weakQuestionIds.length);
+    bookmarkStat.textContent = String(bookmarkedQuestionIds.length);
     weakReviewButton.disabled = weakQuestionIds.length === 0;
     weakReviewButton.textContent = weakQuestionIds.length
       ? `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`
       : "No weak questions yet";
-    resetProgressButton.disabled = answered === 0 && tests === 0 && weakQuestionIds.length === 0;
+    bookmarkReviewButton.disabled = bookmarkedQuestionIds.length === 0;
+    bookmarkReviewButton.textContent = bookmarkedQuestionIds.length
+      ? `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`
+      : "No bookmarks yet";
+    resetProgressButton.disabled = answered === 0 && tests === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0;
   }
 
   function show(screen) {
@@ -217,6 +229,10 @@
   }
 
   function getStudyQuestions(filter) {
+    if (filter === "bookmarked") {
+      return getBookmarkedQuestions();
+    }
+
     const [category, selectedState] = filter.split(":");
     let filteredQuestions;
 
@@ -255,6 +271,40 @@
     return Object.keys(progress.weakQuestions).filter((questionId) => {
       return questions.some((question) => String(question.id) === questionId);
     });
+  }
+
+  function getBookmarkedQuestionIds() {
+    return Object.keys(progress.bookmarkedQuestions).filter((questionId) => {
+      return questions.some((question) => String(question.id) === questionId);
+    });
+  }
+
+  function getBookmarkedQuestions() {
+    return getBookmarkedQuestionIds()
+      .map((questionId) => questions.find((question) => String(question.id) === questionId))
+      .filter(Boolean);
+  }
+
+  function isBookmarked(question) {
+    return Boolean(question && progress.bookmarkedQuestions[String(question.id)]);
+  }
+
+  function toggleCurrentBookmark() {
+    const question = state.run[state.index];
+    if (!question) return;
+
+    const questionId = String(question.id);
+    if (progress.bookmarkedQuestions[questionId]) {
+      delete progress.bookmarkedQuestions[questionId];
+    } else {
+      progress.bookmarkedQuestions[questionId] = {
+        addedAt: new Date().toISOString()
+      };
+    }
+
+    saveProgress();
+    renderBookmarkToggle(question);
+    renderProgressSummary();
   }
 
   function hasActiveRun() {
@@ -353,6 +403,21 @@
     show("quiz");
   }
 
+  function startBookmarkReview() {
+    if (!confirmDiscardActiveRun()) return;
+
+    const bookmarkedQuestions = getBookmarkedQuestions();
+    if (!bookmarkedQuestions.length) return;
+
+    state.mode = "bookmarks";
+    state.run = bookmarkedQuestions;
+    resetRunState();
+    stopTimer();
+    renderTimer();
+    renderQuestion();
+    show("quiz");
+  }
+
   function resetRunState() {
     stopTimer();
     state.index = 0;
@@ -416,6 +481,14 @@
     renderTranslations();
   }
 
+  function renderBookmarkToggle(question) {
+    const bookmarked = isBookmarked(question);
+    bookmarkToggle.setAttribute("aria-pressed", String(bookmarked));
+    bookmarkToggle.textContent = bookmarked ? "Bookmarked" : "Bookmark";
+    bookmarkToggle.title = bookmarked ? "Remove bookmark" : "Bookmark question";
+    bookmarkToggle.setAttribute("aria-label", bookmarked ? "Remove bookmark" : "Bookmark question");
+  }
+
   function renderImages(question) {
     imageGrid.replaceChildren();
     imageGrid.className = `image-grid image-count-${question.images.length}`;
@@ -454,6 +527,7 @@
 
     renderTimer();
     renderModeChrome(question, progress, total);
+    renderBookmarkToggle(question);
     renderImages(question);
     renderAnswers(question);
     renderTranslations();
@@ -668,12 +742,18 @@
 
   function renderResult() {
     if (state.mode !== "test") {
-      resultTitle.textContent = state.mode === "weak-review" ? "Weak review complete" : "Practice complete";
+      resultTitle.textContent = state.mode === "weak-review"
+        ? "Weak review complete"
+        : state.mode === "bookmarks"
+          ? "Bookmark review complete"
+          : "Practice complete";
       resultScore.textContent = `${state.score} / ${state.run.length}`;
       resultStatus.className = "result-status";
       resultStatus.replaceChildren(createReviewText(
         state.mode === "weak-review"
           ? `Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.`
+          : state.mode === "bookmarks"
+            ? "Bookmarked practice is untimed and stays separate from mock-test history."
           : "Practice mode is untimed and separate from mock-test history."
       ));
       resultTime.textContent = "";
@@ -784,6 +864,7 @@
   startButton.addEventListener("click", startRun);
   practiceButton.addEventListener("click", startPracticeRun);
   weakReviewButton.addEventListener("click", startWeakReview);
+  bookmarkReviewButton.addEventListener("click", startBookmarkReview);
   homeButton.addEventListener("click", goHome);
   restartButton.addEventListener("click", restartCurrentRun);
   newTestButton.addEventListener("click", startRun);
@@ -792,6 +873,7 @@
   previousButton.addEventListener("click", previousQuestion);
   nextButton.addEventListener("click", nextQuestion);
   translationToggle.addEventListener("click", toggleTranslations);
+  bookmarkToggle.addEventListener("click", toggleCurrentBookmark);
   renderProgressSummary();
 
   if (!questions.length) {

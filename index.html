@@ -73,7 +73,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="styles.css?v=fd36bad">
+    <link rel="stylesheet" href="styles.css?v=bookmarks">
   </head>
   <body>
     <main class="shell">
@@ -90,6 +90,7 @@
                 <button id="start-button" class="primary-action" type="button">Start mock test</button>
                 <button id="practice-button" class="secondary-action" type="button">Study questions</button>
                 <button id="weak-review-button" class="secondary-action" type="button">Review weak questions</button>
+                <button id="bookmark-review-button" class="secondary-action" type="button">Review bookmarked questions</button>
               </div>
               <label class="study-picker" for="study-filter">
                 <span>Study set</span>
@@ -97,6 +98,7 @@
                   <option value="all">All questions</option>
                   <option value="general">General questions</option>
                   <option value="state:Berlin">Berlin Bundesland questions</option>
+                  <option value="bookmarked">Bookmarked questions</option>
                 </select>
               </label>
             </div>
@@ -128,6 +130,7 @@
                   <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus the Berlin state set in study mode.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
                   <li><span class="feature-mark">✓</span><span>Practice weak questions until they are answered correctly twice in a row.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Bookmark difficult questions for later practice.</span></li>
                   <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
                 </ul>
               </section>
@@ -154,13 +157,17 @@
                     <b id="weak-stat">0</b>
                     <span>weak questions</span>
                   </div>
+                  <div class="progress-stat">
+                    <b id="bookmark-stat">0</b>
+                    <span>bookmarked</span>
+                  </div>
                 </div>
                 <button id="reset-progress-button" class="secondary-action reset-progress" type="button">Reset progress</button>
               </section>
               <section class="start-detail" aria-labelledby="planned-title">
                 <h2 id="planned-title">Planned next</h2>
                 <ul class="feature-list">
-                  <li><span class="feature-mark is-muted">•</span><span>Bookmarked questions and searchable catalogue browsing.</span></li>
+                  <li><span class="feature-mark is-muted">•</span><span>Searchable catalogue browsing and direct question lookup.</span></li>
                 </ul>
               </section>
             </div>
@@ -210,6 +217,7 @@
           <div class="quiz-actions">
             <span id="timer-counter" class="counter timer-counter">60:00</span>
             <span id="score-counter" class="counter">0 correct</span>
+            <button id="bookmark-toggle" class="translation-toggle bookmark-toggle" type="button" aria-pressed="false" title="Bookmark question">Bookmark</button>
             <button id="translation-toggle" class="translation-toggle" type="button" aria-pressed="false" title="Show English translations">EN</button>
             <button id="home-button" class="icon-action" type="button" title="Back to start" aria-label="Back to start">&#8962;</button>
             <button id="restart-button" class="icon-action" type="button" title="Restart test" aria-label="Restart test">&#8635;</button>
@@ -247,9 +255,9 @@
       </section>
     </main>
 
-    <script src="questions.js?v=fd36bad"></script>
-    <script src="explanations.js?v=fd36bad"></script>
-    <script src="translations-en.js?v=fd36bad"></script>
-    <script src="app.js?v=fd36bad"></script>
+    <script src="questions.js?v=bookmarks"></script>
+    <script src="explanations.js?v=bookmarks"></script>
+    <script src="translations-en.js?v=bookmarks"></script>
+    <script src="app.js?v=bookmarks"></script>
   </body>
 </html>

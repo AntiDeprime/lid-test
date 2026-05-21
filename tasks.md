@@ -55,7 +55,7 @@
   - Let users return to the start page without restarting the browser session.
   - Confirm before leaving an answered active run, while making clear that selected answers are already saved.
 
-- [ ] Add bookmarks or pinned questions.
+- [x] Add bookmarks or pinned questions.
   - Let users mark difficult questions for later review.
   - Add a bookmarked-questions practice mode.
   - Persist bookmarks locally.
