@@ -26,6 +26,12 @@ Validate the bundled question, translation, and image data:
 node scripts/validate-data.js
 ```
 
+## Analytics
+
+The page includes the Google Analytics 4 Google tag in `index.html` with measurement ID `G-6LN5H6T5LW`.
+
+Because Google Analytics may use cookies or similar identifiers depending on account settings and jurisdiction, keep the site's privacy notice and consent approach aligned with the production deployment.
+
 ## GitHub Pages
 
 Deploy from the repository root:

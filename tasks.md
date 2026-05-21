@@ -70,10 +70,10 @@
   - Show strongest and weakest areas if categories are added to the catalogue.
   - Show recent test results.
 
-- [ ] Add privacy-friendly webpage visit monitoring.
-  - Choose a lightweight analytics option for the static site, such as Plausible, GoatCounter, Cloudflare Web Analytics, or another no-cookie provider.
-  - Track basic page visits and referral sources without collecting unnecessary personal data.
-  - Document any required setup, script snippet, and privacy implications in the README.
+- [x] Add webpage visit monitoring.
+  - Added Google Analytics 4 using the Google tag with measurement ID `G-6LN5H6T5LW`.
+  - Track basic page visits and referral sources through GA4.
+  - Documented the setup and privacy/consent note in the README.
 
 - [ ] Add support for all 16 Bundesländer.
   - Extend the question catalogue from Berlin-only to the full BAMF set: 300 general questions plus 160 state-specific questions.
