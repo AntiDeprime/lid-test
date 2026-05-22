@@ -200,6 +200,93 @@ h1 {
   line-height: 1.32;
 }
 
+.progress-insights {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.progress-insight {
+  display: grid;
+  gap: 8px;
+}
+
+.progress-insight h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.area-stats,
+.recent-tests {
+  display: grid;
+  gap: 8px;
+}
+
+.area-stat,
+.recent-test,
+.progress-empty {
+  min-height: 54px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+}
+
+.area-stat,
+.recent-test {
+  display: grid;
+  gap: 4px;
+}
+
+.area-stat b,
+.recent-test b {
+  color: var(--accent-strong);
+  font-size: 1.04rem;
+  line-height: 1;
+}
+
+.area-stat span,
+.recent-test span,
+.area-stat small,
+.progress-empty {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.32;
+}
+
+.area-stat.is-strongest {
+  border-color: var(--correct-border);
+  background: var(--correct-bg);
+}
+
+.area-stat.is-weakest {
+  border-color: var(--warn-border);
+  background: var(--warn-bg);
+}
+
+.recent-test {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.recent-test b {
+  grid-row: span 2;
+}
+
+.recent-test span {
+  text-align: right;
+}
+
+.recent-test.is-pass {
+  border-color: rgb(86 184 120 / 0.55);
+}
+
+.recent-test.is-fail {
+  border-color: rgb(215 168 74 / 0.65);
+}
+
 .start-detail {
   padding-top: 14px;
   border-top: 1px solid var(--line);

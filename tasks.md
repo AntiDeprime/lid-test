@@ -65,7 +65,7 @@
   - Support jumping directly to a question by number.
   - Add filters for general questions, state questions, incorrect questions, and bookmarked questions.
 
-- [ ] Add basic statistics.
+- [x] Add basic statistics.
   - Show total questions attempted, accuracy, tests completed, and pass rate.
   - Show strongest and weakest areas if categories are added to the catalogue.
   - Show recent test results.

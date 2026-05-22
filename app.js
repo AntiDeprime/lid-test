@@ -76,6 +76,8 @@
   const passRateStat = $("pass-rate-stat");
   const weakStat = $("weak-stat");
   const bookmarkStat = $("bookmark-stat");
+  const areaStats = $("area-stats");
+  const recentTests = $("recent-tests");
 
   function createEmptyProgress() {
     return {
@@ -214,7 +216,107 @@
       ? `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`
       : "No bookmarks yet";
     resetProgressButton.disabled = answered === 0 && tests === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0;
+    renderAreaStats();
+    renderRecentTests();
     renderCatalogue();
+  }
+
+  function renderAreaStats() {
+    const areas = getAreaStats();
+    areaStats.replaceChildren();
+
+    if (!areas.length) {
+      areaStats.append(createEmptyProgressNote("Answer questions to see your strongest and weakest areas."));
+      return;
+    }
+
+    areas.forEach((area) => {
+      const item = document.createElement("div");
+      const title = document.createElement("span");
+      const value = document.createElement("b");
+      const detail = document.createElement("small");
+
+      item.className = `area-stat ${area.role ? `is-${area.role}` : ""}`.trim();
+      title.textContent = area.label;
+      value.textContent = `${area.accuracy}%`;
+      detail.textContent = `${area.correct} of ${area.answered} correct${area.role ? `, ${area.role}` : ""}`;
+
+      item.append(title, value, detail);
+      areaStats.append(item);
+    });
+  }
+
+  function getAreaStats() {
+    const areaMap = new Map();
+
+    questions.forEach((question) => {
+      const stats = progress.questionStats[String(question.id)];
+      if (!stats || !stats.answered) return;
+
+      const key = question.category === "state" ? `state:${question.state || "Bundesland"}` : "general";
+      const current = areaMap.get(key) || {
+        label: question.category === "state" ? `${question.state || "Bundesland"} questions` : "General questions",
+        answered: 0,
+        correct: 0
+      };
+
+      current.answered += stats.answered || 0;
+      current.correct += stats.correct || 0;
+      areaMap.set(key, current);
+    });
+
+    const areas = [...areaMap.values()].map((area) => ({
+      ...area,
+      accuracy: Math.round((area.correct / area.answered) * 100)
+    }));
+
+    if (areas.length <= 1) return areas;
+
+    const ranked = areas
+      .filter((area) => area.answered > 0)
+      .sort((a, b) => b.accuracy - a.accuracy || b.answered - a.answered);
+    const strongest = ranked[0];
+    const weakest = ranked[ranked.length - 1];
+
+    return areas.map((area) => ({
+      ...area,
+      role: area === strongest
+        ? "strongest"
+        : area === weakest && weakest.accuracy < strongest.accuracy
+          ? "weakest"
+          : ""
+    }));
+  }
+
+  function renderRecentTests() {
+    recentTests.replaceChildren();
+
+    if (!progress.testHistory.length) {
+      recentTests.append(createEmptyProgressNote("Complete a mock test to see recent results here."));
+      return;
+    }
+
+    progress.testHistory.slice(-3).reverse().forEach((test) => {
+      const item = document.createElement("div");
+      const score = document.createElement("b");
+      const meta = document.createElement("span");
+      const status = document.createElement("span");
+
+      item.className = `recent-test ${test.passed ? "is-pass" : "is-fail"}`;
+      score.textContent = `${test.correct} / ${test.total}`;
+      meta.textContent = formatHistoryDate(test.completedAt);
+      status.textContent = test.passed ? "Passed" : "Not passed";
+
+      item.append(score, meta, status);
+      recentTests.append(item);
+    });
+  }
+
+  function createEmptyProgressNote(text) {
+    const note = document.createElement("p");
+    note.className = "progress-empty";
+    note.textContent = text;
+    return note;
   }
 
   function show(screen) {
@@ -485,6 +587,18 @@
     const minutes = Math.floor(safeSeconds / 60);
     const seconds = safeSeconds % 60;
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function formatHistoryDate(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Date unavailable";
+
+    return new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(date);
   }
 
   function toggleTranslations() {
