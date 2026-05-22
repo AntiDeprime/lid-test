@@ -82,6 +82,10 @@
 
 ## Lower Priority
 
+- [x] Add a site logo and favicon.
+  - Created a lowercase connected pen-stroke LiD mark on the app's primary cyan button background.
+  - Added the SVG favicon and wired it into the app metadata.
+
 - [x] Add answer explanations.
   - Add short explanations for important or confusing questions.
   - Show explanations after answering and during review.

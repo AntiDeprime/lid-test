@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#4fb3a5"/>
+  <path
+    d="M126 327
+       C102 298 111 227 151 197
+       C183 173 211 194 202 236
+       C194 276 158 318 121 333
+       C156 342 195 331 222 302
+       C236 287 247 285 250 298
+       C254 318 235 334 254 340
+       C281 348 313 318 325 283
+       C337 249 365 219 395 239
+       C421 256 411 305 378 321
+       C350 335 328 319 334 292
+       C340 266 370 260 394 279
+       C419 299 419 334 396 351"
+    fill="none"
+    stroke="#081512"
+    stroke-width="38"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+  <path
+    d="M252 244 C251 230 259 220 271 218"
+    fill="none"
+    stroke="#081512"
+    stroke-width="30"
+    stroke-linecap="round"/>
+</svg>
