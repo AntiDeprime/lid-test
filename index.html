@@ -73,7 +73,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="styles.css?v=bookmarks">
+    <link rel="stylesheet" href="styles.css?v=catalogue">
   </head>
   <body>
     <main class="shell">
@@ -131,6 +131,7 @@
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
                   <li><span class="feature-mark">✓</span><span>Practice weak questions until they are answered correctly twice in a row.</span></li>
                   <li><span class="feature-mark">✓</span><span>Bookmark difficult questions for later practice.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Search the catalogue, filter question sets, and jump by question number.</span></li>
                   <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
                 </ul>
               </section>
@@ -164,11 +165,37 @@
                 </div>
                 <button id="reset-progress-button" class="secondary-action reset-progress" type="button">Reset progress</button>
               </section>
-              <section class="start-detail" aria-labelledby="planned-title">
-                <h2 id="planned-title">Planned next</h2>
-                <ul class="feature-list">
-                  <li><span class="feature-mark is-muted">•</span><span>Searchable catalogue browsing and direct question lookup.</span></li>
-                </ul>
+              <section class="start-detail catalogue-browser" aria-labelledby="catalogue-title">
+                <div class="catalogue-heading">
+                  <div>
+                    <h2 id="catalogue-title">Question catalogue</h2>
+                    <p id="catalogue-summary" class="meta">Search all questions or jump to a question number.</p>
+                  </div>
+                  <form id="jump-form" class="jump-form" aria-label="Jump to question by number">
+                    <label for="jump-question">Question number</label>
+                    <div>
+                      <input id="jump-question" inputmode="numeric" pattern="[0-9]*" type="search" placeholder="1">
+                      <button class="secondary-action" type="submit">Open</button>
+                    </div>
+                  </form>
+                </div>
+                <div class="catalogue-controls">
+                  <label for="catalogue-search">
+                    <span>Search</span>
+                    <input id="catalogue-search" type="search" placeholder="Keyword, answer, or number">
+                  </label>
+                  <label for="catalogue-filter">
+                    <span>Filter</span>
+                    <select id="catalogue-filter">
+                      <option value="all">All questions</option>
+                      <option value="general">General questions</option>
+                      <option value="state">Berlin questions</option>
+                      <option value="incorrect">Incorrect questions</option>
+                      <option value="bookmarked">Bookmarked questions</option>
+                    </select>
+                  </label>
+                </div>
+                <div id="catalogue-results" class="catalogue-results" aria-live="polite"></div>
               </section>
             </div>
 
@@ -255,9 +282,9 @@
       </section>
     </main>
 
-    <script src="questions.js?v=bookmarks"></script>
-    <script src="explanations.js?v=bookmarks"></script>
-    <script src="translations-en.js?v=bookmarks"></script>
-    <script src="app.js?v=bookmarks"></script>
+    <script src="questions.js?v=catalogue"></script>
+    <script src="explanations.js?v=catalogue"></script>
+    <script src="translations-en.js?v=catalogue"></script>
+    <script src="app.js?v=catalogue"></script>
   </body>
 </html>

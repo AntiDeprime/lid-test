@@ -6,6 +6,8 @@ The app samples 33 questions per run: 30 general questions and 3 Berlin question
 
 Study mode lets users browse all questions, only general questions, the Berlin Bundesland question set, or bookmarked questions. It starts with questions that have no saved attempts, then continues with already studied questions. Answers stay hidden until the user selects an option, and selected answers are saved immediately. Users can bookmark difficult questions from any quiz or study screen and review those bookmarks later from the start page.
 
+The start page also includes catalogue browsing with keyword search, direct question-number lookup, and filters for all, general, Berlin, previously incorrect, and bookmarked questions.
+
 ## Run Locally
 
 Run a local static server from the repository root:

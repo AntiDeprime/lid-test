@@ -219,6 +219,141 @@ h1 {
   padding: 0 12px;
 }
 
+.catalogue-browser {
+  display: grid;
+  gap: 12px;
+}
+
+.catalogue-heading {
+  display: grid;
+  gap: 12px;
+}
+
+.catalogue-heading h2 {
+  margin-bottom: 4px;
+}
+
+.jump-form {
+  display: grid;
+  gap: 6px;
+}
+
+.jump-form label,
+.catalogue-controls span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.jump-form div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.jump-form .secondary-action {
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.catalogue-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.catalogue-controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.jump-form input,
+.catalogue-controls input,
+.catalogue-controls select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--text);
+  font: inherit;
+}
+
+.jump-form input:focus-visible,
+.catalogue-controls input:focus-visible,
+.catalogue-controls select:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(79 179 165 / 0.14);
+  outline: none;
+}
+
+.catalogue-results {
+  display: grid;
+  gap: 8px;
+}
+
+.catalogue-item {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-raised);
+}
+
+.catalogue-item-title {
+  display: grid;
+  gap: 6px;
+}
+
+.catalogue-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.catalogue-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 760;
+}
+
+.catalogue-prompt {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.42;
+}
+
+.catalogue-answer {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.catalogue-study {
+  justify-self: start;
+  width: auto;
+  min-height: 38px;
+  padding: 0 12px;
+}
+
+.catalogue-empty {
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .format-section h2,
 .faq-section h2 {
   margin: 0 0 10px;
@@ -726,6 +861,20 @@ figcaption {
 
   .start-actions {
     grid-template-columns: repeat(2, minmax(0, max-content));
+    align-items: center;
+  }
+
+  .catalogue-heading {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.48fr);
+    align-items: start;
+  }
+
+  .catalogue-controls {
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 0.38fr);
+  }
+
+  .catalogue-item {
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
   }
 

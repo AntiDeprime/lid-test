@@ -9,6 +9,7 @@
   const STORAGE_VERSION = 1;
   const WEAK_CLEAR_STREAK = 2;
   const LETTERS = ["A", "B", "C", "D"];
+  const CATALOGUE_RESULT_LIMIT = 24;
 
   const questions = window.LID_QUESTIONS || [];
   const translations = window.LID_TRANSLATIONS_EN || {};
@@ -45,6 +46,12 @@
   const nextButton = $("next-button");
   const previousButton = $("previous-button");
   const studyFilter = $("study-filter");
+  const catalogueSearch = $("catalogue-search");
+  const catalogueFilter = $("catalogue-filter");
+  const catalogueSummary = $("catalogue-summary");
+  const catalogueResults = $("catalogue-results");
+  const jumpForm = $("jump-form");
+  const jumpQuestion = $("jump-question");
   const translationToggle = $("translation-toggle");
   const bookmarkToggle = $("bookmark-toggle");
   const questionKicker = $("question-kicker");
@@ -207,6 +214,7 @@
       ? `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`
       : "No bookmarks yet";
     resetProgressButton.disabled = answered === 0 && tests === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0;
+    renderCatalogue();
   }
 
   function show(screen) {
@@ -384,6 +392,11 @@
     renderTimer();
     renderQuestion();
     show("quiz");
+  }
+
+  function startCatalogueQuestion(question) {
+    if (!question) return;
+    startPracticeQuestion(question.id);
   }
 
   function startWeakReview() {
@@ -861,6 +874,147 @@
     return `${letter}. ${option ? option.text : "No answer selected"}`;
   }
 
+  function getIncorrectQuestionIds() {
+    return Object.entries(progress.questionStats)
+      .filter(([, stats]) => (stats?.wrong || 0) > 0)
+      .map(([questionId]) => questionId)
+      .filter((questionId) => questions.some((question) => String(question.id) === questionId));
+  }
+
+  function getCatalogueQuestions(filter) {
+    if (filter === "general") {
+      return questions.filter((question) => question.category === "general");
+    }
+
+    if (filter === "state") {
+      return questions.filter((question) => question.category === "state");
+    }
+
+    if (filter === "incorrect") {
+      const incorrectIds = new Set(getIncorrectQuestionIds());
+      return questions.filter((question) => incorrectIds.has(String(question.id)));
+    }
+
+    if (filter === "bookmarked") {
+      const bookmarkedIds = new Set(getBookmarkedQuestionIds());
+      return questions.filter((question) => bookmarkedIds.has(String(question.id)));
+    }
+
+    return questions.slice();
+  }
+
+  function renderCatalogue() {
+    const query = normalizeSearch(catalogueSearch.value);
+    const filter = catalogueFilter.value;
+    const filteredQuestions = getCatalogueQuestions(filter).filter((question) => {
+      if (!query) return true;
+      return getQuestionSearchText(question).includes(query);
+    });
+    const visibleQuestions = filteredQuestions.slice(0, CATALOGUE_RESULT_LIMIT);
+
+    catalogueResults.replaceChildren();
+    catalogueSummary.textContent = getCatalogueSummary(filteredQuestions.length, query);
+
+    if (!filteredQuestions.length) {
+      const empty = document.createElement("p");
+      empty.className = "catalogue-empty";
+      empty.textContent = "No matching questions found.";
+      catalogueResults.append(empty);
+      return;
+    }
+
+    visibleQuestions.forEach((question) => {
+      catalogueResults.append(createCatalogueItem(question));
+    });
+  }
+
+  function getCatalogueSummary(count, query) {
+    const label = count === 1 ? "1 question" : `${count} questions`;
+    const suffix = count > CATALOGUE_RESULT_LIMIT ? ` Showing first ${CATALOGUE_RESULT_LIMIT}.` : "";
+    return query ? `${label} match your search.${suffix}` : `${label} in this view.${suffix}`;
+  }
+
+  function createCatalogueItem(question) {
+    const item = document.createElement("article");
+    const title = document.createElement("div");
+    const meta = document.createElement("div");
+    const numberTag = document.createElement("span");
+    const typeTag = document.createElement("span");
+    const statusTag = document.createElement("span");
+    const prompt = document.createElement("p");
+    const answer = document.createElement("p");
+    const button = document.createElement("button");
+    const correctIndex = question.options.findIndex((option) => option.correct);
+
+    item.className = "catalogue-item";
+    title.className = "catalogue-item-title";
+    meta.className = "catalogue-meta";
+    numberTag.className = "catalogue-tag";
+    typeTag.className = "catalogue-tag";
+    statusTag.className = "catalogue-tag";
+    prompt.className = "catalogue-prompt";
+    answer.className = "catalogue-answer";
+    button.className = "secondary-action catalogue-study";
+    button.type = "button";
+
+    numberTag.textContent = `#${question.sourceNumber || question.id}`;
+    typeTag.textContent = question.category === "state" ? question.state : "General";
+    statusTag.textContent = getCatalogueStatus(question);
+    prompt.textContent = question.prompt;
+    answer.textContent = `Answer: ${formatAnswer(question, correctIndex)}`;
+    button.textContent = "Study";
+    button.addEventListener("click", () => startCatalogueQuestion(question));
+
+    meta.append(numberTag, typeTag, statusTag);
+    title.append(meta, prompt, answer);
+    item.append(title, button);
+    return item;
+  }
+
+  function getCatalogueStatus(question) {
+    const questionId = String(question.id);
+    if (progress.bookmarkedQuestions[questionId]) return "Bookmarked";
+    if ((progress.questionStats[questionId]?.wrong || 0) > 0) return "Incorrect before";
+    if ((progress.questionStats[questionId]?.answered || 0) > 0) return "Studied";
+    return "New";
+  }
+
+  function getQuestionSearchText(question) {
+    const translation = translations[question.id];
+    return normalizeSearch([
+      question.id,
+      question.sourceNumber,
+      question.prompt,
+      question.state,
+      question.options.map((option) => option.text).join(" "),
+      translation?.prompt,
+      Array.isArray(translation?.options) ? translation.options.join(" ") : ""
+    ].filter(Boolean).join(" "));
+  }
+
+  function normalizeSearch(value) {
+    return String(value || "")
+      .trim()
+      .toLocaleLowerCase("de-DE");
+  }
+
+  function jumpToQuestion(event) {
+    event.preventDefault();
+    const targetNumber = Number.parseInt(jumpQuestion.value, 10);
+    if (!Number.isInteger(targetNumber)) return;
+
+    const question = questions.find((item) => item.sourceNumber === targetNumber || item.id === targetNumber);
+    if (!question) {
+      catalogueSearch.value = String(targetNumber);
+      catalogueFilter.value = "all";
+      renderCatalogue();
+      jumpQuestion.select();
+      return;
+    }
+
+    startCatalogueQuestion(question);
+  }
+
   startButton.addEventListener("click", startRun);
   practiceButton.addEventListener("click", startPracticeRun);
   weakReviewButton.addEventListener("click", startWeakReview);
@@ -874,6 +1028,9 @@
   nextButton.addEventListener("click", nextQuestion);
   translationToggle.addEventListener("click", toggleTranslations);
   bookmarkToggle.addEventListener("click", toggleCurrentBookmark);
+  catalogueSearch.addEventListener("input", renderCatalogue);
+  catalogueFilter.addEventListener("change", renderCatalogue);
+  jumpForm.addEventListener("submit", jumpToQuestion);
   renderProgressSummary();
 
   if (!questions.length) {

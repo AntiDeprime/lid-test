@@ -60,7 +60,7 @@
   - Add a bookmarked-questions practice mode.
   - Persist bookmarks locally.
 
-- [ ] Add question search and catalogue browsing.
+- [x] Add question search and catalogue browsing.
   - Add a searchable list of all questions.
   - Support jumping directly to a question by number.
   - Add filters for general questions, state questions, incorrect questions, and bookmarked questions.
