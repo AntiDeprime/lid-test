@@ -4,27 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Leben in Deutschland Test & Einbürgerungstest Practice | LiD Test Prep</title>
-    <meta name="description" content="Prepare for the Leben in Deutschland Test and Einbürgerungstest with a mobile-friendly mock test using 30 general questions, 3 selected Bundesland questions, instant feedback, and answer review.">
+    <meta name="description" content="Prepare for the Leben in Deutschland Test and Einbürgerungstest with study mode, hidden-answer catalogue browsing, and a timed 33-question exam simulation.">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="LiD Test Prep">
     <meta property="og:title" content="Leben in Deutschland Test & Einbürgerungstest Practice">
-    <meta property="og:description" content="Practice a 33-question mock test for the German Leben in Deutschland / Einbürgerungstest with selectable Bundesland questions, instant feedback, and review.">
+    <meta property="og:description" content="Study the German Leben in Deutschland / Einbürgerungstest catalogue and run a timed exam simulation with selectable Bundesland questions.">
     <meta property="og:image" content="lid-v2-images/lid-q328-bild.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Leben in Deutschland Test & Einbürgerungstest Practice">
-    <meta name="twitter:description" content="Prepare for the German citizenship test with randomized mock tests, selectable Bundesland questions, instant feedback, and missed-answer review.">
+    <meta name="twitter:description" content="Prepare for the German citizenship test with study mode, selectable Bundesland questions, exam simulation, and missed-answer review.">
     <meta name="twitter:image" content="lid-v2-images/lid-q328-bild.png">
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6LN5H6T5LW"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-6LN5H6T5LW');
-    </script>
+    <link rel="manifest" href="manifest.webmanifest">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -35,7 +27,7 @@
             "applicationCategory": "EducationalApplication",
             "operatingSystem": "Any",
             "inLanguage": ["en", "de"],
-            "description": "A mobile-friendly practice app for the German Leben in Deutschland Test and Einbürgerungstest with randomized mock tests, selectable Bundesland questions, instant feedback, English translations, and missed-answer review.",
+            "description": "A mobile-friendly practice app for the German Leben in Deutschland Test and Einbürgerungstest with study mode, selectable Bundesland questions, timed exam simulation, English translations, and missed-answer review.",
             "offers": {
               "@type": "Offer",
               "price": "0",
@@ -85,14 +77,15 @@
               <p class="eyebrow">Leben in Deutschland / Einbürgerungstest</p>
               <h1 id="start-title">Leben in Deutschland Test and Einbürgerungstest practice</h1>
               <p class="lede">
-                Practice with the official-style question catalogue in a focused mock test for your selected Bundesland. The app gives you randomized questions, instant feedback, English translations where available, and a review of missed answers.
+                Prepare with study questions that teach immediately, or start a timed exam simulation that saves feedback until the result screen.
               </p>
               <label class="study-picker" for="bundesland-select">
-                <span>Mock test Bundesland</span>
+                <span>Bundesland for your place of residence</span>
                 <select id="bundesland-select"></select>
+                <small>Choose the Bundesland where you live or expect to take the state-specific exam questions.</small>
               </label>
               <div class="start-actions">
-                <button id="start-button" class="primary-action" type="button">Start mock test</button>
+                <button id="start-button" class="primary-action" type="button">Start exam simulation</button>
                 <button id="practice-button" class="secondary-action" type="button">Study questions</button>
                 <button id="weak-review-button" class="secondary-action" type="button">Review weak questions</button>
                 <button id="bookmark-review-button" class="secondary-action" type="button">Review bookmarked questions</button>
@@ -126,15 +119,20 @@
               </dl>
             </section>
 
+            <div class="start-tabs" role="tablist" aria-label="Start page sections">
+              <button class="start-tab is-active" type="button" data-start-tab="progress">Progress</button>
+              <button class="start-tab" type="button" data-start-tab="catalogue">Catalogue</button>
+              <button class="start-tab" type="button" data-start-tab="learn">Learn</button>
+            </div>
+
             <div class="start-details">
               <section class="start-detail" aria-labelledby="included-title">
                 <h2 id="included-title">Practice features</h2>
                 <ul class="feature-list">
-                  <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
-                  <li><span class="feature-mark">✓</span><span>Use a 60-minute countdown for realistic exam timing.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Run a realistic 33-question exam simulation with a 60-minute timer and no instant answer reveal.</span></li>
                   <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus all 16 Bundesland question sets in study mode.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Use instant feedback, explanations, hints, translations, and weak-question tracking while studying.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
-                  <li><span class="feature-mark">✓</span><span>Practice weak questions until they are answered correctly twice in a row.</span></li>
                   <li><span class="feature-mark">✓</span><span>Bookmark difficult questions for later practice.</span></li>
                   <li><span class="feature-mark">✓</span><span>Search the catalogue, filter question sets, and jump by question number.</span></li>
                   <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
@@ -145,19 +143,23 @@
                 <div class="progress-summary" aria-live="polite">
                   <div class="progress-stat">
                     <b id="answered-stat">0</b>
-                    <span>answers saved</span>
+                    <span>unique studied</span>
                   </div>
                   <div class="progress-stat">
                     <b id="accuracy-stat">0%</b>
-                    <span>overall accuracy</span>
+                    <span>study accuracy</span>
+                  </div>
+                  <div class="progress-stat">
+                    <b id="mastery-stat">0%</b>
+                    <span>mastery</span>
                   </div>
                   <div class="progress-stat">
                     <b id="tests-stat">0</b>
-                    <span>tests completed</span>
+                    <span>exam simulations</span>
                   </div>
                   <div class="progress-stat">
                     <b id="pass-rate-stat">0%</b>
-                    <span>test pass rate</span>
+                    <span>exam pass rate</span>
                   </div>
                   <div class="progress-stat">
                     <b id="weak-stat">0</b>
@@ -180,7 +182,7 @@
                 </div>
                 <button id="reset-progress-button" class="secondary-action reset-progress" type="button">Reset progress</button>
               </section>
-              <section class="start-detail catalogue-browser" aria-labelledby="catalogue-title">
+              <section class="start-detail catalogue-browser is-hidden" aria-labelledby="catalogue-title">
                 <div class="catalogue-heading">
                   <div>
                     <h2 id="catalogue-title">Question catalogue</h2>
@@ -214,11 +216,11 @@
               </section>
             </div>
 
-            <section class="faq-section" aria-labelledby="faq-title">
+            <section class="faq-section is-hidden" aria-labelledby="faq-title">
               <h2 id="faq-title">Leben in Deutschland Test FAQ</h2>
               <dl class="faq-item">
-                <dt>How is the mock test built?</dt>
-                <dd>Each run uses 30 general questions and 3 questions from your selected Bundesland.</dd>
+                <dt>How is the exam simulation built?</dt>
+                <dd>The exam simulation uses 30 general questions and 3 questions from the Bundesland where you live.</dd>
               </dl>
               <dl class="faq-item">
                 <dt>What score is needed to pass?</dt>
@@ -229,6 +231,11 @@
                 <dd>Yes. The result screen shows missed questions, and the start page keeps a weak-question review set across sessions.</dd>
               </dl>
             </section>
+            <footer class="legal-footer" aria-label="Legal and privacy">
+              <button class="text-link" type="button" data-legal-panel="privacy">Privacy</button>
+              <button class="text-link" type="button" data-legal-panel="imprint">Imprint</button>
+              <span id="analytics-status">Analytics off</span>
+            </footer>
           </div>
 
           <aside class="catalogue-preview" aria-label="Question preview">
@@ -284,6 +291,7 @@
           <button id="result-home-button" class="icon-action" type="button" title="Back to start" aria-label="Back to start">&#8962;</button>
         </div>
         <h1 id="result-title">Result</h1>
+        <p id="result-context" class="meta result-context"></p>
         <p id="result-score" class="score">0 / 33</p>
         <div id="result-status" class="result-status">
           <p class="meta">Einbürgerung threshold: 17 correct answers.</p>
@@ -300,6 +308,6 @@
     <script src="questions.js?v=catalogue"></script>
     <script src="explanations.js?v=catalogue"></script>
     <script src="translations-en.js?v=catalogue"></script>
-    <script src="app.js?v=catalogue"></script>
+    <script type="module" src="app.js?v=catalogue"></script>
   </body>
 </html>

@@ -1,3 +1,8 @@
+import { loadProgress, saveProgress as persistProgress } from "./modules/storage.js";
+import { getStateNames, orderStudyQuestionsByProgress, sampleByCategory, shuffle } from "./modules/sampling.js";
+import { summarizeProgress } from "./modules/progress.js";
+import { getLearnerHint } from "./modules/hints.js";
+
 (() => {
   "use strict";
 
@@ -5,18 +10,18 @@
   const TOTAL_STATE = 3;
   const PASS_THRESHOLD = 17;
   const EXAM_DURATION_SECONDS = 60 * 60;
-  const STORAGE_KEY = "lidTestPrepProgress";
-  const STORAGE_VERSION = 1;
+  const ANALYTICS_ID = "G-6LN5H6T5LW";
+  const ANALYTICS_CONSENT_KEY = "lidAnalyticsConsent";
   const WEAK_CLEAR_STREAK = 2;
   const LETTERS = ["A", "B", "C", "D"];
   const CATALOGUE_RESULT_LIMIT = 24;
 
   const questions = window.LID_QUESTIONS || [];
   const translations = window.LID_TRANSLATIONS_EN || {};
-  const stateNames = getStateNames();
+  const stateNames = getStateNames(questions);
   const progress = loadProgress();
   const state = {
-    mode: "test",
+    mode: "exam",
     run: [],
     index: 0,
     selected: null,
@@ -28,7 +33,8 @@
     completedAt: null,
     timeRemaining: EXAM_DURATION_SECONDS,
     endedByTimeout: false,
-    studyFilter: "all"
+    studyFilter: "all",
+    selectedState: ""
   };
 
   const $ = (id) => document.getElementById(id);
@@ -76,43 +82,23 @@
   const accuracyStat = $("accuracy-stat");
   const testsStat = $("tests-stat");
   const passRateStat = $("pass-rate-stat");
+  const masteryStat = $("mastery-stat");
   const weakStat = $("weak-stat");
   const bookmarkStat = $("bookmark-stat");
   const areaStats = $("area-stats");
   const recentTests = $("recent-tests");
-
-  function createEmptyProgress() {
-    return {
-      version: STORAGE_VERSION,
-      questionStats: {},
-      weakQuestions: {},
-      bookmarkedQuestions: {},
-      testHistory: []
-    };
-  }
-
-  function loadProgress() {
-    try {
-      const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY));
-      if (!saved || saved.version !== STORAGE_VERSION) return createEmptyProgress();
-      return {
-        version: STORAGE_VERSION,
-        questionStats: saved.questionStats && typeof saved.questionStats === "object" ? saved.questionStats : {},
-        weakQuestions: saved.weakQuestions && typeof saved.weakQuestions === "object" ? saved.weakQuestions : {},
-        bookmarkedQuestions: saved.bookmarkedQuestions && typeof saved.bookmarkedQuestions === "object" ? saved.bookmarkedQuestions : {},
-        testHistory: Array.isArray(saved.testHistory) ? saved.testHistory : []
-      };
-    } catch (error) {
-      return createEmptyProgress();
-    }
-  }
+  const resultContext = $("result-context");
+  const analyticsStatus = $("analytics-status");
+  const startTabs = [...document.querySelectorAll("[data-start-tab]")];
+  const startSections = {
+    progress: $("progress-title").closest(".start-detail"),
+    catalogue: $("catalogue-title").closest(".start-detail"),
+    learn: $("included-title").closest(".start-detail")
+  };
+  const faqSection = $("faq-title").closest(".faq-section");
 
   function saveProgress() {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    } catch (error) {
-      // Progress is helpful, but the quiz should still work if storage is blocked.
-    }
+    persistProgress(progress);
   }
 
   function resetProgress() {
@@ -199,7 +185,7 @@
   }
 
   function recordCompletedTest() {
-    if (state.mode !== "test" || state.run.length !== TOTAL_GENERAL + TOTAL_STATE) return;
+    if (state.mode !== "exam" || state.run.length !== TOTAL_GENERAL + TOTAL_STATE) return;
 
     progress.testHistory.push({
       completedAt: new Date().toISOString(),
@@ -214,18 +200,15 @@
   }
 
   function renderProgressSummary() {
-    const stats = Object.values(progress.questionStats);
-    const answered = stats.reduce((total, item) => total + item.answered, 0);
-    const correct = stats.reduce((total, item) => total + item.correct, 0);
-    const tests = progress.testHistory.length;
-    const passedTests = progress.testHistory.filter((test) => test.passed).length;
+    const summary = summarizeProgress(progress, questions.length);
     const weakQuestionIds = getWeakQuestionIds();
     const bookmarkedQuestionIds = getBookmarkedQuestionIds();
 
-    answeredStat.textContent = String(answered);
-    accuracyStat.textContent = answered ? `${Math.round((correct / answered) * 100)}%` : "0%";
-    testsStat.textContent = String(tests);
-    passRateStat.textContent = tests ? `${Math.round((passedTests / tests) * 100)}%` : "0%";
+    answeredStat.textContent = String(summary.uniqueStudied);
+    accuracyStat.textContent = `${summary.studyAccuracy}%`;
+    masteryStat.textContent = `${summary.mastery}%`;
+    testsStat.textContent = String(summary.tests);
+    passRateStat.textContent = `${summary.passRate}%`;
     weakStat.textContent = String(weakQuestionIds.length);
     bookmarkStat.textContent = String(bookmarkedQuestionIds.length);
     weakReviewButton.disabled = weakQuestionIds.length === 0;
@@ -236,7 +219,7 @@
     bookmarkReviewButton.textContent = bookmarkedQuestionIds.length
       ? `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`
       : "No bookmarks yet";
-    resetProgressButton.disabled = answered === 0 && tests === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0;
+    resetProgressButton.disabled = summary.repeatedAnswers === 0 && summary.tests === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0;
     renderAreaStats();
     renderRecentTests();
     renderCatalogue();
@@ -313,7 +296,7 @@
     recentTests.replaceChildren();
 
     if (!progress.testHistory.length) {
-      recentTests.append(createEmptyProgressNote("Complete a mock test to see recent results here."));
+      recentTests.append(createEmptyProgressNote("Complete an exam simulation to see recent results here."));
       return;
     }
 
@@ -346,29 +329,6 @@
     resultScreen.classList.toggle("is-hidden", screen !== "result");
   }
 
-  function shuffle(items) {
-    const copy = items.slice();
-    for (let i = copy.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-  }
-
-  function getStateNames() {
-    return [...new Set(questions
-      .filter((question) => question.category === "state" && question.state)
-      .map((question) => question.state))]
-      .sort((a, b) => a.localeCompare(b, "de-DE"));
-  }
-
-  function sampleByCategory(category, count, selectedState = null) {
-    return shuffle(questions.filter((question) => {
-      if (question.category !== category) return false;
-      return !selectedState || question.state === selectedState;
-    })).slice(0, count);
-  }
-
   function getStudyQuestions(filter) {
     if (filter === "bookmarked") {
       return getBookmarkedQuestions();
@@ -386,26 +346,7 @@
       });
     }
 
-    return orderStudyQuestionsByProgress(filteredQuestions);
-  }
-
-  function orderStudyQuestionsByProgress(studyQuestions) {
-    const fresh = [];
-    const studied = [];
-
-    studyQuestions.forEach((question) => {
-      if (hasSavedAnswer(question)) {
-        studied.push(question);
-      } else {
-        fresh.push(question);
-      }
-    });
-
-    return [...fresh, ...studied];
-  }
-
-  function hasSavedAnswer(question) {
-    return (progress.questionStats[String(question.id)]?.answered || 0) > 0;
+    return orderStudyQuestionsByProgress(filteredQuestions, progress.questionStats);
   }
 
   function getWeakQuestionIds() {
@@ -469,12 +410,13 @@
   function startRun() {
     if (!confirmDiscardActiveRun()) return;
 
-    const general = sampleByCategory("general", TOTAL_GENERAL);
+    const general = sampleByCategory(questions, "general", TOTAL_GENERAL);
     const selectedState = bundeslandSelect.value;
-    const stateQuestions = sampleByCategory("state", TOTAL_STATE, selectedState);
+    const stateQuestions = sampleByCategory(questions, "state", TOTAL_STATE, selectedState);
     if (stateQuestions.length < TOTAL_STATE) return;
 
-    state.mode = "test";
+    state.mode = "exam";
+    state.selectedState = selectedState;
     state.run = shuffle([...general, ...stateQuestions]);
     resetRunState();
     startTimer();
@@ -575,7 +517,7 @@
     state.answers = [];
     state.startedAt = null;
     state.completedAt = null;
-    state.timeRemaining = state.mode === "test" ? EXAM_DURATION_SECONDS : 0;
+    state.timeRemaining = state.mode === "exam" ? EXAM_DURATION_SECONDS : 0;
     state.endedByTimeout = false;
   }
 
@@ -595,7 +537,7 @@
   }
 
   function tickTimer() {
-    if (state.mode !== "test" || !state.startedAt) {
+    if (state.mode !== "exam" || !state.startedAt) {
       stopTimer();
       return;
     }
@@ -610,7 +552,7 @@
   }
 
   function renderTimer() {
-    const isTimedTest = state.mode === "test";
+    const isTimedTest = state.mode === "exam";
     timerCounter.classList.toggle("is-hidden", !isTimedTest);
     timerCounter.classList.toggle("is-warning", isTimedTest && state.timeRemaining <= 5 * 60);
     timerCounter.textContent = formatDuration(isTimedTest ? state.timeRemaining : 0);
@@ -674,7 +616,7 @@
 
     questionKicker.textContent = `Question ${progress} / ${total}`;
     questionTitle.textContent = question.prompt;
-    scoreCounter.textContent = `${state.score} correct`;
+    scoreCounter.textContent = state.mode === "exam" ? "Exam simulation" : `${state.score} correct`;
     progressBar.style.width = `${((progress - 1) / total) * 100}%`;
     questionHint.textContent = "Choose one answer.";
     questionTranslation.replaceChildren();
@@ -691,10 +633,27 @@
     renderBookmarkToggle(question);
     renderImages(question);
     renderAnswers(question);
+    renderLearnerHint(question);
     renderTranslations();
   }
 
+  function renderLearnerHint(question) {
+    if (state.mode === "exam" || state.selected !== null) return;
+
+    const hint = getLearnerHint(question);
+    if (!hint) return;
+    questionHint.textContent = `Hint: ${hint}`;
+  }
+
   function renderModeChrome(question, progress, total) {
+    if (state.mode === "exam") {
+      questionKicker.textContent = `Exam simulation ${progress} / ${total}`;
+      questionHint.textContent = state.selected === null
+        ? "Choose one answer. Correctness is shown after you finish."
+        : "Answer saved. Continue when ready.";
+      return;
+    }
+
     if (state.mode !== "study") return;
 
     const label = question.category === "state" ? `${question.state} question` : "General question";
@@ -743,8 +702,12 @@
 
       if (answeredEntry) {
         button.disabled = true;
-        if (index === answeredEntry.correctIndex) button.classList.add("is-correct");
-        if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) button.classList.add("is-wrong");
+        if (state.mode === "exam") {
+          if (index === answeredEntry.selectedIndex) button.classList.add("is-selected");
+        } else {
+          if (index === answeredEntry.correctIndex) button.classList.add("is-correct");
+          if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) button.classList.add("is-wrong");
+        }
       }
       answers.append(button);
     });
@@ -819,20 +782,28 @@
     state.selected = selectedIndex;
     state.score += isCorrect ? 1 : 0;
     state.answers.push(answerEntry);
-    recordAnswer(answerEntry);
+    if (state.mode !== "exam") {
+      recordAnswer(answerEntry);
+    }
 
     [...answers.children].forEach((button, index) => {
       button.disabled = true;
-      if (index === correctIndex) button.classList.add("is-correct");
-      if (index === selectedIndex && !isCorrect) button.classList.add("is-wrong");
+      if (state.mode === "exam") {
+        if (index === selectedIndex) button.classList.add("is-selected");
+      } else {
+        if (index === correctIndex) button.classList.add("is-correct");
+        if (index === selectedIndex && !isCorrect) button.classList.add("is-wrong");
+      }
     });
 
-    if (state.mode !== "study") {
+    if (state.mode !== "study" && state.mode !== "exam") {
       scoreCounter.textContent = `${state.score} correct`;
     }
     progressBar.style.width = `${((state.index + 1) / state.run.length) * 100}%`;
-    questionHint.textContent = isCorrect ? "Correct answer." : "Wrong answer.";
-    if (question.explanation) {
+    questionHint.textContent = state.mode === "exam"
+      ? "Answer saved. Continue when ready."
+      : isCorrect ? "Correct answer." : "Wrong answer.";
+    if (state.mode !== "exam" && question.explanation) {
       questionExplanation.textContent = question.explanation;
       questionExplanation.classList.remove("is-hidden");
     }
@@ -875,7 +846,7 @@
     state.completedAt = Date.now();
     state.endedByTimeout = endedByTimeout;
 
-    if (state.mode === "test") {
+    if (state.mode === "exam") {
       completeUnansweredQuestions();
       recordCompletedTest();
     }
@@ -902,7 +873,7 @@
   }
 
   function renderResult() {
-    if (state.mode !== "test") {
+    if (state.mode !== "exam") {
       resultTitle.textContent = state.mode === "weak-review"
         ? "Weak review complete"
         : state.mode === "bookmarks"
@@ -914,10 +885,11 @@
         state.mode === "weak-review"
           ? `Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.`
           : state.mode === "bookmarks"
-            ? "Bookmarked practice is untimed and stays separate from mock-test history."
-          : "Practice mode is untimed and separate from mock-test history."
+            ? "Bookmarked practice is untimed and stays separate from exam-simulation history."
+          : "Practice mode is untimed and separate from exam-simulation history."
       ));
       resultTime.textContent = "";
+      resultContext.textContent = "";
       renderReview();
       return;
     }
@@ -925,6 +897,7 @@
     const passed = state.score >= PASS_THRESHOLD;
     resultTitle.textContent = passed ? "Passed" : "Not passed";
     resultScore.textContent = `${state.score} / ${state.run.length}`;
+    resultContext.textContent = `Bundesland: ${state.selectedState || bundeslandSelect.value}. 30 general questions, 3 residence-based Bundesland questions, 60-minute limit.`;
     resultStatus.className = `result-status ${passed ? "is-pass" : "is-fail"}`;
     resultStatus.replaceChildren(createReviewText(
       state.endedByTimeout
@@ -1093,6 +1066,7 @@
     const answer = document.createElement("p");
     const button = document.createElement("button");
     const correctIndex = question.options.findIndex((option) => option.correct);
+    const answerId = `catalogue-answer-${question.id}`;
 
     item.className = "catalogue-item";
     title.className = "catalogue-item-title";
@@ -1102,6 +1076,7 @@
     statusTag.className = "catalogue-tag";
     prompt.className = "catalogue-prompt";
     answer.className = "catalogue-answer";
+    answer.id = answerId;
     button.className = "secondary-action catalogue-study";
     button.type = "button";
 
@@ -1110,13 +1085,32 @@
     statusTag.textContent = getCatalogueStatus(question);
     prompt.textContent = question.prompt;
     answer.textContent = `Answer: ${formatAnswer(question, correctIndex)}`;
+    answer.hidden = !shouldShowCatalogueAnswer(question);
     button.textContent = "Study";
     button.addEventListener("click", () => startCatalogueQuestion(question));
+    const revealButton = document.createElement("button");
+    revealButton.className = "secondary-action catalogue-study";
+    revealButton.type = "button";
+    revealButton.textContent = answer.hidden ? "Reveal answer" : "Hide answer";
+    revealButton.setAttribute("aria-controls", answerId);
+    revealButton.setAttribute("aria-expanded", String(!answer.hidden));
+    revealButton.addEventListener("click", () => {
+      answer.hidden = !answer.hidden;
+      revealButton.textContent = answer.hidden ? "Reveal answer" : "Hide answer";
+      revealButton.setAttribute("aria-expanded", String(!answer.hidden));
+    });
 
     meta.append(numberTag, typeTag, statusTag);
     title.append(meta, prompt, answer);
-    item.append(title, button);
+    const actions = document.createElement("div");
+    actions.className = "catalogue-actions";
+    actions.append(revealButton, button);
+    item.append(title, actions);
     return item;
+  }
+
+  function shouldShowCatalogueAnswer(question) {
+    return (progress.questionStats[String(question.id)]?.answered || 0) > 0;
   }
 
   function getCatalogueStatus(question) {
@@ -1163,6 +1157,117 @@
     startCatalogueQuestion(question);
   }
 
+  function setStartTab(selectedTab) {
+    startTabs.forEach((tab) => {
+      const active = tab.dataset.startTab === selectedTab;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+
+    Object.entries(startSections).forEach(([name, section]) => {
+      section.classList.toggle("is-hidden", name !== selectedTab);
+    });
+    faqSection.classList.toggle("is-hidden", selectedTab !== "learn");
+  }
+
+  function setupAnalyticsConsent() {
+    const savedConsent = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
+    if (savedConsent === "granted") {
+      loadAnalytics();
+      return;
+    }
+
+    if (savedConsent === "denied") {
+      analyticsStatus.textContent = "Analytics off";
+      return;
+    }
+
+    const banner = document.createElement("section");
+    const text = document.createElement("p");
+    const allow = document.createElement("button");
+    const decline = document.createElement("button");
+    banner.className = "consent-banner";
+    banner.setAttribute("aria-label", "Analytics privacy choice");
+    text.textContent = "Help improve this free study app by allowing privacy-conscious Google Analytics. Analytics stays off unless you consent.";
+    allow.className = "primary-action";
+    allow.type = "button";
+    allow.textContent = "Allow analytics";
+    decline.className = "secondary-action";
+    decline.type = "button";
+    decline.textContent = "Keep off";
+    allow.addEventListener("click", () => {
+      window.localStorage.setItem(ANALYTICS_CONSENT_KEY, "granted");
+      banner.remove();
+      loadAnalytics();
+    });
+    decline.addEventListener("click", () => {
+      window.localStorage.setItem(ANALYTICS_CONSENT_KEY, "denied");
+      analyticsStatus.textContent = "Analytics off";
+      banner.remove();
+    });
+    banner.append(text, allow, decline);
+    document.body.append(banner);
+  }
+
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("service-worker.js").catch(() => {
+      // Offline support is optional during local checks.
+    });
+  }
+
+  function loadAnalytics() {
+    if (document.querySelector(`script[src*="${ANALYTICS_ID}"]`)) return;
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("consent", "default", {
+      ad_storage: "denied",
+      analytics_storage: "granted",
+      ad_user_data: "denied",
+      ad_personalization: "denied"
+    });
+    window.gtag("js", new Date());
+    window.gtag("config", ANALYTICS_ID, {
+      anonymize_ip: true,
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false
+    });
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_ID}`;
+    document.head.append(script);
+    analyticsStatus.textContent = "Analytics on";
+  }
+
+  function showLegalPanel(panel) {
+    const existing = document.querySelector(".legal-modal");
+    if (existing) existing.remove();
+
+    const modal = document.createElement("section");
+    const close = document.createElement("button");
+    const title = document.createElement("h2");
+    const copy = document.createElement("p");
+    modal.className = "legal-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    close.className = "icon-action";
+    close.type = "button";
+    close.textContent = "x";
+    close.setAttribute("aria-label", "Close");
+    title.textContent = panel === "privacy" ? "Privacy" : "Imprint";
+    copy.textContent = panel === "privacy"
+      ? "Progress is stored locally in this browser. Google Analytics loads only after explicit consent and is configured without advertising signals. Add the production operator contact and full privacy notice before public launch."
+      : "Add the production site operator name, address, and contact details before public launch. This placeholder keeps the legal entry point visible during development.";
+    close.addEventListener("click", () => modal.remove());
+    modal.append(close, title, copy);
+    document.body.append(modal);
+    close.focus();
+  }
+
   startButton.addEventListener("click", startRun);
   practiceButton.addEventListener("click", startPracticeRun);
   weakReviewButton.addEventListener("click", startWeakReview);
@@ -1179,7 +1284,14 @@
   catalogueSearch.addEventListener("input", renderCatalogue);
   catalogueFilter.addEventListener("change", renderCatalogue);
   jumpForm.addEventListener("submit", jumpToQuestion);
+  startTabs.forEach((tab) => tab.addEventListener("click", () => setStartTab(tab.dataset.startTab)));
+  document.querySelectorAll("[data-legal-panel]").forEach((button) => {
+    button.addEventListener("click", () => showLegalPanel(button.dataset.legalPanel));
+  });
   populateStateControls();
+  setStartTab("progress");
+  setupAnalyticsConsent();
+  registerServiceWorker();
   renderProgressSummary();
 
   if (!questions.length) {

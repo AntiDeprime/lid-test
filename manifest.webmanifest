@@ -1,0 +1,18 @@
+{
+  "name": "LiD Test Prep",
+  "short_name": "LiD Prep",
+  "description": "Study and exam simulation for the Leben in Deutschland / Einbürgerungstest catalogue.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#11100e",
+  "theme_color": "#4fb3a5",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
