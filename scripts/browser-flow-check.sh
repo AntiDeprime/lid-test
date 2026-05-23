@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PORT="${PORT:-8000}"
+HOST="${HOST:-127.0.0.1}"
+URL="${URL:-http://${HOST}:${PORT}/}"
+SESSION="${PLAYWRIGHT_CLI_SESSION:-lid-test-flow}"
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+PWCLI="${PWCLI:-$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh}"
+SERVER_LOG="${SERVER_LOG:-/tmp/lid-test-flow-http-${PORT}.log}"
+
+server_pid=""
+
+cleanup() {
+  set +e
+  "$PWCLI" --session "$SESSION" close >/dev/null 2>&1
+  if [[ -n "$server_pid" ]]; then
+    kill "$server_pid" >/dev/null 2>&1
+    wait "$server_pid" >/dev/null 2>&1
+  fi
+}
+trap cleanup EXIT
+
+python3 -m http.server "$PORT" --bind "$HOST" >"$SERVER_LOG" 2>&1 &
+server_pid="$!"
+
+for _ in {1..30}; do
+  if curl --fail --silent --show-error "$URL" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 0.2
+done
+
+curl --fail --silent --show-error "$URL" >/dev/null
+
+"$PWCLI" --session "$SESSION" open "$URL"
+"$PWCLI" --session "$SESSION" eval "(() => { localStorage.clear(); return true; })()"
+"$PWCLI" --session "$SESSION" open "$URL"
+"$PWCLI" --session "$SESSION" eval "async () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const click = (selector) => {
+    const element = document.querySelector(selector);
+    if (!element) throw new Error('Missing selector: ' + selector);
+    element.click();
+  };
+  const currentQuestion = () => {
+    const prompt = document.querySelector('#question-title')?.textContent;
+    return window.LID_QUESTIONS.find((question) => question.prompt === prompt);
+  };
+  const clickAnswer = (wantCorrect) => {
+    const question = currentQuestion();
+    if (!question) throw new Error('Current question not found');
+    const index = question.options.findIndex((option) => Boolean(option.correct) === wantCorrect);
+    document.querySelectorAll('.answer-option')[index].click();
+  };
+  const finishExam = async (wantCorrect) => {
+    for (let i = 0; i < 33; i += 1) {
+      const beforeReveal = [...document.querySelectorAll('.answer-option')].some((button) => button.classList.contains('is-correct') || button.classList.contains('is-wrong'));
+      if (beforeReveal) throw new Error('Exam simulation revealed correctness before result');
+      clickAnswer(wantCorrect);
+      if (i < 32) {
+        click('#next-button');
+        await delay(0);
+      } else {
+        click('#next-button');
+      }
+    }
+    await delay(0);
+  };
+
+  await delay(100);
+  click('.consent-banner .secondary-action');
+  click('#start-button');
+  await delay(0);
+  if (!document.querySelector('#timer-counter')?.textContent.includes('60:00')) {
+    throw new Error('Exam timer did not start at 60:00');
+  }
+  await finishExam(true);
+  if (document.querySelector('#result-title')?.textContent !== 'Passed') {
+    throw new Error('All-correct exam did not pass');
+  }
+  if (!document.querySelector('#result-context')?.textContent.includes('30 general')) {
+    throw new Error('Result context does not describe exam composition');
+  }
+
+  click('#new-test-button');
+  await delay(0);
+  await finishExam(false);
+  if (document.querySelector('#result-title')?.textContent !== 'Not passed') {
+    throw new Error('All-wrong exam did not fail');
+  }
+
+  click('#result-home-button');
+  click('[data-start-tab=\"catalogue\"]');
+  await delay(0);
+  const firstCatalogueItem = document.querySelector('.catalogue-item');
+  if (!firstCatalogueItem) throw new Error('Catalogue item missing');
+  if (!firstCatalogueItem.querySelector('.catalogue-answer')?.hidden) {
+    throw new Error('Catalogue answer spoiler is visible by default');
+  }
+  firstCatalogueItem.querySelector('[aria-controls]')?.click();
+  if (firstCatalogueItem.querySelector('.catalogue-answer')?.hidden) {
+    throw new Error('Catalogue reveal button did not show answer');
+  }
+
+  document.querySelector('#catalogue-search').value = 'Grundgesetz';
+  document.querySelector('#catalogue-search').dispatchEvent(new Event('input', { bubbles: true }));
+  await delay(0);
+  if (!document.querySelector('#catalogue-summary')?.textContent.includes('match')) {
+    throw new Error('Catalogue search did not update summary');
+  }
+
+  click('#translation-toggle');
+  click('#result-home-button');
+  click('#practice-button');
+  await delay(0);
+  click('#translation-toggle');
+  if (!document.querySelector('#question-translation')?.textContent.trim()) {
+    throw new Error('Translation panel did not render in study mode');
+  }
+  click('#bookmark-toggle');
+  click('#home-button');
+  await delay(0);
+  if (!document.querySelector('#bookmark-review-button')?.textContent.includes('bookmarked')) {
+    throw new Error('Bookmark review queue did not update');
+  }
+
+  click('#start-button');
+  await delay(0);
+  const realNow = Date.now;
+  Date.now = () => realNow() + 61 * 60 * 1000;
+  await delay(1100);
+  Date.now = realNow;
+  if (!document.querySelector('#result-status')?.textContent.includes('Time expired')) {
+    throw new Error('Timeout result did not render');
+  }
+
+  return {
+    passedFlow: true,
+    title: document.title,
+    result: document.querySelector('#result-title')?.textContent
+  };
+}"
+"$PWCLI" --session "$SESSION" console

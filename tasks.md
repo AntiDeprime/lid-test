@@ -42,6 +42,17 @@
   - Keep practice results separate from completed mock-test history.
   - Keep unanswered timeout items out of weak-question progress.
 
+- [x] Add production-ready analytics privacy controls.
+  - Gate Google Analytics behind an explicit consent flow or configure privacy-preserving consent defaults before loading tracking.
+  - Add visible privacy and imprint/legal links appropriate for a Germany-focused education app.
+  - Document the production privacy setup in the README.
+
+- [x] Split learning feedback from realistic exam simulation.
+  - Keep instant correctness, explanations, and weak-question tracking in study/practice modes.
+  - Add a true exam-simulation mode that withholds correctness and explanations until the result screen.
+  - Make the start-page copy clearly distinguish study practice from exam simulation.
+  - Verify that exam simulation still uses 30 general questions, 3 selected Bundesland questions, a 60-minute timer, and the 17-correct pass threshold.
+
 ## Medium Priority
 
 - [x] Expand practice into full study mode.
@@ -71,14 +82,42 @@
   - Show recent test results.
 
 - [x] Add webpage visit monitoring.
-  - Added Google Analytics 4 using the Google tag with measurement ID `G-6LN5H6T5LW`.
-  - Track basic page visits and referral sources through GA4.
-  - Documented the setup and privacy/consent note in the README.
+  - Added consent-gated Google Analytics 4 support with measurement ID `G-6LN5H6T5LW`.
+  - Track basic page visits and referral sources through GA4 after explicit consent.
+  - Documented the setup and privacy/consent behavior in the README.
 
 - [x] Add support for all 16 Bundesländer.
   - Extend the question catalogue from Berlin-only to the full BAMF set: 300 general questions plus 160 state-specific questions.
   - Add a Bundesland selector before starting a test.
   - Sample 30 general questions and 3 questions from the selected Bundesland.
+
+- [x] Hide catalogue answer spoilers by default.
+  - Do not show correct answers in the catalogue list unless the user explicitly reveals them.
+  - Keep search and jump-to-question flows useful without exposing answers prematurely.
+  - Preserve answer visibility after a user opens and answers a study question.
+
+- [x] Improve progress and mastery statistics.
+  - Separate repeated answer attempts from unique questions attempted.
+  - Add a clearer mastery metric that cannot be inflated by repeating one easy question.
+  - Keep exam-simulation pass rate separate from study/practice accuracy.
+  - Show weak-question and bookmark counts as actionable queues, not general accuracy.
+
+- [x] Simplify the start-page information architecture.
+  - Keep the first viewport focused on the primary actions, Bundesland selection, and current progress.
+  - Move FAQ, feature copy, and the full catalogue into collapsible sections, tabs, or lower-priority views.
+  - Make repeat-user workflows faster on mobile.
+  - Verify the first screen at mobile and desktop widths after changes.
+
+- [x] Clarify Bundesland selection copy.
+  - Explain that the selected Bundesland should match the user's primary residence for the state-specific exam questions.
+  - Update labels and FAQ copy from generic "Mock test Bundesland" wording to clearer residence-based language.
+  - Keep the selected Bundesland visible in exam-simulation and result context.
+
+- [x] Expand browser coverage for critical flows.
+  - Add checks for completing an exam simulation and seeing the correct pass/fail result.
+  - Add checks for timeout behavior and unanswered-question handling.
+  - Add checks for weak-question clearing, bookmarked-question review, translation fallback, catalogue jump, and reset progress.
+  - Keep `scripts/browser-smoke-check.sh` fast, and add deeper checks as a separate script if needed.
 
 ## Lower Priority
 
@@ -100,12 +139,16 @@
   - Add optional English translations for German prompts and answers.
   - Keep German as the default and official test language.
 
-- [ ] Add richer learner hints and multilingual support.
+- [x] Add richer learner hints.
   - Add optional learner hints for difficult German civic terms.
-  - Consider multilingual translations beyond English.
   - Keep German as the default and official test language.
 
-- [ ] Make the app installable as a PWA.
+- [x] Make the app installable as a PWA.
   - Add a web app manifest.
   - Add a service worker for asset and question-cache support.
   - Verify offline loading after deployment.
+
+- [x] Split the single-page JavaScript into smaller modules.
+  - Separate question sampling, storage/progress, quiz state transitions, catalogue rendering, and statistics rendering.
+  - Keep the app build-free unless a module strategy requires a documented local-server workflow.
+  - Add focused tests around pure sampling and progress functions once separated.

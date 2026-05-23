@@ -2,11 +2,11 @@
 
 Static, mobile-first practice app for the German **Leben in Deutschland** / **Einbürgerungstest** question catalogue.
 
-The app samples 33 questions per run: 30 general questions and 3 questions from the selected Bundesland. The final result uses the Einbürgerung threshold of 17 correct answers out of 33.
+The exam simulation samples 33 questions per run: 30 general questions and 3 questions from the Bundesland selected for the user's place of residence. It uses a 60-minute timer, withholds correctness and explanations until the result screen, and applies the Einbürgerung threshold of 17 correct answers out of 33.
 
-Study mode lets users browse all questions, only general questions, all Bundesland questions, one selected Bundesland question set, or bookmarked questions. It starts with questions that have no saved attempts, then continues with already studied questions. Answers stay hidden until the user selects an option, and selected answers are saved immediately. Users can bookmark difficult questions from any quiz or study screen and review those bookmarks later from the start page.
+Study mode lets users browse all questions, only general questions, all Bundesland questions, one selected Bundesland question set, or bookmarked questions. It starts with questions that have no saved attempts, then continues with already studied questions. Answers stay hidden until the user selects an option, and selected answers are saved immediately. Study and review modes include instant correctness, explanations, learner hints, English translations where available, weak-question tracking, and bookmarks.
 
-The start page also includes catalogue browsing with keyword search, direct question-number lookup, and filters for all, general, Bundesland, previously incorrect, and bookmarked questions. Local statistics show attempted answers, accuracy, completed tests, pass rate, area performance, recent mock-test results, weak questions, and bookmarks.
+The start page also includes tabbed catalogue browsing with keyword search, direct question-number lookup, and filters for all, general, Bundesland, previously incorrect, and bookmarked questions. Catalogue answers are hidden by default unless the question was already studied or the user explicitly reveals the answer. Local statistics separate unique studied questions, repeated study accuracy, mastery, completed exam simulations, exam pass rate, weak-question queues, and bookmarks.
 
 ## Run Locally
 
@@ -35,6 +35,14 @@ scripts/browser-smoke-check.sh
 ```
 
 The script starts `python3 -m http.server 8000 --bind 127.0.0.1`, waits for `http://127.0.0.1:8000/`, opens the app through the Codex Playwright CLI wrapper, verifies the start page DOM, captures a snapshot, prints console output, then closes the browser and server.
+
+Deeper browser flow check:
+
+```sh
+scripts/browser-flow-check.sh
+```
+
+The flow check completes passing and failing exam simulations, verifies that exam feedback is withheld until results, checks timeout handling, catalogue answer reveal behavior, catalogue search, translation fallback, bookmarked review queue updates, and reset-safe localStorage setup.
 
 Useful overrides:
 
@@ -88,9 +96,13 @@ Codex sandbox notes:
 
 ## Analytics
 
-The page includes the Google Analytics 4 Google tag in `index.html` with measurement ID `G-6LN5H6T5LW`.
+The page supports Google Analytics 4 with measurement ID `G-6LN5H6T5LW`, but the Google tag is not loaded until the user explicitly allows analytics in the consent banner.
 
-Because Google Analytics may use cookies or similar identifiers depending on account settings and jurisdiction, keep the site's privacy notice and consent approach aligned with the production deployment.
+The app stores progress locally in the user's browser. The current analytics configuration denies advertising storage and personalization signals, enables analytics storage only after consent, and exposes visible privacy and imprint links. Replace the placeholder privacy and imprint copy with the production operator details before public launch.
+
+## PWA
+
+The app includes `manifest.webmanifest` and `service-worker.js` so it can be installed and can cache the shell, data files, modules, and visited assets for offline use after the first load.
 
 ## GitHub Pages
 
@@ -108,7 +120,8 @@ GitHub Pages will serve `index.html` as the app entry point.
 
 - `index.html` contains the one-page UI structure and metadata.
 - `styles.css` contains the app styling.
-- `app.js` contains the vanilla JavaScript app logic.
+- `app.js` contains the vanilla JavaScript app wiring and screen state.
+- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, and learner hints.
 - `questions.js` contains the question catalogue loaded by the page.
 - `explanations.js` adds learner-facing explanations to the question catalogue without changing the official answer data.
 - `translations-en.js` contains local English translations for the bundled questions.
