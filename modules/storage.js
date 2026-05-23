@@ -11,8 +11,17 @@ export function createEmptyProgress() {
   };
 }
 
-export function loadProgress(storage = window.localStorage) {
+function getDefaultStorage() {
   try {
+    return window.localStorage;
+  } catch (error) {
+    return null;
+  }
+}
+
+export function loadProgress(storage = getDefaultStorage()) {
+  try {
+    if (!storage) return createEmptyProgress();
     const saved = JSON.parse(storage.getItem(STORAGE_KEY));
     if (!saved || saved.version !== STORAGE_VERSION) return createEmptyProgress();
     return {
@@ -27,10 +36,30 @@ export function loadProgress(storage = window.localStorage) {
   }
 }
 
-export function saveProgress(progress, storage = window.localStorage) {
+export function saveProgress(progress, storage = getDefaultStorage()) {
   try {
+    if (!storage) return;
     storage.setItem(STORAGE_KEY, JSON.stringify(progress));
   } catch (error) {
     // Progress is helpful, but the quiz should still work if storage is blocked.
+  }
+}
+
+export function getStorageItem(key, storage = getDefaultStorage()) {
+  try {
+    if (!storage) return null;
+    return storage.getItem(key);
+  } catch (error) {
+    return null;
+  }
+}
+
+export function setStorageItem(key, value, storage = getDefaultStorage()) {
+  try {
+    if (!storage) return false;
+    storage.setItem(key, value);
+    return true;
+  } catch (error) {
+    return false;
   }
 }

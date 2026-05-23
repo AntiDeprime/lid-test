@@ -465,6 +465,13 @@ h1 {
   padding: 0 12px;
 }
 
+.catalogue-more {
+  justify-self: start;
+  width: auto;
+  min-height: 40px;
+  padding: 0 14px;
+}
+
 .catalogue-actions {
   display: flex;
   gap: 8px;

@@ -120,13 +120,13 @@
             </section>
 
             <div class="start-tabs" role="tablist" aria-label="Start page sections">
-              <button class="start-tab is-active" type="button" data-start-tab="progress">Progress</button>
-              <button class="start-tab" type="button" data-start-tab="catalogue">Catalogue</button>
-              <button class="start-tab" type="button" data-start-tab="learn">Learn</button>
+              <button id="progress-tab" class="start-tab is-active" type="button" role="tab" aria-controls="progress-panel" data-start-tab="progress">Progress</button>
+              <button id="catalogue-tab" class="start-tab" type="button" role="tab" aria-controls="catalogue-panel" data-start-tab="catalogue">Catalogue</button>
+              <button id="learn-tab" class="start-tab" type="button" role="tab" aria-controls="learn-panel" data-start-tab="learn">Learn</button>
             </div>
 
             <div class="start-details">
-              <section class="start-detail" aria-labelledby="included-title">
+              <section id="learn-panel" class="start-detail" role="tabpanel" aria-labelledby="learn-tab">
                 <h2 id="included-title">Practice features</h2>
                 <ul class="feature-list">
                   <li><span class="feature-mark">✓</span><span>Run a realistic 33-question exam simulation with a 60-minute timer and no instant answer reveal.</span></li>
@@ -138,7 +138,7 @@
                   <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
                 </ul>
               </section>
-              <section class="start-detail" aria-labelledby="progress-title">
+              <section id="progress-panel" class="start-detail" role="tabpanel" aria-labelledby="progress-tab">
                 <h2 id="progress-title">Your progress</h2>
                 <div class="progress-summary" aria-live="polite">
                   <div class="progress-stat">
@@ -182,7 +182,7 @@
                 </div>
                 <button id="reset-progress-button" class="secondary-action reset-progress" type="button">Reset progress</button>
               </section>
-              <section class="start-detail catalogue-browser is-hidden" aria-labelledby="catalogue-title">
+              <section id="catalogue-panel" class="start-detail catalogue-browser is-hidden" role="tabpanel" aria-labelledby="catalogue-tab">
                 <div class="catalogue-heading">
                   <div>
                     <h2 id="catalogue-title">Question catalogue</h2>
@@ -213,6 +213,7 @@
                   </label>
                 </div>
                 <div id="catalogue-results" class="catalogue-results" aria-live="polite"></div>
+                <button id="catalogue-more-button" class="secondary-action catalogue-more is-hidden" type="button">Show more questions</button>
               </section>
             </div>
 

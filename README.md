@@ -6,7 +6,7 @@ The exam simulation samples 33 questions per run: 30 general questions and 3 que
 
 Study mode lets users browse all questions, only general questions, all Bundesland questions, one selected Bundesland question set, or bookmarked questions. It starts with questions that have no saved attempts, then continues with already studied questions. Answers stay hidden until the user selects an option, and selected answers are saved immediately. Study and review modes include instant correctness, explanations, learner hints, English translations where available, weak-question tracking, and bookmarks.
 
-The start page also includes tabbed catalogue browsing with keyword search, direct question-number lookup, and filters for all, general, Bundesland, previously incorrect, and bookmarked questions. Catalogue answers are hidden by default unless the question was already studied or the user explicitly reveals the answer. Local statistics separate unique studied questions, repeated study accuracy, mastery, completed exam simulations, exam pass rate, weak-question queues, and bookmarks.
+The start page also includes tabbed catalogue browsing with keyword search, direct question-number lookup, filters for all, general, Bundesland, previously incorrect, and bookmarked questions, and a "show more" control for browsing beyond the first batch. Catalogue answers are hidden by default unless the question was already studied or the user explicitly reveals the answer. Local statistics separate unique studied questions, repeated study accuracy, mastery, completed exam simulations, exam pass rate, weak-question queues, and bookmarks.
 
 ## Run Locally
 
@@ -71,7 +71,7 @@ PWCLI="$HOME/.codex/skills/playwright/scripts/playwright_cli.sh"
     ['area stats', Boolean(document.querySelector('#area-stats'))],
     ['recent tests', Boolean(document.querySelector('#recent-tests'))],
     ['Bundesland selector', document.querySelectorAll('#bundesland-select option').length === 16],
-    ['catalogue summary', document.querySelector('#catalogue-summary')?.textContent.includes('460 questions')]
+    ['catalogue summary', document.querySelector('#catalogue-summary')?.textContent.includes('Showing 24 of 460')]
   ];
   const missing = required.filter(([, ok]) => !ok).map(([name]) => name);
   if (missing.length) throw new Error('Browser smoke check failed: ' + missing.join(', '));
@@ -98,7 +98,7 @@ Codex sandbox notes:
 
 The page supports Google Analytics 4 with measurement ID `G-6LN5H6T5LW`, but the Google tag is not loaded until the user explicitly allows analytics in the consent banner.
 
-The app stores progress locally in the user's browser. The current analytics configuration denies advertising storage and personalization signals, enables analytics storage only after consent, and exposes visible privacy and imprint links. Replace the placeholder privacy and imprint copy with the production operator details before public launch.
+The app stores progress locally in the user's browser. The current analytics configuration denies advertising storage and personalization signals, enables analytics storage only after consent, and exposes visible privacy and imprint links with the local-data policy, analytics behavior, maintainer contact, and unofficial-app notice used by the static app.
 
 ## PWA
 

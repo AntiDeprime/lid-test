@@ -25,13 +25,23 @@ python3 -m http.server "$PORT" --bind "$HOST" >"$SERVER_LOG" 2>&1 &
 server_pid="$!"
 
 for _ in {1..30}; do
+  if ! kill -0 "$server_pid" >/dev/null 2>&1; then
+    echo "Local static server failed to start. Server log:" >&2
+    sed -n '1,120p' "$SERVER_LOG" >&2 || true
+    exit 1
+  fi
+
   if curl --fail --silent --show-error "$URL" >/dev/null 2>&1; then
     break
   fi
   sleep 0.2
 done
 
-curl --fail --silent --show-error "$URL" >/dev/null
+if ! curl --fail --silent --show-error "$URL" >/dev/null; then
+  echo "Local static server did not become ready at $URL. Server log:" >&2
+  sed -n '1,120p' "$SERVER_LOG" >&2 || true
+  exit 1
+fi
 
 "$PWCLI" --session "$SESSION" open "$URL"
 "$PWCLI" --session "$SESSION" eval "(() => { localStorage.clear(); return true; })()"
@@ -93,8 +103,22 @@ curl --fail --silent --show-error "$URL" >/dev/null
   click('#result-home-button');
   click('[data-start-tab=\"catalogue\"]');
   await delay(0);
+  if (document.querySelector('[data-start-tab=\"catalogue\"]')?.getAttribute('role') !== 'tab') {
+    throw new Error('Catalogue tab is missing tab semantics');
+  }
+  if (document.querySelector('#catalogue-panel')?.getAttribute('role') !== 'tabpanel') {
+    throw new Error('Catalogue panel is missing tabpanel semantics');
+  }
   const firstCatalogueItem = document.querySelector('.catalogue-item');
   if (!firstCatalogueItem) throw new Error('Catalogue item missing');
+  if (document.querySelectorAll('.catalogue-item').length !== 24) {
+    throw new Error('Catalogue initial batch size changed unexpectedly');
+  }
+  click('#catalogue-more-button');
+  await delay(0);
+  if (document.querySelectorAll('.catalogue-item').length !== 48) {
+    throw new Error('Catalogue show more did not render the next batch');
+  }
   if (!firstCatalogueItem.querySelector('.catalogue-answer')?.hidden) {
     throw new Error('Catalogue answer spoiler is visible by default');
   }
@@ -110,10 +134,21 @@ curl --fail --silent --show-error "$URL" >/dev/null
     throw new Error('Catalogue search did not update summary');
   }
 
+  click('[data-legal-panel=\"privacy\"]');
+  await delay(0);
+  const legalCopy = document.querySelector('.legal-modal')?.textContent || '';
+  if (/placeholder|Add the production/i.test(legalCopy)) {
+    throw new Error('Legal copy still contains placeholder launch text');
+  }
+  click('.legal-modal .icon-action');
+
   click('#translation-toggle');
   click('#result-home-button');
   click('#practice-button');
   await delay(0);
+  if (!document.querySelector('.answer-option')?.getAttribute('aria-label')) {
+    throw new Error('Answer options are missing accessible labels before selection');
+  }
   click('#translation-toggle');
   if (!document.querySelector('#question-translation')?.textContent.trim()) {
     throw new Error('Translation panel did not render in study mode');

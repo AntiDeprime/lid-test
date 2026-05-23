@@ -1,4 +1,4 @@
-import { loadProgress, saveProgress as persistProgress } from "./modules/storage.js";
+import { getStorageItem, loadProgress, saveProgress as persistProgress, setStorageItem } from "./modules/storage.js";
 import { getStateNames, orderStudyQuestionsByProgress, sampleByCategory, shuffle } from "./modules/sampling.js";
 import { summarizeProgress } from "./modules/progress.js";
 import { getLearnerHint } from "./modules/hints.js";
@@ -15,6 +15,24 @@ import { getLearnerHint } from "./modules/hints.js";
   const WEAK_CLEAR_STREAK = 2;
   const LETTERS = ["A", "B", "C", "D"];
   const CATALOGUE_RESULT_LIMIT = 24;
+  const LEGAL_NOTICE = {
+    privacy: {
+      title: "Privacy",
+      paragraphs: [
+        "This app stores study progress, weak questions, bookmarks, and analytics consent locally in this browser.",
+        "Google Analytics loads only after explicit consent. The tag is configured without advertising storage, Google Signals, or ad personalization signals.",
+        "No account is required, and this static app does not send your answers or saved progress to an app server."
+      ]
+    },
+    imprint: {
+      title: "Imprint",
+      paragraphs: [
+        "LiD Test Prep is maintained as an educational open-source practice app for the Leben in Deutschland / Einbürgerungstest catalogue.",
+        "Responsible project maintainer: AntiDeprime. Contact and issue reporting: https://github.com/AntiDeprime/lid-test/issues",
+        "This app is not an official BAMF or government service."
+      ]
+    }
+  };
 
   const questions = window.LID_QUESTIONS || [];
   const translations = window.LID_TRANSLATIONS_EN || {};
@@ -58,6 +76,7 @@ import { getLearnerHint } from "./modules/hints.js";
   const catalogueFilter = $("catalogue-filter");
   const catalogueSummary = $("catalogue-summary");
   const catalogueResults = $("catalogue-results");
+  const catalogueMoreButton = $("catalogue-more-button");
   const jumpForm = $("jump-form");
   const jumpQuestion = $("jump-question");
   const translationToggle = $("translation-toggle");
@@ -96,6 +115,7 @@ import { getLearnerHint } from "./modules/hints.js";
     learn: $("included-title").closest(".start-detail")
   };
   const faqSection = $("faq-title").closest(".faq-section");
+  let catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
 
   function saveProgress() {
     persistProgress(progress);
@@ -222,7 +242,7 @@ import { getLearnerHint } from "./modules/hints.js";
     resetProgressButton.disabled = summary.repeatedAnswers === 0 && summary.tests === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0;
     renderAreaStats();
     renderRecentTests();
-    renderCatalogue();
+    renderCatalogue({ preserveLimit: true });
   }
 
   function renderAreaStats() {
@@ -702,15 +722,49 @@ import { getLearnerHint } from "./modules/hints.js";
 
       if (answeredEntry) {
         button.disabled = true;
-        if (state.mode === "exam") {
-          if (index === answeredEntry.selectedIndex) button.classList.add("is-selected");
-        } else {
-          if (index === answeredEntry.correctIndex) button.classList.add("is-correct");
-          if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) button.classList.add("is-wrong");
-        }
+        applyAnswerAccessibility(button, option, index, answeredEntry);
+      } else {
+        applyAnswerAccessibility(button, option, index, null);
       }
       answers.append(button);
     });
+  }
+
+  function applyAnswerAccessibility(button, option, index, answeredEntry) {
+    const label = `${LETTERS[index]}. ${option.text}`;
+    if (!answeredEntry) {
+      button.setAttribute("aria-label", label);
+      return;
+    }
+
+    if (state.mode === "exam") {
+      if (index === answeredEntry.selectedIndex) {
+        button.classList.add("is-selected");
+        button.setAttribute("aria-label", appendAnswerState(label, "Your selected answer."));
+      } else {
+        button.setAttribute("aria-label", label);
+      }
+      return;
+    }
+
+    if (index === answeredEntry.correctIndex) {
+      button.classList.add("is-correct");
+      button.setAttribute("aria-label", appendAnswerState(label, "Correct answer."));
+      return;
+    }
+
+    if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) {
+      button.classList.add("is-wrong");
+      button.setAttribute("aria-label", appendAnswerState(label, "Your selected answer, incorrect."));
+      return;
+    }
+
+    button.setAttribute("aria-label", label);
+  }
+
+  function appendAnswerState(label, stateText) {
+    const separator = /[.!?]$/.test(label.trim()) ? " " : ". ";
+    return `${label}${separator}${stateText}`;
   }
 
   function getCurrentAnswerEntry(question = state.run[state.index]) {
@@ -788,12 +842,7 @@ import { getLearnerHint } from "./modules/hints.js";
 
     [...answers.children].forEach((button, index) => {
       button.disabled = true;
-      if (state.mode === "exam") {
-        if (index === selectedIndex) button.classList.add("is-selected");
-      } else {
-        if (index === correctIndex) button.classList.add("is-correct");
-        if (index === selectedIndex && !isCorrect) button.classList.add("is-wrong");
-      }
+      applyAnswerAccessibility(button, question.options[index], index, answerEntry);
     });
 
     if (state.mode !== "study" && state.mode !== "exam") {
@@ -1024,23 +1073,43 @@ import { getLearnerHint } from "./modules/hints.js";
     return questions.slice();
   }
 
-  function renderCatalogue() {
+  function resetCatalogueLimit() {
+    catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
+    renderCatalogue({ preserveLimit: true });
+  }
+
+  function showMoreCatalogueItems() {
+    catalogueVisibleCount += CATALOGUE_RESULT_LIMIT;
+    renderCatalogue({ preserveLimit: true });
+  }
+
+  function renderCatalogue(options = {}) {
+    if (!options.preserveLimit) {
+      catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
+    }
+
     const query = normalizeSearch(catalogueSearch.value);
     const filter = catalogueFilter.value;
     const filteredQuestions = getCatalogueQuestions(filter).filter((question) => {
       if (!query) return true;
       return getQuestionSearchText(question).includes(query);
     });
-    const visibleQuestions = filteredQuestions.slice(0, CATALOGUE_RESULT_LIMIT);
+    const visibleQuestions = filteredQuestions.slice(0, catalogueVisibleCount);
+    const hasMore = filteredQuestions.length > visibleQuestions.length;
 
     catalogueResults.replaceChildren();
-    catalogueSummary.textContent = getCatalogueSummary(filteredQuestions.length, query);
+    catalogueSummary.textContent = getCatalogueSummary(filteredQuestions.length, visibleQuestions.length, query);
+    catalogueMoreButton.classList.toggle("is-hidden", !hasMore);
+    catalogueMoreButton.textContent = hasMore
+      ? `Show ${Math.min(CATALOGUE_RESULT_LIMIT, filteredQuestions.length - visibleQuestions.length)} more questions`
+      : "All matching questions shown";
 
     if (!filteredQuestions.length) {
       const empty = document.createElement("p");
       empty.className = "catalogue-empty";
       empty.textContent = "No matching questions found.";
       catalogueResults.append(empty);
+      catalogueMoreButton.classList.add("is-hidden");
       return;
     }
 
@@ -1049,9 +1118,9 @@ import { getLearnerHint } from "./modules/hints.js";
     });
   }
 
-  function getCatalogueSummary(count, query) {
+  function getCatalogueSummary(count, visibleCount, query) {
     const label = count === 1 ? "1 question" : `${count} questions`;
-    const suffix = count > CATALOGUE_RESULT_LIMIT ? ` Showing first ${CATALOGUE_RESULT_LIMIT}.` : "";
+    const suffix = count > visibleCount ? ` Showing ${visibleCount} of ${count}.` : "";
     return query ? `${label} match your search.${suffix}` : `${label} in this view.${suffix}`;
   }
 
@@ -1162,16 +1231,19 @@ import { getLearnerHint } from "./modules/hints.js";
       const active = tab.dataset.startTab === selectedTab;
       tab.classList.toggle("is-active", active);
       tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
     });
 
     Object.entries(startSections).forEach(([name, section]) => {
       section.classList.toggle("is-hidden", name !== selectedTab);
+      section.hidden = name !== selectedTab;
     });
     faqSection.classList.toggle("is-hidden", selectedTab !== "learn");
+    faqSection.hidden = selectedTab !== "learn";
   }
 
   function setupAnalyticsConsent() {
-    const savedConsent = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
+    const savedConsent = getStorageItem(ANALYTICS_CONSENT_KEY);
     if (savedConsent === "granted") {
       loadAnalytics();
       return;
@@ -1196,12 +1268,12 @@ import { getLearnerHint } from "./modules/hints.js";
     decline.type = "button";
     decline.textContent = "Keep off";
     allow.addEventListener("click", () => {
-      window.localStorage.setItem(ANALYTICS_CONSENT_KEY, "granted");
+      setStorageItem(ANALYTICS_CONSENT_KEY, "granted");
       banner.remove();
       loadAnalytics();
     });
     decline.addEventListener("click", () => {
-      window.localStorage.setItem(ANALYTICS_CONSENT_KEY, "denied");
+      setStorageItem(ANALYTICS_CONSENT_KEY, "denied");
       analyticsStatus.textContent = "Analytics off";
       banner.remove();
     });
@@ -1250,20 +1322,25 @@ import { getLearnerHint } from "./modules/hints.js";
     const modal = document.createElement("section");
     const close = document.createElement("button");
     const title = document.createElement("h2");
-    const copy = document.createElement("p");
+    const content = LEGAL_NOTICE[panel] || LEGAL_NOTICE.privacy;
+    const titleId = `legal-title-${panel}`;
     modal.className = "legal-modal";
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", titleId);
     close.className = "icon-action";
     close.type = "button";
     close.textContent = "x";
     close.setAttribute("aria-label", "Close");
-    title.textContent = panel === "privacy" ? "Privacy" : "Imprint";
-    copy.textContent = panel === "privacy"
-      ? "Progress is stored locally in this browser. Google Analytics loads only after explicit consent and is configured without advertising signals. Add the production operator contact and full privacy notice before public launch."
-      : "Add the production site operator name, address, and contact details before public launch. This placeholder keeps the legal entry point visible during development.";
+    title.id = titleId;
+    title.textContent = content.title;
     close.addEventListener("click", () => modal.remove());
-    modal.append(close, title, copy);
+    modal.append(close, title);
+    content.paragraphs.forEach((paragraph) => {
+      const copy = document.createElement("p");
+      copy.textContent = paragraph;
+      modal.append(copy);
+    });
     document.body.append(modal);
     close.focus();
   }
@@ -1281,8 +1358,9 @@ import { getLearnerHint } from "./modules/hints.js";
   nextButton.addEventListener("click", nextQuestion);
   translationToggle.addEventListener("click", toggleTranslations);
   bookmarkToggle.addEventListener("click", toggleCurrentBookmark);
-  catalogueSearch.addEventListener("input", renderCatalogue);
-  catalogueFilter.addEventListener("change", renderCatalogue);
+  catalogueSearch.addEventListener("input", resetCatalogueLimit);
+  catalogueFilter.addEventListener("change", resetCatalogueLimit);
+  catalogueMoreButton.addEventListener("click", showMoreCatalogueItems);
   jumpForm.addEventListener("submit", jumpToQuestion);
   startTabs.forEach((tab) => tab.addEventListener("click", () => setStartTab(tab.dataset.startTab)));
   document.querySelectorAll("[data-legal-panel]").forEach((button) => {

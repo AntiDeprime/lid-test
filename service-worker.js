@@ -1,4 +1,4 @@
-const CACHE_NAME = "lid-test-prep-v1";
+const CACHE_NAME = "lid-test-prep-v2";
 const ASSETS = [
   "./",
   "./index.html",
