@@ -2,11 +2,11 @@
 
 Static, mobile-first practice app for the German **Leben in Deutschland** / **Einbürgerungstest** question catalogue.
 
-The app samples 33 questions per run: 30 general questions and 3 Berlin questions. The final result uses the Einbürgerung threshold of 17 correct answers out of 33.
+The app samples 33 questions per run: 30 general questions and 3 questions from the selected Bundesland. The final result uses the Einbürgerung threshold of 17 correct answers out of 33.
 
-Study mode lets users browse all questions, only general questions, the Berlin Bundesland question set, or bookmarked questions. It starts with questions that have no saved attempts, then continues with already studied questions. Answers stay hidden until the user selects an option, and selected answers are saved immediately. Users can bookmark difficult questions from any quiz or study screen and review those bookmarks later from the start page.
+Study mode lets users browse all questions, only general questions, all Bundesland questions, one selected Bundesland question set, or bookmarked questions. It starts with questions that have no saved attempts, then continues with already studied questions. Answers stay hidden until the user selects an option, and selected answers are saved immediately. Users can bookmark difficult questions from any quiz or study screen and review those bookmarks later from the start page.
 
-The start page also includes catalogue browsing with keyword search, direct question-number lookup, and filters for all, general, Berlin, previously incorrect, and bookmarked questions. Local statistics show attempted answers, accuracy, completed tests, pass rate, area performance, recent mock-test results, weak questions, and bookmarks.
+The start page also includes catalogue browsing with keyword search, direct question-number lookup, and filters for all, general, Bundesland, previously incorrect, and bookmarked questions. Local statistics show attempted answers, accuracy, completed tests, pass rate, area performance, recent mock-test results, weak questions, and bookmarks.
 
 ## Run Locally
 
@@ -62,7 +62,8 @@ PWCLI="$HOME/.codex/skills/playwright/scripts/playwright_cli.sh"
     ['progress heading', document.querySelector('#progress-title')?.textContent === 'Your progress'],
     ['area stats', Boolean(document.querySelector('#area-stats'))],
     ['recent tests', Boolean(document.querySelector('#recent-tests'))],
-    ['catalogue summary', document.querySelector('#catalogue-summary')?.textContent.includes('310 questions')]
+    ['Bundesland selector', document.querySelectorAll('#bundesland-select option').length === 16],
+    ['catalogue summary', document.querySelector('#catalogue-summary')?.textContent.includes('460 questions')]
   ];
   const missing = required.filter(([, ok]) => !ok).map(([name]) => name);
   if (missing.length) throw new Error('Browser smoke check failed: ' + missing.join(', '));
@@ -116,4 +117,4 @@ GitHub Pages will serve `index.html` as the app entry point.
 
 ## Catalogue Notes
 
-The current local catalogue contains all 300 general questions and 10 Berlin state questions. This version is Berlin-only because the other Bundesland question sets are not present in the source material.
+The current local catalogue contains all 300 general questions and 160 state questions: 10 questions for each of the 16 Bundesländer. English translations cover the bundled general catalogue and fall back gracefully where a state-question translation is not available.

@@ -13,6 +13,7 @@
 
   const questions = window.LID_QUESTIONS || [];
   const translations = window.LID_TRANSLATIONS_EN || {};
+  const stateNames = getStateNames();
   const progress = loadProgress();
   const state = {
     mode: "test",
@@ -36,6 +37,7 @@
   const resultScreen = $("result-screen");
   const startButton = $("start-button");
   const practiceButton = $("practice-button");
+  const bundeslandSelect = $("bundesland-select");
   const weakReviewButton = $("weak-review-button");
   const bookmarkReviewButton = $("bookmark-review-button");
   const homeButton = $("home-button");
@@ -122,6 +124,25 @@
     progress.testHistory = [];
     saveProgress();
     renderProgressSummary();
+  }
+
+  function populateStateControls() {
+    stateNames.forEach((stateName) => {
+      const testOption = document.createElement("option");
+      const studyOption = document.createElement("option");
+
+      testOption.value = stateName;
+      testOption.textContent = stateName;
+      studyOption.value = `state:${stateName}`;
+      studyOption.textContent = `${stateName} Bundesland questions`;
+
+      bundeslandSelect.append(testOption);
+      studyFilter.append(studyOption);
+    });
+
+    if (stateNames.includes("Berlin")) {
+      bundeslandSelect.value = "Berlin";
+    }
   }
 
   function recordAnswer(entry, options = {}) {
@@ -334,8 +355,18 @@
     return copy;
   }
 
-  function sampleByCategory(category, count) {
-    return shuffle(questions.filter((question) => question.category === category)).slice(0, count);
+  function getStateNames() {
+    return [...new Set(questions
+      .filter((question) => question.category === "state" && question.state)
+      .map((question) => question.state))]
+      .sort((a, b) => a.localeCompare(b, "de-DE"));
+  }
+
+  function sampleByCategory(category, count, selectedState = null) {
+    return shuffle(questions.filter((question) => {
+      if (question.category !== category) return false;
+      return !selectedState || question.state === selectedState;
+    })).slice(0, count);
   }
 
   function getStudyQuestions(filter) {
@@ -439,7 +470,10 @@
     if (!confirmDiscardActiveRun()) return;
 
     const general = sampleByCategory("general", TOTAL_GENERAL);
-    const stateQuestions = sampleByCategory("state", TOTAL_STATE);
+    const selectedState = bundeslandSelect.value;
+    const stateQuestions = sampleByCategory("state", TOTAL_STATE, selectedState);
+    if (stateQuestions.length < TOTAL_STATE) return;
+
     state.mode = "test";
     state.run = shuffle([...general, ...stateQuestions]);
     resetRunState();
@@ -1145,6 +1179,7 @@
   catalogueSearch.addEventListener("input", renderCatalogue);
   catalogueFilter.addEventListener("change", renderCatalogue);
   jumpForm.addEventListener("submit", jumpToQuestion);
+  populateStateControls();
   renderProgressSummary();
 
   if (!questions.length) {

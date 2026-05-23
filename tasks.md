@@ -75,7 +75,7 @@
   - Track basic page visits and referral sources through GA4.
   - Documented the setup and privacy/consent note in the README.
 
-- [ ] Add support for all 16 Bundesländer.
+- [x] Add support for all 16 Bundesländer.
   - Extend the question catalogue from Berlin-only to the full BAMF set: 300 general questions plus 160 state-specific questions.
   - Add a Bundesland selector before starting a test.
   - Sample 30 general questions and 3 questions from the selected Bundesland.

@@ -4,16 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Leben in Deutschland Test & Einbürgerungstest Practice | LiD Test Prep</title>
-    <meta name="description" content="Prepare for the Leben in Deutschland Test and Einbürgerungstest with a mobile-friendly Berlin mock test using 30 general questions, 3 Bundesland questions, instant feedback, and answer review.">
+    <meta name="description" content="Prepare for the Leben in Deutschland Test and Einbürgerungstest with a mobile-friendly mock test using 30 general questions, 3 selected Bundesland questions, instant feedback, and answer review.">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="LiD Test Prep">
     <meta property="og:title" content="Leben in Deutschland Test & Einbürgerungstest Practice">
-    <meta property="og:description" content="Practice a 33-question mock test for the German Leben in Deutschland / Einbürgerungstest with Berlin state questions, instant feedback, and review.">
+    <meta property="og:description" content="Practice a 33-question mock test for the German Leben in Deutschland / Einbürgerungstest with selectable Bundesland questions, instant feedback, and review.">
     <meta property="og:image" content="lid-v2-images/lid-q328-bild.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Leben in Deutschland Test & Einbürgerungstest Practice">
-    <meta name="twitter:description" content="Prepare for the German citizenship test with randomized mock tests, Berlin questions, instant feedback, and missed-answer review.">
+    <meta name="twitter:description" content="Prepare for the German citizenship test with randomized mock tests, selectable Bundesland questions, instant feedback, and missed-answer review.">
     <meta name="twitter:image" content="lid-v2-images/lid-q328-bild.png">
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <!-- Google tag (gtag.js) -->
@@ -35,7 +35,7 @@
             "applicationCategory": "EducationalApplication",
             "operatingSystem": "Any",
             "inLanguage": ["en", "de"],
-            "description": "A mobile-friendly practice app for the German Leben in Deutschland Test and Einbürgerungstest with randomized Berlin mock tests, instant feedback, English translations, and missed-answer review.",
+            "description": "A mobile-friendly practice app for the German Leben in Deutschland Test and Einbürgerungstest with randomized mock tests, selectable Bundesland questions, instant feedback, English translations, and missed-answer review.",
             "offers": {
               "@type": "Offer",
               "price": "0",
@@ -66,7 +66,7 @@
                 "name": "Which Bundesland questions are included?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "This version includes Berlin state questions."
+                  "text": "This version includes state questions for all 16 Bundesländer."
                 }
               }
             ]
@@ -85,8 +85,12 @@
               <p class="eyebrow">Leben in Deutschland / Einbürgerungstest</p>
               <h1 id="start-title">Leben in Deutschland Test and Einbürgerungstest practice</h1>
               <p class="lede">
-                Practice with the official-style question catalogue in a focused mock test for Berlin. The app gives you randomized questions, instant feedback, English translations, and a review of missed answers.
+                Practice with the official-style question catalogue in a focused mock test for your selected Bundesland. The app gives you randomized questions, instant feedback, English translations where available, and a review of missed answers.
               </p>
+              <label class="study-picker" for="bundesland-select">
+                <span>Mock test Bundesland</span>
+                <select id="bundesland-select"></select>
+              </label>
               <div class="start-actions">
                 <button id="start-button" class="primary-action" type="button">Start mock test</button>
                 <button id="practice-button" class="secondary-action" type="button">Study questions</button>
@@ -98,7 +102,7 @@
                 <select id="study-filter">
                   <option value="all">All questions</option>
                   <option value="general">General questions</option>
-                  <option value="state:Berlin">Berlin Bundesland questions</option>
+                  <option value="state">All Bundesland questions</option>
                   <option value="bookmarked">Bookmarked questions</option>
                 </select>
               </label>
@@ -128,7 +132,7 @@
                 <ul class="feature-list">
                   <li><span class="feature-mark">✓</span><span>Start a randomized 33-question mock test.</span></li>
                   <li><span class="feature-mark">✓</span><span>Use a 60-minute countdown for realistic exam timing.</span></li>
-                  <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus the Berlin state set in study mode.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus all 16 Bundesland question sets in study mode.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
                   <li><span class="feature-mark">✓</span><span>Practice weak questions until they are answered correctly twice in a row.</span></li>
                   <li><span class="feature-mark">✓</span><span>Bookmark difficult questions for later practice.</span></li>
@@ -200,7 +204,7 @@
                     <select id="catalogue-filter">
                       <option value="all">All questions</option>
                       <option value="general">General questions</option>
-                      <option value="state">Berlin questions</option>
+                      <option value="state">Bundesland questions</option>
                       <option value="incorrect">Incorrect questions</option>
                       <option value="bookmarked">Bookmarked questions</option>
                     </select>
@@ -214,7 +218,7 @@
               <h2 id="faq-title">Leben in Deutschland Test FAQ</h2>
               <dl class="faq-item">
                 <dt>How is the mock test built?</dt>
-                <dd>Each run uses 30 general questions and 3 Berlin Bundesland questions.</dd>
+                <dd>Each run uses 30 general questions and 3 questions from your selected Bundesland.</dd>
               </dl>
               <dl class="faq-item">
                 <dt>What score is needed to pass?</dt>
@@ -230,10 +234,10 @@
           <aside class="catalogue-preview" aria-label="Question preview">
             <div class="preview-top">
               <p class="preview-title">Question preview</p>
-              <span class="preview-badge">Berlin set</span>
+              <span class="preview-badge">Bundesland set</span>
             </div>
             <div class="preview-image">
-              <img src="lid-v2-images/lid-q328-bild.png" alt="Map image used in a Berlin state question">
+              <img src="lid-v2-images/328-welches-bundesland-berlin.png" alt="Map image used in a Bundesland question">
             </div>
             <div class="preview-options" aria-label="Example answers">
               <div class="preview-option">A. 1</div>

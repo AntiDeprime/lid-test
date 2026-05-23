@@ -23,6 +23,7 @@ if (!Array.isArray(questions) || questions.length === 0) {
 
 const seenIds = new Set();
 const categoryCounts = {};
+const stateCounts = {};
 
 questions.forEach((question, questionIndex) => {
   const label = `Question at index ${questionIndex}`;
@@ -39,6 +40,14 @@ questions.forEach((question, questionIndex) => {
     fail(`Question ${question.id} has invalid category "${question.category}".`);
   } else {
     categoryCounts[question.category] = (categoryCounts[question.category] || 0) + 1;
+  }
+
+  if (question.category === "state") {
+    if (typeof question.state !== "string" || !question.state.trim()) {
+      fail(`Question ${question.id} is missing a Bundesland.`);
+    } else {
+      stateCounts[question.state] = (stateCounts[question.state] || 0) + 1;
+    }
   }
 
   if (typeof question.prompt !== "string" || !question.prompt.trim()) {
@@ -77,9 +86,11 @@ questions.forEach((question, questionIndex) => {
   }
 
   const translation = translations[question.id];
-  if (!translation) {
+  if (!translation && question.category === "general") {
     fail(`Question ${question.id} is missing an English translation.`);
-  } else {
+  }
+
+  if (translation) {
     if (typeof translation.prompt !== "string" || !translation.prompt.trim()) {
       fail(`Question ${question.id} has an empty English prompt translation.`);
     }
@@ -94,8 +105,23 @@ if (categoryCounts.general !== 300) {
   fail(`Expected 300 general questions; found ${categoryCounts.general || 0}.`);
 }
 
-if (categoryCounts.state !== 10) {
-  fail(`Expected 10 bundled Berlin state questions; found ${categoryCounts.state || 0}.`);
+if (categoryCounts.state !== 160) {
+  fail(`Expected 160 bundled Bundesland questions; found ${categoryCounts.state || 0}.`);
+}
+
+const states = Object.entries(stateCounts);
+if (states.length !== 16) {
+  fail(`Expected questions for 16 Bundesländer; found ${states.length}.`);
+}
+
+states.forEach(([state, count]) => {
+  if (count !== 10) {
+    fail(`Expected 10 questions for ${state}; found ${count}.`);
+  }
+});
+
+if (questions.length !== 460) {
+  fail(`Expected 460 total questions; found ${questions.length}.`);
 }
 
 if (errors.length) {
@@ -105,5 +131,5 @@ if (errors.length) {
 }
 
 console.log(
-  `Data validation passed: ${questions.length} questions, ${categoryCounts.general} general, ${categoryCounts.state} Berlin state.`
+  `Data validation passed: ${questions.length} questions, ${categoryCounts.general} general, ${categoryCounts.state} Bundesland state.`
 );

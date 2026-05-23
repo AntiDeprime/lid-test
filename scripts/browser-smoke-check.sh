@@ -62,7 +62,8 @@ curl --fail --silent --show-error "$URL" >/dev/null
     ['progress heading', document.querySelector('#progress-title')?.textContent === 'Your progress'],
     ['area stats', Boolean(document.querySelector('#area-stats'))],
     ['recent tests', Boolean(document.querySelector('#recent-tests'))],
-    ['catalogue summary', document.querySelector('#catalogue-summary')?.textContent.includes('310 questions')]
+    ['Bundesland selector', document.querySelectorAll('#bundesland-select option').length === 16],
+    ['catalogue summary', document.querySelector('#catalogue-summary')?.textContent.includes('460 questions')]
   ];
   const missing = required.filter(([, ok]) => !ok).map(([name]) => name);
   if (missing.length) throw new Error('Browser smoke check failed: ' + missing.join(', '));
