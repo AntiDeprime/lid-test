@@ -1,4 +1,5 @@
-const CACHE_NAME = "lid-test-prep-v3";
+const APP_REVISION = "2026-05-review-fixes";
+const CACHE_NAME = `lid-test-prep-${APP_REVISION}`;
 const ASSETS = [
   "./",
   "./index.html",
@@ -13,6 +14,7 @@ const ASSETS = [
   "./modules/hints.js",
   "./modules/tabs.js",
   "./modules/dialog.js",
+  "./modules/quiz-rules.js",
   "./assets/favicon.svg",
   "./assets/lid-logo.svg",
   "./manifest.webmanifest"

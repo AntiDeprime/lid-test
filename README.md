@@ -28,6 +28,12 @@ Validate the bundled question, translation, and image data:
 node scripts/validate-data.js
 ```
 
+Validate pure progress and quiz-rule behavior:
+
+```sh
+node scripts/validate-progress.mjs
+```
+
 Preferred browser smoke check:
 
 ```sh
@@ -121,7 +127,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `index.html` contains the one-page UI structure and metadata.
 - `styles.css` contains the app styling.
 - `app.js` contains the vanilla JavaScript app wiring and screen state.
-- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, and learner hints.
+- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, and quiz rules.
 - `questions.js` contains the question catalogue loaded by the page.
 - `explanations.js` adds learner-facing explanations to the question catalogue without changing the official answer data.
 - `translations-en.js` contains local English translations for the bundled questions.

@@ -4,14 +4,20 @@ import { summarizeProgress } from "./modules/progress.js";
 import { getLearnerHint } from "./modules/hints.js";
 import { createTabController } from "./modules/tabs.js";
 import { showModalDialog } from "./modules/dialog.js";
+import {
+  EXAM_DURATION_SECONDS,
+  PASS_THRESHOLD,
+  TOTAL_GENERAL,
+  TOTAL_STATE,
+  createAnswerEntry,
+  createExamRun,
+  createUnansweredEntry,
+  getPassResult
+} from "./modules/quiz-rules.js";
 
 (() => {
   "use strict";
 
-  const TOTAL_GENERAL = 30;
-  const TOTAL_STATE = 3;
-  const PASS_THRESHOLD = 17;
-  const EXAM_DURATION_SECONDS = 60 * 60;
   const ANALYTICS_ID = "G-6LN5H6T5LW";
   const ANALYTICS_CONSENT_KEY = "lidAnalyticsConsent";
   const WEAK_CLEAR_STREAK = 2;
@@ -239,11 +245,13 @@ import { showModalDialog } from "./modules/dialog.js";
     passRateStat.textContent = `${summary.passRate}%`;
     weakStat.textContent = String(weakQuestionIds.length);
     bookmarkStat.textContent = String(bookmarkedQuestionIds.length);
-    weakReviewButton.disabled = weakQuestionIds.length === 0;
+    weakReviewButton.classList.toggle("is-empty-queue", weakQuestionIds.length === 0);
+    weakReviewButton.setAttribute("aria-disabled", String(weakQuestionIds.length === 0));
     weakReviewButton.textContent = weakQuestionIds.length
       ? `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`
       : "No weak questions yet";
-    bookmarkReviewButton.disabled = bookmarkedQuestionIds.length === 0;
+    bookmarkReviewButton.classList.toggle("is-empty-queue", bookmarkedQuestionIds.length === 0);
+    bookmarkReviewButton.setAttribute("aria-disabled", String(bookmarkedQuestionIds.length === 0));
     bookmarkReviewButton.textContent = bookmarkedQuestionIds.length
       ? `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`
       : "No bookmarks yet";
@@ -438,14 +446,13 @@ import { showModalDialog } from "./modules/dialog.js";
   function startRun() {
     if (!confirmDiscardActiveRun()) return;
 
-    const general = sampleByCategory(questions, "general", TOTAL_GENERAL);
     const selectedState = bundeslandSelect.value;
-    const stateQuestions = sampleByCategory(questions, "state", TOTAL_STATE, selectedState);
-    if (stateQuestions.length < TOTAL_STATE) return;
+    const examRun = createExamRun(questions, selectedState, { sampleByCategory, shuffle });
+    if (!examRun.length) return;
 
     state.mode = "exam";
     state.selectedState = selectedState;
-    state.run = shuffle([...general, ...stateQuestions]);
+    state.run = examRun;
     setTranslationsEnabled(false);
     resetRunState();
     startTimer();
@@ -512,7 +519,10 @@ import { showModalDialog } from "./modules/dialog.js";
     const weakQuestions = getWeakQuestionIds()
       .map((questionId) => questions.find((item) => String(item.id) === questionId))
       .filter(Boolean);
-    if (!weakQuestions.length) return;
+    if (!weakQuestions.length) {
+      startTabController.selectTab("progress");
+      return;
+    }
 
     state.mode = "weak-review";
     state.run = shuffle(weakQuestions);
@@ -527,7 +537,10 @@ import { showModalDialog } from "./modules/dialog.js";
     if (!confirmDiscardActiveRun()) return;
 
     const bookmarkedQuestions = getBookmarkedQuestions();
-    if (!bookmarkedQuestions.length) return;
+    if (!bookmarkedQuestions.length) {
+      startTabController.selectTab("progress");
+      return;
+    }
 
     state.mode = "bookmarks";
     state.run = bookmarkedQuestions;
@@ -746,9 +759,10 @@ import { showModalDialog } from "./modules/dialog.js";
       button.addEventListener("click", () => chooseAnswer(index));
 
       if (answeredEntry) {
-        button.disabled = true;
+        button.setAttribute("aria-disabled", "true");
         applyAnswerAccessibility(button, option, index, answeredEntry);
       } else {
+        button.removeAttribute("aria-disabled");
         applyAnswerAccessibility(button, option, index, null);
       }
       answers.append(button);
@@ -850,23 +864,16 @@ import { showModalDialog } from "./modules/dialog.js";
     if (getCurrentAnswerEntry()) return;
 
     const question = state.run[state.index];
-    const correctIndex = question.options.findIndex((option) => option.correct);
-    const isCorrect = selectedIndex === correctIndex;
-    const answerEntry = {
-      question,
-      selectedIndex,
-      correctIndex,
-      isCorrect
-    };
+    const answerEntry = createAnswerEntry(question, selectedIndex);
     state.selected = selectedIndex;
-    state.score += isCorrect ? 1 : 0;
+    state.score += answerEntry.isCorrect ? 1 : 0;
     state.answers.push(answerEntry);
     if (state.mode !== "exam") {
       recordAnswer(answerEntry);
     }
 
     [...answers.children].forEach((button, index) => {
-      button.disabled = true;
+      button.setAttribute("aria-disabled", "true");
       applyAnswerAccessibility(button, question.options[index], index, answerEntry);
     });
 
@@ -876,7 +883,7 @@ import { showModalDialog } from "./modules/dialog.js";
     progressBar.style.width = `${((state.index + 1) / state.run.length) * 100}%`;
     questionHint.textContent = state.mode === "exam"
       ? "Answer saved. Continue when ready."
-      : isCorrect ? "Correct answer." : "Wrong answer.";
+      : answerEntry.isCorrect ? "Correct answer." : "Wrong answer.";
     if (state.mode !== "exam" && question.explanation) {
       questionExplanation.textContent = question.explanation;
       questionExplanation.classList.remove("is-hidden");
@@ -934,13 +941,7 @@ import { showModalDialog } from "./modules/dialog.js";
     state.run.forEach((question) => {
       if (answeredQuestionIds.has(String(question.id))) return;
 
-      const answerEntry = {
-        question,
-        selectedIndex: null,
-        correctIndex: question.options.findIndex((option) => option.correct),
-        isCorrect: false,
-        isUnanswered: true
-      };
+      const answerEntry = createUnansweredEntry(question);
       state.answers.push(answerEntry);
       recordAnswer(answerEntry, { countStats: false, trackWeak: false });
     });
@@ -968,7 +969,7 @@ import { showModalDialog } from "./modules/dialog.js";
       return;
     }
 
-    const passed = state.score >= PASS_THRESHOLD;
+    const passed = getPassResult(state.score);
     resultTitle.textContent = passed ? "Passed" : "Not passed";
     resultScore.textContent = `${state.score} / ${state.run.length}`;
     resultContext.textContent = `Bundesland: ${state.selectedState || bundeslandSelect.value}. 30 general questions, 3 residence-based Bundesland questions, 60-minute limit.`;

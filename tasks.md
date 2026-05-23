@@ -121,6 +121,13 @@
 
 ## Lower Priority
 
+- [x] Address architecture and UX review follow-ups.
+  - Extract reusable exam and answer rules from the main app wiring.
+  - Make mastery recover after later correct study attempts.
+  - Keep answered options keyboard-reviewable after selection.
+  - Reduce inactive queue-button weight and improve first-visit consent layout.
+  - Add focused progress and quiz-rule validation.
+
 - [x] Add a site logo and favicon.
   - Created a lowercase connected pen-stroke LiD mark on the app's primary cyan button background.
   - Added the SVG favicon and wired it into the app metadata.
