@@ -2,6 +2,8 @@ import { getStorageItem, loadProgress, saveProgress as persistProgress, setStora
 import { getStateNames, orderStudyQuestionsByProgress, sampleByCategory, shuffle } from "./modules/sampling.js";
 import { summarizeProgress } from "./modules/progress.js";
 import { getLearnerHint } from "./modules/hints.js";
+import { createTabController } from "./modules/tabs.js";
+import { showModalDialog } from "./modules/dialog.js";
 
 (() => {
   "use strict";
@@ -115,6 +117,12 @@ import { getLearnerHint } from "./modules/hints.js";
     learn: $("included-title").closest(".start-detail")
   };
   const faqSection = $("faq-title").closest(".faq-section");
+  const startTabController = createTabController(startTabs, startSections, {
+    onChange(selectedTab) {
+      faqSection.classList.toggle("is-hidden", selectedTab !== "learn");
+      faqSection.hidden = selectedTab !== "learn";
+    }
+  });
   let catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
 
   function saveProgress() {
@@ -438,6 +446,7 @@ import { getLearnerHint } from "./modules/hints.js";
     state.mode = "exam";
     state.selectedState = selectedState;
     state.run = shuffle([...general, ...stateQuestions]);
+    setTranslationsEnabled(false);
     resetRunState();
     startTimer();
     renderQuestion();
@@ -598,10 +607,25 @@ import { getLearnerHint } from "./modules/hints.js";
   }
 
   function toggleTranslations() {
+    if (state.mode === "exam") return;
     state.translationsEnabled = !state.translationsEnabled;
-    translationToggle.setAttribute("aria-pressed", String(state.translationsEnabled));
-    translationToggle.title = state.translationsEnabled ? "Hide English translations" : "Show English translations";
+    renderTranslationToggle();
     renderTranslations();
+  }
+
+  function setTranslationsEnabled(enabled) {
+    state.translationsEnabled = enabled;
+    renderTranslationToggle();
+  }
+
+  function renderTranslationToggle() {
+    const disabled = state.mode === "exam";
+    translationToggle.disabled = disabled;
+    translationToggle.setAttribute("aria-pressed", String(!disabled && state.translationsEnabled));
+    translationToggle.title = disabled
+      ? "English translations are disabled in exam simulation"
+      : state.translationsEnabled ? "Hide English translations" : "Show English translations";
+    translationToggle.setAttribute("aria-label", translationToggle.title);
   }
 
   function renderBookmarkToggle(question) {
@@ -650,6 +674,7 @@ import { getLearnerHint } from "./modules/hints.js";
 
     renderTimer();
     renderModeChrome(question, progress, total);
+    renderTranslationToggle();
     renderBookmarkToggle(question);
     renderImages(question);
     renderAnswers(question);
@@ -776,7 +801,7 @@ import { getLearnerHint } from "./modules/hints.js";
     const question = state.run[state.index];
     if (!question) return;
 
-    if (!state.translationsEnabled) {
+    if (state.mode === "exam" || !state.translationsEnabled) {
       questionTranslation.classList.add("is-hidden");
       answers.querySelectorAll(".option-translation").forEach((item) => {
         item.classList.add("is-hidden");
@@ -1226,22 +1251,6 @@ import { getLearnerHint } from "./modules/hints.js";
     startCatalogueQuestion(question);
   }
 
-  function setStartTab(selectedTab) {
-    startTabs.forEach((tab) => {
-      const active = tab.dataset.startTab === selectedTab;
-      tab.classList.toggle("is-active", active);
-      tab.setAttribute("aria-selected", String(active));
-      tab.tabIndex = active ? 0 : -1;
-    });
-
-    Object.entries(startSections).forEach(([name, section]) => {
-      section.classList.toggle("is-hidden", name !== selectedTab);
-      section.hidden = name !== selectedTab;
-    });
-    faqSection.classList.toggle("is-hidden", selectedTab !== "learn");
-    faqSection.hidden = selectedTab !== "learn";
-  }
-
   function setupAnalyticsConsent() {
     const savedConsent = getStorageItem(ANALYTICS_CONSENT_KEY);
     if (savedConsent === "granted") {
@@ -1315,34 +1324,23 @@ import { getLearnerHint } from "./modules/hints.js";
     analyticsStatus.textContent = "Analytics on";
   }
 
-  function showLegalPanel(panel) {
-    const existing = document.querySelector(".legal-modal");
-    if (existing) existing.remove();
-
-    const modal = document.createElement("section");
-    const close = document.createElement("button");
-    const title = document.createElement("h2");
+  function showLegalPanel(panel, trigger) {
     const content = LEGAL_NOTICE[panel] || LEGAL_NOTICE.privacy;
     const titleId = `legal-title-${panel}`;
-    modal.className = "legal-modal";
-    modal.setAttribute("role", "dialog");
-    modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-labelledby", titleId);
-    close.className = "icon-action";
-    close.type = "button";
-    close.textContent = "x";
-    close.setAttribute("aria-label", "Close");
-    title.id = titleId;
-    title.textContent = content.title;
-    close.addEventListener("click", () => modal.remove());
-    modal.append(close, title);
-    content.paragraphs.forEach((paragraph) => {
-      const copy = document.createElement("p");
-      copy.textContent = paragraph;
-      modal.append(copy);
+
+    showModalDialog({
+      className: "legal-modal",
+      title: content.title,
+      labelledBy: titleId,
+      trigger,
+      renderContent(modal) {
+        content.paragraphs.forEach((paragraph) => {
+          const copy = document.createElement("p");
+          copy.textContent = paragraph;
+          modal.append(copy);
+        });
+      }
     });
-    document.body.append(modal);
-    close.focus();
   }
 
   startButton.addEventListener("click", startRun);
@@ -1362,12 +1360,11 @@ import { getLearnerHint } from "./modules/hints.js";
   catalogueFilter.addEventListener("change", resetCatalogueLimit);
   catalogueMoreButton.addEventListener("click", showMoreCatalogueItems);
   jumpForm.addEventListener("submit", jumpToQuestion);
-  startTabs.forEach((tab) => tab.addEventListener("click", () => setStartTab(tab.dataset.startTab)));
   document.querySelectorAll("[data-legal-panel]").forEach((button) => {
-    button.addEventListener("click", () => showLegalPanel(button.dataset.legalPanel));
+    button.addEventListener("click", () => showLegalPanel(button.dataset.legalPanel, button));
   });
   populateStateControls();
-  setStartTab("progress");
+  startTabController.selectTab("progress");
   setupAnalyticsConsent();
   registerServiceWorker();
   renderProgressSummary();

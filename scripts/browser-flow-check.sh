@@ -162,12 +162,43 @@ fi
 
   click('#start-button');
   await delay(0);
+  if (document.querySelector('#translation-toggle')?.getAttribute('aria-pressed') !== 'false') {
+    throw new Error('Exam simulation kept translations enabled');
+  }
+  if (!document.querySelector('#translation-toggle')?.disabled) {
+    throw new Error('Exam simulation did not disable the translation toggle');
+  }
+  if (!document.querySelector('#question-translation')?.classList.contains('is-hidden')) {
+    throw new Error('Exam simulation rendered an English translation');
+  }
   const realNow = Date.now;
   Date.now = () => realNow() + 61 * 60 * 1000;
   await delay(1100);
   Date.now = realNow;
   if (!document.querySelector('#result-status')?.textContent.includes('Time expired')) {
     throw new Error('Timeout result did not render');
+  }
+
+  click('#result-home-button');
+  document.querySelector('#progress-tab').focus();
+  document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+  await delay(0);
+  if (document.activeElement?.id !== 'catalogue-tab' || document.querySelector('#catalogue-panel')?.hidden) {
+    throw new Error('Tablist arrow navigation did not activate the catalogue tab');
+  }
+
+  click('[data-legal-panel=\"privacy\"]');
+  await delay(0);
+  if (document.activeElement?.getAttribute('aria-label') !== 'Close') {
+    throw new Error('Legal modal did not move focus to the close button');
+  }
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  await delay(0);
+  if (document.querySelector('.legal-modal')) {
+    throw new Error('Legal modal did not close with Escape');
+  }
+  if (document.activeElement?.dataset.legalPanel !== 'privacy') {
+    throw new Error('Legal modal did not restore focus to the opener');
   }
 
   return {
