@@ -121,6 +121,71 @@
 
 ## Lower Priority
 
+- [x] Add CI validation before more feature work.
+  - Run catalogue/data validation on pushes and pull requests.
+  - Run pure app logic validation on pushes and pull requests.
+  - Smoke-test that the static app is served successfully in CI.
+
+- [x] Fix misleading active-run discard copy.
+  - Make unfinished exam simulations clear that the result is not saved when leaving early.
+  - Keep study/practice copy clear that already selected answers are saved locally.
+
+- [x] Extract more app logic into focused modules.
+  - Move catalogue filtering, search normalization, and catalogue summary copy into a pure helper module.
+  - Add focused Node validation for the extracted catalogue helpers.
+  - Include the new helper module in the service-worker cache list.
+
+- [ ] Add production privacy and legal controls.
+  - Add a real production privacy page or section with controller/contact details, legal basis, local-storage behavior, analytics behavior, and retention notes.
+  - Add an explicit analytics revocation path after consent.
+  - Replace placeholder-style imprint copy with production-ready legal details before public launch.
+
+- [ ] Add production SEO assets.
+  - Add canonical URL support when the production domain is known.
+  - Add `robots.txt` and `sitemap.xml`.
+  - Use absolute production URLs for Open Graph and Twitter images.
+
+- [ ] Improve catalogue search quality and spoiler handling.
+  - Add diacritic-tolerant search and ranked matches.
+  - Highlight matched text in catalogue results.
+  - Decide whether hidden answer text should remain searchable before reveal.
+
+- [ ] Add resume support for interrupted exam simulations.
+  - Persist in-progress exam run state, selected answers, selected Bundesland, and start time.
+  - Resume or discard stale unfinished exams explicitly.
+  - Keep the timer accurate after refresh or mobile browser suspension.
+
+- [ ] Strengthen PWA and offline validation.
+  - Add an offline browser check.
+  - Make service-worker cache revision updates part of the release checklist or generate them.
+  - Verify cache updates after asset changes.
+
+- [ ] Make browser flow tests easier to maintain.
+  - Move large inline Playwright assertions out of the shell script.
+  - Keep fast smoke checks separate from deeper flow checks.
+  - Make the deeper browser check practical to run in CI.
+
+- [ ] Document data provenance and update workflow.
+  - Record the official catalogue source, source date, and import/update process.
+  - Add validation expectations for future catalogue refreshes.
+  - Document how explanations and translations are maintained separately from official answer data.
+
+- [ ] Replace native confirmation dialogs with app dialogs.
+  - Use the existing modal helper for reset-progress and leave-run confirmations.
+  - Preserve focus management and mobile-friendly copy.
+
+- [ ] Add accessibility and visual regression checks.
+  - Check keyboard flow through quiz, result, catalogue, and modal interactions.
+  - Add mobile viewport layout checks.
+  - Add contrast and screen-reader-oriented assertions where practical.
+
+- [ ] Reduce first-load payload as content grows.
+  - Consider lazy-loading translations and explanations.
+  - Keep first exam-start performance fast on mobile.
+
+- [ ] Expand operational documentation.
+  - Document CI, release checks, cache-bump rules, production privacy requirements, and known limitations.
+
 - [x] Address architecture and UX review follow-ups.
   - Extract reusable exam and answer rules from the main app wiring.
   - Make mastery recover after later correct study attempts.

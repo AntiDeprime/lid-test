@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { summarizeProgress } from "../modules/progress.js";
 import {
+  getCatalogueQuestions,
+  getCatalogueSummary,
+  normalizeSearch,
+  searchCatalogueQuestions
+} from "../modules/catalogue.js";
+import {
   PASS_THRESHOLD,
   TOTAL_GENERAL,
   TOTAL_STATE,
@@ -82,5 +88,36 @@ const run = createExamRun([...generalQuestions, ...stateQuestions], "Berlin", {
 assert.equal(run.length, TOTAL_GENERAL + TOTAL_STATE);
 assert.equal(run.filter((item) => item.category === "general").length, TOTAL_GENERAL);
 assert.equal(run.filter((item) => item.category === "state" && item.state === "Berlin").length, TOTAL_STATE);
+
+const catalogueQuestions = [
+  {
+    id: 1,
+    sourceNumber: 10,
+    category: "general",
+    prompt: "Was schützt das Grundgesetz?",
+    options: [{ text: "Die Grundrechte" }]
+  },
+  {
+    id: 2,
+    sourceNumber: 301,
+    category: "state",
+    state: "Berlin",
+    prompt: "Welches Wappen gehört zu Berlin?",
+    options: [{ text: "Der Bär" }]
+  }
+];
+const catalogueTranslations = {
+  2: {
+    prompt: "Which coat of arms belongs to Berlin?",
+    options: ["The bear"]
+  }
+};
+
+assert.equal(normalizeSearch("  GRUNDGESETZ  "), "grundgesetz");
+assert.equal(getCatalogueSummary(460, 24, ""), "460 questions in this view. Showing 24 of 460.");
+assert.equal(getCatalogueSummary(1, 1, "berlin"), "1 question match your search.");
+assert.equal(getCatalogueQuestions(catalogueQuestions, "state").length, 1);
+assert.equal(getCatalogueQuestions(catalogueQuestions, "bookmarked", { bookmarkedIds: new Set(["2"]) })[0].id, 2);
+assert.equal(searchCatalogueQuestions(catalogueQuestions, "coat of arms", catalogueTranslations)[0].id, 2);
 
 console.log("Progress and quiz-rule validation passed.");

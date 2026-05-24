@@ -1,0 +1,36 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  static-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate question data
+        run: node scripts/validate-data.js
+
+      - name: Validate pure app logic
+        run: node scripts/validate-progress.mjs
+
+      - name: Smoke test static server
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/lid-test-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:8000/ >/dev/null; then
+              break
+            fi
+            sleep 0.2
+          done
+          curl --fail --silent --show-error http://127.0.0.1:8000/ | grep -q "Leben in Deutschland Test"

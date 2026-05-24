@@ -1,4 +1,4 @@
-const APP_REVISION = "2026-05-review-fixes";
+const APP_REVISION = "2026-05-hardening";
 const CACHE_NAME = `lid-test-prep-${APP_REVISION}`;
 const ASSETS = [
   "./",
@@ -15,6 +15,7 @@ const ASSETS = [
   "./modules/tabs.js",
   "./modules/dialog.js",
   "./modules/quiz-rules.js",
+  "./modules/catalogue.js",
   "./assets/favicon.svg",
   "./assets/lid-logo.svg",
   "./manifest.webmanifest"

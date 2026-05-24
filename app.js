@@ -5,6 +5,13 @@ import { getLearnerHint } from "./modules/hints.js";
 import { createTabController } from "./modules/tabs.js";
 import { showModalDialog } from "./modules/dialog.js";
 import {
+  CATALOGUE_RESULT_LIMIT,
+  getCatalogueQuestions as getCataloguePool,
+  getCatalogueSummary,
+  normalizeSearch,
+  searchCatalogueQuestions
+} from "./modules/catalogue.js";
+import {
   EXAM_DURATION_SECONDS,
   PASS_THRESHOLD,
   TOTAL_GENERAL,
@@ -22,7 +29,6 @@ import {
   const ANALYTICS_CONSENT_KEY = "lidAnalyticsConsent";
   const WEAK_CLEAR_STREAK = 2;
   const LETTERS = ["A", "B", "C", "D"];
-  const CATALOGUE_RESULT_LIMIT = 24;
   const LEGAL_NOTICE = {
     privacy: {
       title: "Privacy",
@@ -431,9 +437,10 @@ import {
 
   function confirmDiscardActiveRun() {
     if (!hasActiveRun()) return true;
-    return window.confirm(
-      "Leave the current run? Answers you already selected are saved, but unanswered questions in this run will be skipped."
-    );
+    const message = state.mode === "exam"
+      ? "Leave the current exam simulation? This unfinished exam result will not be saved."
+      : "Leave the current run? Answers you already selected are saved, but unanswered questions in this run will be skipped.";
+    return window.confirm(message);
   }
 
   function goHome() {
@@ -1077,28 +1084,6 @@ import {
       .filter((questionId) => questions.some((question) => String(question.id) === questionId));
   }
 
-  function getCatalogueQuestions(filter) {
-    if (filter === "general") {
-      return questions.filter((question) => question.category === "general");
-    }
-
-    if (filter === "state") {
-      return questions.filter((question) => question.category === "state");
-    }
-
-    if (filter === "incorrect") {
-      const incorrectIds = new Set(getIncorrectQuestionIds());
-      return questions.filter((question) => incorrectIds.has(String(question.id)));
-    }
-
-    if (filter === "bookmarked") {
-      const bookmarkedIds = new Set(getBookmarkedQuestionIds());
-      return questions.filter((question) => bookmarkedIds.has(String(question.id)));
-    }
-
-    return questions.slice();
-  }
-
   function resetCatalogueLimit() {
     catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
     renderCatalogue({ preserveLimit: true });
@@ -1116,10 +1101,11 @@ import {
 
     const query = normalizeSearch(catalogueSearch.value);
     const filter = catalogueFilter.value;
-    const filteredQuestions = getCatalogueQuestions(filter).filter((question) => {
-      if (!query) return true;
-      return getQuestionSearchText(question).includes(query);
+    const cataloguePool = getCataloguePool(questions, filter, {
+      incorrectIds: new Set(getIncorrectQuestionIds()),
+      bookmarkedIds: new Set(getBookmarkedQuestionIds())
     });
+    const filteredQuestions = searchCatalogueQuestions(cataloguePool, query, translations);
     const visibleQuestions = filteredQuestions.slice(0, catalogueVisibleCount);
     const hasMore = filteredQuestions.length > visibleQuestions.length;
 
@@ -1142,12 +1128,6 @@ import {
     visibleQuestions.forEach((question) => {
       catalogueResults.append(createCatalogueItem(question));
     });
-  }
-
-  function getCatalogueSummary(count, visibleCount, query) {
-    const label = count === 1 ? "1 question" : `${count} questions`;
-    const suffix = count > visibleCount ? ` Showing ${visibleCount} of ${count}.` : "";
-    return query ? `${label} match your search.${suffix}` : `${label} in this view.${suffix}`;
   }
 
   function createCatalogueItem(question) {
@@ -1214,25 +1194,6 @@ import {
     if ((progress.questionStats[questionId]?.wrong || 0) > 0) return "Incorrect before";
     if ((progress.questionStats[questionId]?.answered || 0) > 0) return "Studied";
     return "New";
-  }
-
-  function getQuestionSearchText(question) {
-    const translation = translations[question.id];
-    return normalizeSearch([
-      question.id,
-      question.sourceNumber,
-      question.prompt,
-      question.state,
-      question.options.map((option) => option.text).join(" "),
-      translation?.prompt,
-      Array.isArray(translation?.options) ? translation.options.join(" ") : ""
-    ].filter(Boolean).join(" "));
-  }
-
-  function normalizeSearch(value) {
-    return String(value || "")
-      .trim()
-      .toLocaleLowerCase("de-DE");
   }
 
   function jumpToQuestion(event) {

@@ -34,6 +34,8 @@ Validate pure progress and quiz-rule behavior:
 node scripts/validate-progress.mjs
 ```
 
+These validation commands also run in GitHub Actions on pushes and pull requests. The CI workflow additionally starts a local static server and checks that `index.html` is served successfully.
+
 Preferred browser smoke check:
 
 ```sh

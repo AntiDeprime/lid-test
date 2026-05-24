@@ -68,6 +68,19 @@ fi
       const beforeReveal = [...document.querySelectorAll('.answer-option')].some((button) => button.classList.contains('is-correct') || button.classList.contains('is-wrong'));
       if (beforeReveal) throw new Error('Exam simulation revealed correctness before result');
       clickAnswer(wantCorrect);
+      if (i === 0 && wantCorrect) {
+        const realConfirm = window.confirm;
+        let confirmMessage = '';
+        window.confirm = (message) => {
+          confirmMessage = message;
+          return false;
+        };
+        click('#home-button');
+        window.confirm = realConfirm;
+        if (!confirmMessage.includes('unfinished exam result will not be saved')) {
+          throw new Error('Exam leave confirmation copy is misleading: ' + confirmMessage);
+        }
+      }
       if (i < 32) {
         click('#next-button');
         await delay(0);
