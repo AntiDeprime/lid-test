@@ -205,7 +205,8 @@
 - [x] Improve answer explanation quality.
   - Rewrite repetitive generated explanations into clearer learner-facing explanations.
   - Explain German-specific institutions, parties, rights, offices, elections, history, and Berlin terms where relevant.
-  - Keep the official question and answer data unchanged.
+  - Keep explanation copy separate from official question and answer data.
+  - Replace lazy fallback explanation copy with topic-aware notes and validation that catches thin explanations.
 
 - [x] Add English translations for bundled questions.
   - Add optional English translations for German prompts and answers.

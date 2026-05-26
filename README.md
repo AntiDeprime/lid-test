@@ -22,7 +22,7 @@ The app is static and has no package manager or build step. A local server keeps
 
 ## Checks
 
-Validate the bundled question, translation, and image data:
+Validate the bundled question, translation, explanation, and image data:
 
 ```sh
 node scripts/validate-data.js
@@ -134,7 +134,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `explanations.js` adds learner-facing explanations to the question catalogue without changing the official answer data.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
-- `scripts/validate-data.js` validates catalogue structure, translation coverage, and image references.
+- `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and image references.
 
 ## Catalogue Notes
 

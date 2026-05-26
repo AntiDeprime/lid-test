@@ -8,6 +8,7 @@ global.window = {};
 
 require("../questions.js");
 require("../translations-en.js");
+require("../explanations.js");
 
 const questions = window.LID_QUESTIONS || [];
 const translations = window.LID_TRANSLATIONS_EN || {};
@@ -83,6 +84,29 @@ questions.forEach((question, questionIndex) => {
         fail(`Question ${question.id} references missing image ${image.src}.`);
       }
     });
+  }
+
+  if (typeof question.explanation !== "string" || !question.explanation.trim()) {
+    fail(`Question ${question.id} is missing a learner explanation.`);
+  } else {
+    const lazyExplanationPatterns = [
+      /^The correct answer is "[^"]+"\.$/,
+      /The tempting wrong answers/,
+      /different right, institution, date, or everyday rule/,
+      /Use the exact wording of the prompt/,
+      /does not add learner context/
+    ];
+
+    lazyExplanationPatterns.forEach((pattern) => {
+      if (pattern.test(question.explanation)) {
+        fail(`Question ${question.id} has a generic learner explanation: ${question.explanation}`);
+      }
+    });
+
+    const sentenceCount = question.explanation.split(/[.!?]+/).filter((part) => part.trim()).length;
+    if (sentenceCount < 2) {
+      fail(`Question ${question.id} explanation is too thin to be useful: ${question.explanation}`);
+    }
   }
 
   const translation = translations[question.id];

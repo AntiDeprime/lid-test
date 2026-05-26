@@ -1414,10 +1414,10 @@ Warum gibt es die 5%-Hürde im Wahlgesetz der Bundesrepublik Deutschland? Es gib
 
 - [ ] die Programme von vielen kleinen Parteien viele Gemeinsamkeiten haben.
 - [ ] die Bürgerinnen und Bürger bei vielen kleinen Parteien die Orientierung verlieren können.
-- [ ] viele kleine Parteien die Regierungsbildung erschweren.
-- [x] die kleinen Parteien nicht so viel Geld haben, um die Politikerinnen und Politiker zu bezahlen.
+- [x] viele kleine Parteien die Regierungsbildung erschweren.
+- [ ] die kleinen Parteien nicht so viel Geld haben, um die Politikerinnen und Politiker zu bezahlen.
 
-Richtige Antwort: die kleinen Parteien nicht so viel Geld haben, um die Politikerinnen und Politiker zu bezahlen.
+Richtige Antwort: viele kleine Parteien die Regierungsbildung erschweren.
 
 #### Aufgabe 128
 

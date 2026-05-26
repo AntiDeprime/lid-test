@@ -10,6 +10,9 @@ window.LID_EXPLANATION_HELPERS = (() => {
     40: "The German national anthem begins with \"Einigkeit und Recht und Freiheit\". These words mean unity, justice, and freedom, three central ideas of the Federal Republic. The other answer choices are not the opening line of today's official anthem.",
     55: "The picture shows the Reichstag building in Berlin, where the Bundestag meets. The Bundestag is Germany's federal parliament and passes federal laws. It is different from the Bundesrat, which represents the federal states, and from the Chancellery, where the Chancellor works.",
     130: "In this voting example, candidate 1 has the most votes, so candidate 1 wins. For this question you do not need a special political rule; you only need to compare the numbers shown in the image. The other candidates have fewer votes.",
+    46: "Building roads and schools is a public infrastructure task. The state and municipalities provide many services that private companies do not simply decide for everyone, such as public roads and public schools. Selling clothes, producing cars, or giving everyone free newspapers are not core state tasks.",
+    66: "This question uses Gemeinden to mean Jewish communities, not municipalities. Berlin and Munich have the largest Jewish communities in Germany. The other city pairs may have Jewish history or communities too, but they are not the largest pair asked for here.",
+    77: "The Bundeswehr is Germany's armed forces, so the correct answer is the German army. It is separate from the police, which handles internal public safety, and from citizen initiatives, which are voluntary civic groups.",
     176: "After the Second World War, Germany was divided into occupation zones controlled by Great Britain, the Soviet Union, the USA, and France. The map in the question labels those four zones in that order. This is background for understanding the later division into West Germany and the GDR.",
     209: "Bild 4 shows the GDR coat of arms: hammer, compass, and a wreath of grain. The GDR was East Germany from 1949 to 1990. The other images show different symbols and are not the official GDR emblem.",
     226: "Bild 2 shows the European Union flag: twelve yellow stars on a blue background. The number of stars does not change with the number of EU member states; it is a fixed symbol of unity and solidarity. The other pictures are not the EU flag.",
@@ -140,7 +143,7 @@ window.LID_EXPLANATION_HELPERS = (() => {
       note: "For work questions, separate employment rights, social insurance, taxes, and company representation. The test often checks which protection or office applies in a concrete work situation."
     },
     {
-      test: /Eltern|Kinder|Kind|Erziehung|Schule|Ehe|verheiratet|Scheidung|Familie|volljährig/,
+      test: /Eltern|Kinder|Kind|Erziehung|Ehe|verheiratet|Scheidung|Familie|volljährig/,
       note: "For family questions, remember that parents are responsible for children, but adults make their own life choices and the state protects equal rights and child welfare."
     },
     {
@@ -148,7 +151,7 @@ window.LID_EXPLANATION_HELPERS = (() => {
       note: "For custom and religion questions, the test usually asks for common German cultural knowledge while still respecting freedom of religion."
     },
     {
-      test: /Berlin|Pankow|Regierende|Senator|Stadtstaat|Landesflagge|Wappen/,
+      test: /Berlin|Pankow|Regierende|Senator|Stadtstaat/,
       note: "For Berlin questions, remember that Berlin is both a city and a federal state, so its institutions have city-state names such as Governing Mayor and Senate."
     }
   ];
@@ -168,6 +171,90 @@ window.LID_EXPLANATION_HELPERS = (() => {
     [/EU|Europäische Union|Europäischen Parlament/, "EU institutions are different from German federal institutions, even when both are democratic."],
     [/Ordnungsamt|Einwohnermeldeamt|Standesamt|Jugendamt|Finanzamt/, "German offices have narrow responsibilities, so the correct answer depends on the exact life situation in the question."],
     [/Ministerpräsident|Oberbürgermeister|Senatspräsident/, "Berlin uses special city-state titles. Its head of government is the Governing Mayor, not a Minister-President."]
+  ];
+
+  const ANSWER_NOTES = [
+    [/Religionsunterricht teilnimmt/, "In Germany, religious education has a special constitutional status. Parents may decide about a child's participation until age 14; after that, the child decides on religious matters for themselves."],
+    [/Meinungsfreiheit/, "Meinungsfreiheit is a basic right because it protects public and private expression, including political criticism. It is different from voting rights or religious freedom."],
+    [/Glaubens- und Gewissensfreiheit/, "This right protects both religious belief and personal conscience. The test often contrasts it with social or economic interests such as work, housing, or entertainment."],
+    [/Alle sollen gleich viel Geld haben/, "The Basic Law guarantees equality before the law and basic freedoms, but it does not require everyone to have the same income or wealth."],
+    [/die Geldstrafe/, "A Geldstrafe is a lawful criminal penalty decided through legal procedure. Torture, corporal punishment, and the death penalty conflict with human dignity and the Basic Law."],
+    [/Zwangsarbeit/, "Forced labor is banned because people may not be compelled to work against their will, except for very narrow civic duties allowed by law."],
+    [/Ungleichbehandlung der Bürgerinnen und Bürger durch den Staat/, "The state must treat people equally under the law. Rights such as expression, petitions, and assembly are protected, not forbidden."],
+    [/verfassungswidrig/, "A party that aims to abolish democracy and create a dictatorship acts against the constitution. In Germany, defending the free democratic basic order is part of the constitutional system."],
+    [/Pressezensur/, "Pressezensur means state control or suppression of the press. It is not a feature of democracy because independent media are needed to inform voters and scrutinize power."],
+    [/Presse/, "Germany's three branches of state power are legislative, executive, and judicial. The press is independent and important in democracy, but it is not a branch of state authority."],
+    [/Koalition/, "A coalition is formed when parties cooperate to create a governing majority. This is common in Germany because one party often does not win enough seats to govern alone."],
+    [/Krankenversicherung/, "Health insurance is part of Germany's social security system. It protects people from major financial risk when they need medical care."],
+    [/eine eigene Regierung/, "Because Germany is a federal state, each Bundesland has its own parliament and government. Foreign policy and currency are federal or European matters, not state-level powers."],
+    [/Schulpolitik/, "Education policy is mainly a responsibility of the Bundesländer. That is why school rules can differ between German states."],
+    [/Bund, Länder und Kommunen/, "Germany's administration is organized across the federal level, the states, and municipalities. This is different from the temporary occupation zones after 1945."],
+    [/Gemeinden/, "Gemeinden are the local level of political administration. They handle local public services and are the lowest level in the three-tier structure."],
+    [/Frank-Walter Steinmeier/, "Germany's head of state is the Federal President, currently Frank-Walter Steinmeier. This office is separate from the Bundestag presidency, state premiers, and former Federal Presidents."],
+    [/Christlich Demokratische Union/, "CDU stands for Christlich Demokratische Union. It is a party name, not an entrepreneurs' club or a generic phrase about Germany."],
+    [/Sozialdemokratische Partei Deutschlands/, "SPD stands for Sozialdemokratische Partei Deutschlands. The exact party name matters because the distractors use similar-sounding but unofficial wording."],
+    [/Freie Demokratische Partei/, "FDP stands for Freie Demokratische Partei. The distractors are built from plausible political words, so learn the official party name as a fixed abbreviation."],
+    [/Bündnis 90\/Die Grünen/, "This is the official name of the Green party in Germany. The name combines the East German civil rights alliance Bündnis 90 with Die Grünen."],
+    [/Die Linke/, "Die Linke is the party name. Do not infer the answer from generic political direction alone; the test asks for the official name."],
+    [/CDU\/CSU und AfD/, "This question asks for the current largest parliamentary groups, so it can change after Bundestag elections. Learn it as a current-facts item rather than as a permanent rule."],
+    [/Bundestag/, "The Bundestag is elected by voters and is Germany's national parliament. It is different from the Bundesrat, which represents state governments."],
+    [/Bundesversammlung/, "The Bundesversammlung has one main task: electing the Federal President. It is not a normal lawmaking parliament."],
+    [/Bundeswehr/, "The Bundeswehr is Germany's armed forces. It is responsible for military defense, not policing, intelligence surveillance, or citizens' initiatives."],
+    [/ein Recht/, "Voting in Germany is a right, not a legal duty. Eligible voters may choose whether to vote."],
+    [/Mehrheits- und Verhältniswahlrecht/, "Federal elections combine constituency candidates with proportional party representation. That is why the system is described as both majority and proportional voting."],
+    [/frei, gleich, geheim/, "These are core election principles: voters decide freely, each vote has equal value, and the ballot is secret."],
+    [/Mindestanteil an Wählerstimmen, um ins Parlament zu kommen/, "The 5 percent threshold is the minimum vote share a party usually needs to enter parliament. It is meant to keep parliament workable by limiting fragmentation."],
+    [/viele kleine Parteien die Regierungsbildung erschweren/, "The 5 percent threshold is meant to keep parliament workable. If many very small parties entered parliament, forming stable majorities and governments would become harder."],
+    [/eine Wahlbenachrichtigung von der Gemeinde/, "Before an election, eligible voters receive an official notice from their municipality. It tells them where and when they can vote."],
+    [/Man kann durch Briefwahl seine Stimme abgeben/, "Postal voting is allowed in Germany. It lets eligible voters cast their ballot without going to the polling station on election day."],
+    [/entscheidet mit Richterinnen\/Richtern über Schuld und Strafe/, "A Schöffin or Schöffe is a lay judge. They sit with professional judges in some criminal cases and help decide guilt and punishment."],
+    [/arbeitet an einem Gericht und spricht Urteile/, "A judge's core task is to decide legal cases at court and issue judgments. Legal advice is the work of lawyers, and official documents are often handled by administrative offices."],
+    [/Judikative|rechtsprechenden Gewalt|Recht sprechen/, "Judges belong to the judicial branch. Their role is to apply the law independently, not to govern, legislate, or carry out police work."],
+    [/die Einhaltung von Gesetzen zu überwachen/, "Police help enforce laws and protect public safety. They do not make laws, run the country, or replace courts."],
+    [/den Holocaust leugnen/, "Denying the Holocaust is antisemitic because it rejects the Nazi genocide of Jews. Visiting a Jewish festival or criticizing a government is not automatically antisemitic."],
+    [/Ende des Zweiten Weltkriegs in Europa/, "8 May 1945 marks the end of the Second World War in Europe and the defeat of Nazi Germany. It is not a date for German reunification or an election."],
+    [/der Zweite Weltkrieg/, "The war from 1939 to 1945 was the Second World War. Keeping major dates straight helps separate Nazi-era questions from Cold War and reunification questions."],
+    [/das Attentat auf Hitler am 20. Juli 1944/, "Stauffenberg is remembered for the 20 July 1944 assassination attempt against Hitler. The question is about resistance to National Socialism, not sport or architecture."],
+    [/Jüdische Geschäfte und Synagogen werden durch Nationalsozialisten und ihre Anhänger zerstört/, "9 November 1938 refers to the November pogroms, when Nazis and supporters attacked Jewish shops and synagogues. It is a key date in Nazi persecution of Jews."],
+    [/USA, Sowjetunion, Großbritannien, Frankreich/, "After the Second World War, these four powers occupied Germany. Their occupation zones shaped the later division into the Federal Republic and the GDR."],
+    [/sowjetischen Besatzungszone/, "The GDR was founded in the Soviet occupation zone. The western zones developed into the Federal Republic of Germany."],
+    [/der Europäischen Union \(EU\)/, "Germany was a founding member of the European integration project that became the EU. NATO and the Warsaw Pact were military alliances, not the answer here."],
+    [/Einheit/, "The Day of German Unity on 3 October commemorates German reunification in 1990. It is Germany's national holiday."],
+    [/Willy Brandt/, "Willy Brandt, Chancellor from 1969 to 1974, is closely associated with Ostpolitik and the treaties with Eastern Europe. These policies aimed to reduce Cold War tensions."],
+    [/Bundesrepublik Deutschland/, "Germany's full official name is Bundesrepublik Deutschland. The name points to a federal republic, not a monarchy or a loose confederation."],
+    [/Dänemark|Tschechien/, "Neighbor-country questions are geography facts. Germany borders Denmark in the north and Czechia to the east."],
+    [/das Abitur/, "The Abitur is the school-leaving qualification normally required for university study in Germany. It is different from vocational qualifications or lower secondary certificates."],
+    [/einem Abendgymnasium/, "An Abendgymnasium is an evening school where adults can earn the Abitur. It is designed for people who want to continue education after regular school age."],
+    [/Türkei/, "Many people with a migration background in Germany have roots in Turkey, especially because of labor migration agreements and family migration after the 1960s."],
+    [/Westerwaldkreis|Neunkirchen/, "District-name questions test local geography within the selected Bundesland. The other options are real or plausible districts from other states."],
+    [/richtet sich nach Angebot und Nachfrage, aber der Staat sorgt für einen sozialen Ausgleich/, "The social market economy combines market competition with social protection. Prices and supply are shaped by markets, while the state helps balance social risks."],
+    [/Ministerpräsidentin\/Ministerpräsident/, "In most Bundesländer, the head of the state government is called Ministerpräsidentin or Ministerpräsident. City-states can use different titles."],
+    [/Regierende Bürgermeisterin\/Regierender Bürgermeister/, "Berlin's head of government is called the Governing Mayor because Berlin is both a city and a federal state."],
+    [/Außenministerin\/Außenminister|Senatorin\/Senator für Außenbeziehungen/, "Foreign policy is handled at the federal level, so a Bundesland does not have its own foreign minister. State governments have portfolios such as interior, justice, and finance."],
+    [/Landeszentrale für politische Bildung|Landesbeauftragten für politische Bildung/, "The state political education office is the public source for civic education and political information. It is different from consumer advice, churches, or local public-order offices."],
+    [/Landkreis|Kreis|Vogtlandkreis|Wartburgkreis|Börde|Nordfriesland|Rhein-Sieg-Kreis|Uckermark|Prignitz|Altötting|Ammerland|Mecklenburgische Seenplatte/, "District-name questions test local geography within the selected Bundesland. The other options are real or plausible districts from other states."],
+    [/weiß|rot|grün|blau|gelb|schwarz/, "Flag-color questions are memorization items for the selected Bundesland. The distractors often reuse colors from other state flags."],
+    [/^3$|^4$|^5$|^6$|^14$|^16$|^18$|^20$/, "Number questions usually test a fixed legal or civic fact. Check whether the prompt asks about years, voting age, or a count before choosing."]
+  ];
+
+  const PROMPT_NOTES = [
+    [/Staatsoberhaupt/, "Staatsoberhaupt means head of state. In Germany that is the Federal President, while the Chancellor leads the federal government."],
+    [/Wappen gehört zum (Bundesland|Freistaat)|Welches Wappen/, "For coat-of-arms questions, compare the official state symbol shown in the image. These are state symbols, not federal institutions."],
+    [/Welches Bundesland ist/, "Map questions ask you to recognize the selected Bundesland by location. Learn each state with its position and neighboring states."],
+    [/Für wie viele Jahre wird der Landtag/, "State parliaments are elected for fixed legislative terms. In these state questions, the expected answer is the current term length for that Bundesland."],
+    [/Ab welchem Alter darf man .* Kommunalwahlen wählen/, "Kommunalwahlen are local elections. Voting age can differ by Bundesland, so this is a state-specific fact."],
+    [/Welche Farben hat die Landesflagge/, "A Landesflagge is the state flag, not the German federal flag. The answer is the color combination used by that Bundesland."],
+    [/Welche Ministerin\/welchen Minister hat .* nicht|Welche Senatorin\/welchen Senator hat .* nicht/, "The word \"nicht\" makes this an exception question. Choose the ministry portfolio that does not exist at state level."],
+    [/Wie nennt man die Regierungschefin\/den Regierungschef/, "This asks for the title of the head of a state government. Most states use Ministerpräsidentin or Ministerpräsident; Berlin, Hamburg, and Bremen have city-state titles."],
+    [/Landeshauptstadt/, "Landeshauptstadt means state capital. This is a direct geography fact for the selected Bundesland."],
+    [/Abkürzung/, "Abbreviation questions are best learned as fixed official names; the wrong answers often differ by only one political-sounding word."],
+    [/Alliierte Besatzungsmächte/, "Allied occupation powers refers to the countries that controlled occupation zones in Germany after the Second World War."],
+    [/Bundeswehr/, "Bundeswehr means Germany's armed forces. The test contrasts external defense with police work and civic participation."],
+    [/soziale Sicherheit|Sozialversicherung|Pflegeversicherung|Krankenversicherung|Rentenversicherung|Arbeitslosenversicherung/, "Social-security questions are about public insurance systems that protect against illness, care needs, unemployment, accidents, and old age."],
+    [/Schulwesen|Schulpolitik|Schule/, "School policy is a major responsibility of the Bundesländer, even though the Basic Law sets the broader constitutional framework."],
+    [/Nationalsozial|Drittes Reich|Hitler|Holocaust|Synagogen|8\. Mai 1945|9\. November 1938|1939 bis 1945|20\. Juli 1944/, "Nazi-era questions test dictatorship, persecution, war, and resistance. Separate these dates from the Cold War and reunification timeline."],
+    [/DDR|Besatzungszone|Montagsdemonstrationen|Wir sind das Volk|Wiedervereinigung|Warschauer Pakt/, "GDR questions belong to the Cold War period: two German states existed from 1949 until reunification in 1990."],
+    [/Gericht|Richter|Schöff|Polizei|Strafe|Urteile/, "Legal-system questions separate police, courts, judges, lawyers, and lay judges. Each has a different role in the rule of law."]
   ];
 
   function clean(text) {
@@ -204,7 +291,7 @@ window.LID_EXPLANATION_HELPERS = (() => {
     const promptAndCorrect = [question.prompt, correctOption(question)?.text || ""].join(" ");
     const allText = haystack(question);
     const ranked = TERM_NOTES
-      .filter(([term]) => allText.includes(term))
+      .filter(([term]) => promptAndCorrect.includes(term))
       .map(([term, note]) => ({
         term,
         note,
@@ -212,6 +299,7 @@ window.LID_EXPLANATION_HELPERS = (() => {
       }))
       .filter((item, index, items) => {
         if (item.term === "Partei" && allText.includes("Parteien")) return false;
+        if (item.term === "Gemeinden" && /jüdischen Gemeinden/.test(promptAndCorrect)) return false;
         return items.findIndex((candidate) => candidate.note === item.note) === index;
       })
       .sort((a, b) => a.rank - b.rank);
@@ -231,12 +319,24 @@ window.LID_EXPLANATION_HELPERS = (() => {
     ).slice(0, limit);
   }
 
+  function matchingAnswerNotes(question, limit = 2) {
+    const correct = correctOption(question);
+    if (!correct) return [];
+    const source = clean(correct.text);
+    return unique(ANSWER_NOTES.filter(([pattern]) => pattern.test(source)).map(([, note]) => note)).slice(0, limit);
+  }
+
+  function matchingPromptNotes(question, limit = 1) {
+    const source = question.prompt;
+    return PROMPT_NOTES.filter(([pattern]) => pattern.test(source)).map(([, note]) => note).slice(0, limit);
+  }
+
   function isNegativeQuestion(question) {
     return /\b(nicht|kein|keine|keinen|keinem|keiner|verboten|abschaffen|darf nicht)\b/i.test(question.prompt);
   }
 
   function isVisualQuestion(question) {
-    return question.images.length > 0 || /Bild|Wappen|Flagge|Karte/.test(question.prompt);
+    return question.images.length > 0 || /\b(Bild|Wappen|Flagge|Karte)\b/.test(question.prompt);
   }
 
   function isDateOrNumberQuestion(question) {
@@ -244,7 +344,7 @@ window.LID_EXPLANATION_HELPERS = (() => {
   }
 
   function isPersonOrGroupQuestion(question) {
-    return /Wer|Wen|Welche Person|Präsident|Kanzler|Bürgermeister|Arbeitnehmer|Abgeordnete/i.test(question.prompt);
+    return /\b(Wer|Wen|Welche Person)\b|Präsident|Kanzler|Bürgermeister|Arbeitnehmer|Abgeordnete/i.test(question.prompt);
   }
 
   function isPlaceOrOfficeQuestion(question) {
@@ -253,23 +353,23 @@ window.LID_EXPLANATION_HELPERS = (() => {
 
   function openingFor(question, correct) {
     if (isVisualQuestion(question)) {
-      return `The correct answer is ${quoted(correct.text)} because that image or label matches the official symbol, map, or place asked for in the question.`;
+      return `${quoted(correct.text)} matches the official symbol, map position, building, or image label asked for here.`;
     }
 
     if (isNegativeQuestion(question)) {
       if (/abschaffen/i.test(question.prompt)) {
-        return `This question asks whether a protected democratic right can simply be abolished. The correct answer is ${quoted(correct.text)}.`;
+        return `This question asks whether a protected democratic right can simply be abolished; ${quoted(correct.text)} is the answer because basic rights bind the state.`;
       }
 
       if (/verbietet|verboten/i.test(question.prompt)) {
-        return `This question asks what German law or the Basic Law forbids. The correct answer is ${quoted(correct.text)}.`;
+        return `This question asks what German law or the Basic Law forbids, so ${quoted(correct.text)} is the prohibited item.`;
       }
 
       if (/\bnicht\b/i.test(question.prompt)) {
-        return `Because the wording says "not", look for the answer that does not belong. The correct answer is ${quoted(correct.text)}.`;
+        return `Because the wording says "not", ${quoted(correct.text)} is the option that does not belong.`;
       }
 
-      return `This question is asking for the exception, the limit, or the option that is not correct. The correct answer is ${quoted(correct.text)}.`;
+      return `This question asks for an exception or limit, so ${quoted(correct.text)} is the option that does not fit the rule.`;
     }
 
     if (/Was bedeutet|Was ist damit gemeint|Wofür steht|Was versteht man/i.test(question.prompt)) {
@@ -277,18 +377,18 @@ window.LID_EXPLANATION_HELPERS = (() => {
     }
 
     if (isPersonOrGroupQuestion(question)) {
-      return `The correct person or office is ${quoted(correct.text)}.`;
+      return `${quoted(correct.text)} is the person, group, or office with the role asked about here.`;
     }
 
     if (isDateOrNumberQuestion(question)) {
-      return `The correct fact to remember is ${quoted(correct.text)}.`;
+      return `${quoted(correct.text)} is the date, number, or fixed fact the question is testing.`;
     }
 
     if (isPlaceOrOfficeQuestion(question)) {
-      return `The responsible place or institution is ${quoted(correct.text)}.`;
+      return `${quoted(correct.text)} is the responsible place or institution for this situation.`;
     }
 
-    return `The correct answer is ${quoted(correct.text)}.`;
+    return `${quoted(correct.text)} fits the exact concept asked for in the question.`;
   }
 
   function explainWrongOptions(question) {
@@ -324,8 +424,7 @@ window.LID_EXPLANATION_HELPERS = (() => {
       return "The other choices may be real places or offices, but they handle different situations.";
     }
 
-    const conciseWrong = wrong.slice(0, 2).map(quoted).join(" and ");
-    return `The tempting wrong answers, such as ${conciseWrong}, point to a different right, institution, date, or everyday rule than the one asked for here.`;
+    return "";
   }
 
   function buildExplanation(question) {
@@ -336,11 +435,19 @@ window.LID_EXPLANATION_HELPERS = (() => {
     const correct = correctOption(question);
     if (!correct) return "";
 
+    const answerNotes = matchingAnswerNotes(question);
+    const promptNotes = matchingPromptNotes(question);
+    const termNotes = matchingTermNotes(question, answerNotes.length || promptNotes.length ? 1 : 2);
+    const topicNotes = matchingTopicNotes(question, promptNotes.length ? 0 : 1);
+    const wrongExplanation = answerNotes.length && promptNotes.length ? "" : explainWrongOptions(question);
+
     const parts = [
       openingFor(question, correct),
-      ...matchingTermNotes(question),
-      ...matchingTopicNotes(question),
-      explainWrongOptions(question)
+      ...answerNotes,
+      ...promptNotes,
+      ...termNotes,
+      ...topicNotes,
+      wrongExplanation
     ];
 
     return unique(parts).map(sentence).join(" ");
