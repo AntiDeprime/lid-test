@@ -8,11 +8,27 @@ global.window = {};
 
 require("../questions.js");
 require("../translations-en.js");
+const explanationFiles = [
+  "explanation-texts-001-115.js",
+  "explanation-texts-116-230.js",
+  "explanation-texts-231-345.js",
+  "explanation-texts-346-460.js"
+];
+explanationFiles.forEach((file) => require(`../${file}`));
 require("../explanations.js");
 
 const questions = window.LID_QUESTIONS || [];
 const translations = window.LID_TRANSLATIONS_EN || {};
 const errors = [];
+
+const explanationIds = explanationFiles.flatMap((file) => {
+  const source = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
+  return [...source.matchAll(/^\s+(\d+):/gm)].map((match) => Number(match[1]));
+});
+const explanationIdCounts = explanationIds.reduce((counts, id) => {
+  counts[id] = (counts[id] || 0) + 1;
+  return counts;
+}, {});
 
 function fail(message) {
   errors.push(message);
@@ -21,6 +37,16 @@ function fail(message) {
 if (!Array.isArray(questions) || questions.length === 0) {
   fail("Question catalogue is missing or empty.");
 }
+
+for (let id = 1; id <= 460; id += 1) {
+  if (explanationIdCounts[id] !== 1) {
+    fail(`Question ${id} must have exactly one bespoke explanation entry; found ${explanationIdCounts[id] || 0}.`);
+  }
+}
+
+explanationIds.filter((id) => id < 1 || id > 460).forEach((id) => {
+  fail(`Explanation entry ${id} is outside the 1-460 catalogue range.`);
+});
 
 const seenIds = new Set();
 const categoryCounts = {};
@@ -91,6 +117,10 @@ questions.forEach((question, questionIndex) => {
   } else {
     const lazyExplanationPatterns = [
       /^The correct answer is "[^"]+"\.$/,
+      /fits the exact concept/i,
+      /the test is looking for/i,
+      /plausible-looking distractors/i,
+      /other (pictures|choices|answers|numbers|people|groups|offices).*distractors/i,
       /The tempting wrong answers/,
       /different right, institution, date, or everyday rule/,
       /Use the exact wording of the prompt/,
@@ -106,6 +136,10 @@ questions.forEach((question, questionIndex) => {
     const sentenceCount = question.explanation.split(/[.!?]+/).filter((part) => part.trim()).length;
     if (sentenceCount < 2) {
       fail(`Question ${question.id} explanation is too thin to be useful: ${question.explanation}`);
+    }
+
+    if (sentenceCount > 5) {
+      fail(`Question ${question.id} explanation is too long (${sentenceCount} sentences).`);
     }
   }
 

@@ -131,11 +131,13 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `app.js` contains the vanilla JavaScript app wiring and screen state.
 - `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, and quiz rules.
 - `questions.js` contains the question catalogue loaded by the page.
-- `explanations.js` adds learner-facing explanations to the question catalogue without changing the official answer data.
+- `explanation-texts-*.js` contains one reviewed, question-specific learner explanation for each catalogue item.
+- `explanations.js` attaches the reviewed explanation map to the question catalogue.
+- `docs/explanation-guidelines.md` defines the evidence-informed rubric used to review and maintain explanations.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
 - `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and image references.
 
 ## Catalogue Notes
 
-The current local catalogue contains all 300 general questions and 160 state questions: 10 questions for each of the 16 Bundesländer. English translations cover the bundled general catalogue and fall back gracefully where a state-question translation is not available.
+The current local catalogue contains all 300 general questions and 160 state questions: 10 questions for each of the 16 Bundesländer. English translations cover the bundled general catalogue and fall back gracefully where a state-question translation is not available. Every catalogue item has a bespoke explanation that is validated for exact ID coverage and generic fallback wording.

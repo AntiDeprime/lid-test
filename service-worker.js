@@ -1,10 +1,14 @@
-const APP_REVISION = "2026-05-hardening";
+const APP_REVISION = "2026-08-explanation-audit";
 const CACHE_NAME = `lid-test-prep-${APP_REVISION}`;
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css?v=catalogue",
   "./questions.js?v=catalogue",
+  "./explanation-texts-001-115.js?v=catalogue",
+  "./explanation-texts-116-230.js?v=catalogue",
+  "./explanation-texts-231-345.js?v=catalogue",
+  "./explanation-texts-346-460.js?v=catalogue",
   "./explanations.js?v=catalogue",
   "./translations-en.js?v=catalogue",
   "./app.js?v=catalogue",

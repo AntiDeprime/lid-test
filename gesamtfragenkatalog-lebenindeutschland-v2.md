@@ -1941,11 +1941,11 @@ Richtige Antwort: 1949
 Wie viele Besatzungszonen gab es in Deutschland nach dem Zweiten Weltkrieg?
 
 - [ ] 3
-- [ ] 4
+- [x] 4
 - [ ] 5
-- [x] 6
+- [ ] 6
 
-Richtige Antwort: 6
+Richtige Antwort: 4
 
 #### Aufgabe 176
 
@@ -2194,8 +2194,8 @@ Richtige Antwort: Thüringen
 Welches heutige deutsche Bundesland gehörte früher zum Gebiet der DDR?
 
 - [ ] Bayern
-- [x] Niedersachsen
-- [ ] Sachsen
+- [ ] Niedersachsen
+- [x] Sachsen
 - [ ] Baden-Württemberg
 
 Richtige Antwort: Sachsen

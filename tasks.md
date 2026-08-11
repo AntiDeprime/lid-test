@@ -208,6 +208,12 @@
   - Keep explanation copy separate from official question and answer data.
   - Replace lazy fallback explanation copy with topic-aware notes and validation that catches thin explanations.
 
+- [x] Audit every answer explanation against an evidence-informed rubric.
+  - Replace reusable topic fragments with one bespoke explanation for each of the 460 questions.
+  - Explain the decisive fact for the correct option and the concrete mismatch in every distractor.
+  - Remove abstract openings, repeated definitions, generic test-taking advice, and unrelated background.
+  - Document the maintenance rubric and validate exact explanation coverage.
+
 - [x] Add English translations for bundled questions.
   - Add optional English translations for German prompts and answers.
   - Keep German as the default and official test language.

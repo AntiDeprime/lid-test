@@ -73,5 +73,28 @@ curl --fail --silent --show-error "$URL" >/dev/null
     catalogue: document.querySelector('#catalogue-summary').textContent
   };
 })()"
+"$PWCLI" --session "$SESSION" eval "async () => {
+  const explanations = window.LID_SPECIFIC_EXPLANATIONS || {};
+  if (Object.keys(explanations).length !== 460) {
+    throw new Error('Expected 460 bespoke explanations');
+  }
+  if (!window.LID_QUESTIONS.every((question) => question.explanation === explanations[question.id])) {
+    throw new Error('A catalogue question did not receive its bespoke explanation');
+  }
+
+  document.querySelector('#practice-button').click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const prompt = document.querySelector('#question-title')?.textContent;
+  const question = window.LID_QUESTIONS.find((item) => item.prompt === prompt);
+  if (!question) throw new Error('Study question was not found in the catalogue');
+  const correctIndex = question.options.findIndex((option) => option.correct);
+  document.querySelectorAll('.answer-option')[correctIndex].click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const explanation = document.querySelector('#question-explanation');
+  if (explanation?.classList.contains('is-hidden') || explanation?.textContent !== question.explanation) {
+    throw new Error('Study mode did not reveal the bespoke explanation');
+  }
+  return { questionId: question.id, explanation: explanation.textContent };
+}"
 "$PWCLI" --session "$SESSION" snapshot
 "$PWCLI" --session "$SESSION" console
