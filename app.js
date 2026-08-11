@@ -95,11 +95,13 @@ import {
   const jumpQuestion = $("jump-question");
   const translationToggle = $("translation-toggle");
   const bookmarkToggle = $("bookmark-toggle");
+  const bookmarkLabel = $("bookmark-label");
   const questionKicker = $("question-kicker");
   const questionTitle = $("question-title");
   const questionTranslation = $("question-translation");
   const timerCounter = $("timer-counter");
   const scoreCounter = $("score-counter");
+  const quizProgress = $("quiz-progress");
   const progressBar = $("progress-bar");
   const imageGrid = $("image-grid");
   const answers = $("answers");
@@ -651,7 +653,7 @@ import {
   function renderBookmarkToggle(question) {
     const bookmarked = isBookmarked(question);
     bookmarkToggle.setAttribute("aria-pressed", String(bookmarked));
-    bookmarkToggle.textContent = bookmarked ? "Bookmarked" : "Bookmark";
+    bookmarkLabel.textContent = bookmarked ? "Saved" : "Bookmark";
     bookmarkToggle.title = bookmarked ? "Remove bookmark" : "Bookmark question";
     bookmarkToggle.setAttribute("aria-label", bookmarked ? "Remove bookmark" : "Bookmark question");
   }
@@ -681,6 +683,9 @@ import {
     questionKicker.textContent = `Question ${progress} / ${total}`;
     questionTitle.textContent = question.prompt;
     scoreCounter.textContent = state.mode === "exam" ? "Exam simulation" : `${state.score} correct`;
+    quizProgress.setAttribute("aria-valuemax", String(total));
+    quizProgress.setAttribute("aria-valuenow", String(progress));
+    quizProgress.setAttribute("aria-valuetext", `Question ${progress} of ${total}`);
     progressBar.style.width = `${((progress - 1) / total) * 100}%`;
     questionHint.textContent = "Choose one answer.";
     questionTranslation.replaceChildren();
@@ -786,6 +791,7 @@ import {
     if (state.mode === "exam") {
       if (index === answeredEntry.selectedIndex) {
         button.classList.add("is-selected");
+        appendVisibleAnswerState(button, "Selected", "•");
         button.setAttribute("aria-label", appendAnswerState(label, "Your selected answer."));
       } else {
         button.setAttribute("aria-label", label);
@@ -795,17 +801,27 @@ import {
 
     if (index === answeredEntry.correctIndex) {
       button.classList.add("is-correct");
+      appendVisibleAnswerState(button, "Correct", "✓");
       button.setAttribute("aria-label", appendAnswerState(label, "Correct answer."));
       return;
     }
 
     if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) {
       button.classList.add("is-wrong");
+      appendVisibleAnswerState(button, "Your answer", "×");
       button.setAttribute("aria-label", appendAnswerState(label, "Your selected answer, incorrect."));
       return;
     }
 
     button.setAttribute("aria-label", label);
+  }
+
+  function appendVisibleAnswerState(button, text, symbol) {
+    const stateLabel = document.createElement("span");
+    stateLabel.className = "answer-state";
+    stateLabel.setAttribute("aria-hidden", "true");
+    stateLabel.textContent = `${symbol} ${text}`;
+    button.querySelector(".option-copy")?.append(stateLabel);
   }
 
   function appendAnswerState(label, stateText) {

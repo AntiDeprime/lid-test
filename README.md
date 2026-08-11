@@ -20,6 +20,8 @@ Then open `http://127.0.0.1:8000/`.
 
 The app is static and has no package manager or build step. A local server keeps local checks consistent with GitHub Pages and the repository agent workflow.
 
+The app's interaction and visual conventions are documented in [`docs/ui-principles.md`](docs/ui-principles.md), including the mobile toolbar grouping, touch-target, focus, state, and responsive review criteria.
+
 ## Checks
 
 Validate the bundled question, translation, explanation, and image data:
@@ -42,7 +44,7 @@ Preferred browser smoke check:
 scripts/browser-smoke-check.sh
 ```
 
-The script starts `python3 -m http.server 8000 --bind 127.0.0.1`, waits for `http://127.0.0.1:8000/`, opens the app through the Codex Playwright CLI wrapper, verifies the start page DOM, captures a snapshot, prints console output, then closes the browser and server.
+The script starts `python3 -m http.server 8000 --bind 127.0.0.1`, waits for `http://127.0.0.1:8000/`, opens the app through the Codex Playwright CLI wrapper, verifies the start page DOM, checks the quiz toolbar structure, labels, 44px targets, accessible progress, and overflow at a 390px viewport, captures a snapshot, prints console output, then closes the browser and server.
 
 Deeper browser flow check:
 
@@ -56,6 +58,7 @@ Useful overrides:
 
 ```sh
 PORT=8010 PLAYWRIGHT_CLI_SESSION=lid-test-check scripts/browser-smoke-check.sh
+PLAYWRIGHT_BROWSER=firefox scripts/browser-smoke-check.sh
 PWCLI="$HOME/.codex/skills/playwright/scripts/playwright_cli.sh" scripts/browser-smoke-check.sh
 ```
 
@@ -134,6 +137,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `explanation-texts-*.js` contains one reviewed, question-specific learner explanation for each catalogue item.
 - `explanations.js` attaches the reviewed explanation map to the question catalogue.
 - `docs/explanation-guidelines.md` defines the evidence-informed rubric used to review and maintain explanations.
+- `docs/ui-principles.md` defines the research-informed interaction and visual standards used for interface reviews.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
 - `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and image references.

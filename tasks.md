@@ -2,6 +2,13 @@
 
 ## High Priority
 
+- [x] Polish and clarify the quiz interface.
+  - Define a research-informed set of reusable UI principles for hierarchy, grouping, consistency, touch targets, visible state, accessibility, and responsive behavior.
+  - Separate question tools from session navigation instead of allowing unrelated controls to wrap into an ambiguous cluster.
+  - Give every quiz action a consistent shape, a visible icon-and-text label, a 44px touch target, and a clear focus/pressed state.
+  - Refresh the quiz panel, answer cards, progress treatment, and feedback states for a calmer, more professional learning experience.
+  - Verify the toolbar at a 390px mobile viewport and expose question progress to assistive technology.
+
 - [x] Redesign the first page into a clear, user-friendly introduction.
   - Explain that the app helps users prepare for the German Leben in Deutschland / Einbürgerungstest.
   - State the test format clearly: 33 questions, 30 general questions, 3 Bundesland questions, 17 correct answers needed to pass.

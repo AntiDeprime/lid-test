@@ -257,23 +257,41 @@
         </div>
       </section>
 
-      <section id="quiz-screen" class="app-panel is-hidden" aria-labelledby="question-title">
-        <header class="topbar">
-          <div>
+      <section id="quiz-screen" class="app-panel quiz-panel is-hidden" aria-labelledby="question-title">
+        <header class="quiz-header">
+          <div class="quiz-heading-row">
             <p id="question-kicker" class="eyebrow">Question</p>
-            <h1 id="question-title" lang="de"></h1>
-            <div id="question-translation" class="translation-panel is-hidden" aria-live="polite" lang="en"></div>
+            <div class="quiz-status" aria-label="Current session status">
+              <span id="timer-counter" class="counter timer-counter">60:00</span>
+              <span id="score-counter" class="counter">0 correct</span>
+            </div>
           </div>
-          <div class="quiz-actions">
-            <span id="timer-counter" class="counter timer-counter">60:00</span>
-            <span id="score-counter" class="counter">0 correct</span>
-            <button id="bookmark-toggle" class="translation-toggle bookmark-toggle" type="button" aria-pressed="false" title="Bookmark question">Bookmark</button>
-            <button id="translation-toggle" class="translation-toggle" type="button" aria-pressed="false" title="Show English translations">EN</button>
-            <button id="home-button" class="icon-action" type="button" title="Back to start" aria-label="Back to start">&#8962;</button>
-            <button id="restart-button" class="icon-action" type="button" title="Restart test" aria-label="Restart test">&#8635;</button>
+          <h1 id="question-title" lang="de"></h1>
+          <div id="question-translation" class="translation-panel is-hidden" aria-live="polite" lang="en"></div>
+          <div id="quiz-toolbar" class="quiz-toolbar" aria-label="Question and session actions">
+            <div class="toolbar-group" role="group" aria-label="Question tools">
+              <button id="bookmark-toggle" class="toolbar-action bookmark-toggle" type="button" aria-pressed="false" title="Bookmark question">
+                <svg class="toolbar-icon bookmark-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.75 4.75A1.75 1.75 0 0 1 8.5 3h7A1.75 1.75 0 0 1 17.25 4.75v16L12 17.45l-5.25 3.3v-16Z"/></svg>
+                <span id="bookmark-label" class="toolbar-label">Bookmark</span>
+              </button>
+              <button id="translation-toggle" class="toolbar-action" type="button" aria-pressed="false" title="Show English translations">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h10M9 3v2m3.5 0c-.7 3.8-3.2 7-6.5 8.7m2-5.7c1.1 2.3 2.8 4.2 5 5.5M14 21l3.4-8 3.4 8M15.2 18h4.4"/></svg>
+                <span class="toolbar-label">English</span>
+              </button>
+            </div>
+            <div class="toolbar-group" role="group" aria-label="Session navigation">
+              <button id="home-button" class="toolbar-action" type="button" title="Back to home" aria-label="Back to home">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 10 8-6.5 8 6.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19v-9ZM9.5 20.5v-6h5v6"/></svg>
+                <span class="toolbar-label">Home</span>
+              </button>
+              <button id="restart-button" class="toolbar-action" type="button" title="Restart this set" aria-label="Restart this set">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 8a8 8 0 1 0 .4 7M19 3v5h-5"/></svg>
+                <span class="toolbar-label">Restart</span>
+              </button>
+            </div>
           </div>
         </header>
-        <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+        <div id="quiz-progress" class="progress" role="progressbar" aria-label="Question progress" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1"><span id="progress-bar"></span></div>
         <div id="image-grid" class="image-grid is-hidden"></div>
         <div id="answers" class="answers" lang="de"></div>
         <p id="question-explanation" class="review-explanation question-explanation is-hidden"></p>
@@ -289,7 +307,10 @@
       <section id="result-screen" class="app-panel is-hidden" aria-labelledby="result-title">
         <div class="result-topbar">
           <p class="eyebrow">Result</p>
-          <button id="result-home-button" class="icon-action" type="button" title="Back to start" aria-label="Back to start">&#8962;</button>
+          <button id="result-home-button" class="toolbar-action result-home-action" type="button" title="Back to home" aria-label="Back to home">
+            <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6-6 6 6 6M5 12h15"/></svg>
+            <span class="toolbar-label">Start page</span>
+          </button>
         </div>
         <h1 id="result-title">Result</h1>
         <p id="result-context" class="meta result-context"></p>

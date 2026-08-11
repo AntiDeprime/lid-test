@@ -5,6 +5,7 @@ PORT="${PORT:-8000}"
 HOST="${HOST:-127.0.0.1}"
 URL="${URL:-http://${HOST}:${PORT}/}"
 SESSION="${PLAYWRIGHT_CLI_SESSION:-lid-test-smoke}"
+BROWSER="${PLAYWRIGHT_BROWSER:-chrome}"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 PWCLI="${PWCLI:-$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh}"
 SERVER_LOG="${SERVER_LOG:-/tmp/lid-test-http-${PORT}.log}"
@@ -53,7 +54,8 @@ done
 
 curl --fail --silent --show-error "$URL" >/dev/null
 
-"$PWCLI" --session "$SESSION" open "$URL"
+"$PWCLI" --session "$SESSION" open "$URL" --browser "$BROWSER"
+"$PWCLI" --session "$SESSION" resize 390 844
 "$PWCLI" --session "$SESSION" eval "(() => {
   const required = [
     ['title', document.title.includes('Leben in Deutschland Test')],
@@ -84,6 +86,28 @@ curl --fail --silent --show-error "$URL" >/dev/null
 
   document.querySelector('#practice-button').click();
   await new Promise((resolve) => setTimeout(resolve, 0));
+  const toolbar = document.querySelector('#quiz-toolbar');
+  const toolbarGroups = [...document.querySelectorAll('#quiz-toolbar [role=group]')];
+  const toolbarButtons = [...document.querySelectorAll('#quiz-toolbar .toolbar-action')];
+  if (!toolbar || toolbarGroups.length !== 2 || toolbarButtons.length !== 4) {
+    throw new Error('Quiz actions are not organized into two clear toolbar groups');
+  }
+  if (toolbarButtons.some((button) => !button.querySelector('.toolbar-label')?.textContent.trim())) {
+    throw new Error('A quiz toolbar action is missing a visible text label');
+  }
+  if (toolbarButtons.some((button) => button.getBoundingClientRect().height < 44)) {
+    throw new Error('A quiz toolbar action has a touch target smaller than 44px');
+  }
+  if (new Set(toolbarButtons.map((button) => getComputedStyle(button).borderRadius)).size !== 1) {
+    throw new Error('Quiz toolbar actions do not use one consistent shape');
+  }
+  if (toolbar.scrollWidth > toolbar.clientWidth || document.documentElement.scrollWidth > window.innerWidth) {
+    throw new Error('Quiz toolbar causes horizontal overflow at 390px');
+  }
+  const quizProgress = document.querySelector('#quiz-progress');
+  if (quizProgress?.getAttribute('role') !== 'progressbar' || quizProgress.getAttribute('aria-valuenow') !== '1') {
+    throw new Error('Quiz progress is not exposed accessibly');
+  }
   const prompt = document.querySelector('#question-title')?.textContent;
   const question = window.LID_QUESTIONS.find((item) => item.prompt === prompt);
   if (!question) throw new Error('Study question was not found in the catalogue');
@@ -93,6 +117,9 @@ curl --fail --silent --show-error "$URL" >/dev/null
   const explanation = document.querySelector('#question-explanation');
   if (explanation?.classList.contains('is-hidden') || explanation?.textContent !== question.explanation) {
     throw new Error('Study mode did not reveal the bespoke explanation');
+  }
+  if (!document.querySelector('.answer-option.is-correct .answer-state')?.textContent.includes('Correct')) {
+    throw new Error('Correct feedback relies on color without a visible state label');
   }
   return { questionId: question.id, explanation: explanation.textContent };
 }"

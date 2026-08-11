@@ -5,6 +5,7 @@ PORT="${PORT:-8000}"
 HOST="${HOST:-127.0.0.1}"
 URL="${URL:-http://${HOST}:${PORT}/}"
 SESSION="${PLAYWRIGHT_CLI_SESSION:-lid-test-flow}"
+BROWSER="${PLAYWRIGHT_BROWSER:-chrome}"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 PWCLI="${PWCLI:-$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh}"
 SERVER_LOG="${SERVER_LOG:-/tmp/lid-test-flow-http-${PORT}.log}"
@@ -43,9 +44,9 @@ if ! curl --fail --silent --show-error "$URL" >/dev/null; then
   exit 1
 fi
 
-"$PWCLI" --session "$SESSION" open "$URL"
+"$PWCLI" --session "$SESSION" open "$URL" --browser "$BROWSER"
 "$PWCLI" --session "$SESSION" eval "(() => { localStorage.clear(); return true; })()"
-"$PWCLI" --session "$SESSION" open "$URL"
+"$PWCLI" --session "$SESSION" open "$URL" --browser "$BROWSER"
 "$PWCLI" --session "$SESSION" eval "async () => {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const click = (selector) => {
