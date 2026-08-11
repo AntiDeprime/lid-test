@@ -20,7 +20,7 @@ Then open `http://127.0.0.1:8000/`.
 
 The app is static and has no package manager or build step. A local server keeps local checks consistent with GitHub Pages and the repository agent workflow.
 
-The app's interaction and visual conventions are documented in [`docs/ui-principles.md`](docs/ui-principles.md), including the mobile toolbar grouping, touch-target, focus, state, and responsive review criteria.
+The app's interaction conventions are documented in [`docs/ui-principles.md`](docs/ui-principles.md). The companion [`docs/visual-identity.md`](docs/visual-identity.md) defines the brand idea, logo use, palette, typography, shape, depth, graphic language, components, motion, accessibility guardrails, and interface voice.
 
 ## Checks
 
@@ -44,7 +44,7 @@ Preferred browser smoke check:
 scripts/browser-smoke-check.sh
 ```
 
-The script starts `python3 -m http.server 8000 --bind 127.0.0.1`, waits for `http://127.0.0.1:8000/`, opens the app through the Codex Playwright CLI wrapper, verifies the start page DOM, checks the quiz toolbar structure, labels, 44px targets, accessible progress, and overflow at a 390px viewport, captures a snapshot, prints console output, then closes the browser and server.
+The script starts `python3 -m http.server 8000 --bind 127.0.0.1`, waits for `http://127.0.0.1:8000/`, opens the app through the Codex Playwright CLI wrapper, verifies the start-page brand and launch hierarchy, checks 390px overflow and consent targets, checks the quiz toolbar structure, labels, 44px targets, and accessible progress, captures a snapshot, prints console output, then closes the browser and server.
 
 Deeper browser flow check:
 
@@ -52,7 +52,7 @@ Deeper browser flow check:
 scripts/browser-flow-check.sh
 ```
 
-The flow check completes passing and failing exam simulations, verifies that exam feedback is withheld until results, checks timeout handling, catalogue answer reveal behavior, catalogue search, translation fallback, bookmarked review queue updates, and reset-safe localStorage setup.
+The flow check completes passing and failing exam simulations, verifies the visual result states and withheld exam feedback, checks timeout handling, catalogue structure and answer reveal behavior, catalogue search, legal-modal presentation and focus, translation fallback, bookmarked review queue updates, and reset-safe localStorage setup.
 
 Useful overrides:
 
@@ -138,6 +138,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `explanations.js` attaches the reviewed explanation map to the question catalogue.
 - `docs/explanation-guidelines.md` defines the evidence-informed rubric used to review and maintain explanations.
 - `docs/ui-principles.md` defines the research-informed interaction and visual standards used for interface reviews.
+- `docs/visual-identity.md` defines the reusable LiD Test Prep brand and visual system applied across every screen.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
 - `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and image references.

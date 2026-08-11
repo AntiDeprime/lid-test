@@ -1,4 +1,4 @@
-const APP_REVISION = "2026-08-quiz-ui-polish";
+const APP_REVISION = "2026-08-visual-identity";
 const CACHE_NAME = `lid-test-prep-${APP_REVISION}`;
 const ASSETS = [
   "./",

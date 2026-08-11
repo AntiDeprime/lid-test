@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0c1110">
     <title>Leben in Deutschland Test & Einbürgerungstest Practice | LiD Test Prep</title>
     <meta name="description" content="Prepare for the Leben in Deutschland Test and Einbürgerungstest with study mode, hidden-answer catalogue browsing, and a timed 33-question exam simulation.">
     <meta name="robots" content="index, follow">
@@ -70,25 +71,60 @@
   </head>
   <body>
     <main class="shell">
-      <section id="start-screen" class="app-panel" aria-labelledby="start-title">
+      <section id="start-screen" class="app-panel start-panel" aria-labelledby="start-title">
+        <header class="brand-bar">
+          <div class="brand-lockup">
+            <img src="assets/lid-logo.svg" alt="" width="46" height="46">
+            <div>
+              <strong>LiD Test Prep</strong>
+              <span>Learn with clarity</span>
+            </div>
+          </div>
+          <span class="brand-catalogue-count"><i aria-hidden="true"></i><b>460</b><span>official questions</span></span>
+        </header>
         <div class="start-layout">
           <div class="start-copy">
-            <div>
+            <div class="hero-copy">
               <p class="eyebrow">Leben in Deutschland / Einbürgerungstest</p>
-              <h1 id="start-title">Leben in Deutschland Test and Einbürgerungstest practice</h1>
+              <h1 id="start-title">Prepare with clarity.<br><span>Pass with confidence.</span></h1>
               <p class="lede">
-                Prepare with study questions that teach immediately, or start a timed exam simulation that saves feedback until the result screen.
+                Master the Leben in Deutschland Test with guided study, thoughtful explanations, and realistic exam simulation.
               </p>
-              <label class="study-picker" for="bundesland-select">
+              <div class="hero-proof" aria-label="App highlights">
+                <span class="hero-proof-item"><b>✓</b> Free</span>
+                <span class="hero-proof-item"><b>✓</b> Private by design</span>
+                <span class="hero-proof-item"><b>✓</b> All 16 states</span>
+              </div>
+            </div>
+
+            <div class="start-setup-card">
+              <div class="setup-heading">
+                <span class="setup-step">01</span>
+                <div>
+                  <strong>Choose your learning path</strong>
+                  <span>Set your state, then study or simulate the real exam.</span>
+                </div>
+              </div>
+              <label class="study-picker residence-picker" for="bundesland-select">
                 <span>Bundesland for your place of residence</span>
                 <select id="bundesland-select"></select>
-                <small>Choose the Bundesland where you live or expect to take the state-specific exam questions.</small>
+                <small>Used for the three state-specific questions in exam simulation.</small>
               </label>
               <div class="start-actions">
-                <button id="start-button" class="primary-action" type="button">Start exam simulation</button>
-                <button id="practice-button" class="secondary-action" type="button">Study questions</button>
-                <button id="weak-review-button" class="secondary-action" type="button">Review weak questions</button>
-                <button id="bookmark-review-button" class="secondary-action" type="button">Review bookmarked questions</button>
+                <button id="start-button" class="primary-action launch-card" type="button">
+                  <svg class="launch-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5L8 5.5Z"/></svg>
+                  <span><strong>Exam simulation</strong><small>33 questions · 60 minutes</small></span>
+                  <span class="launch-arrow" aria-hidden="true">→</span>
+                </button>
+                <button id="practice-button" class="secondary-action launch-card" type="button">
+                  <svg class="launch-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h9a2 2 0 0 1 2 2v13H7a2 2 0 0 1-2-2v-13Zm11 3h1a2 2 0 0 1 2 2v10h-3M8.5 9h4M8.5 12h4"/></svg>
+                  <span><strong>Study questions</strong><small>Untimed · instant feedback</small></span>
+                  <span class="launch-arrow" aria-hidden="true">→</span>
+                </button>
+              </div>
+              <div class="queue-actions" aria-label="Quick review queues">
+                <button id="weak-review-button" class="secondary-action queue-action" type="button">Review weak questions</button>
+                <button id="bookmark-review-button" class="secondary-action queue-action" type="button">Review bookmarked questions</button>
               </div>
               <label class="study-picker" for="study-filter">
                 <span>Study set</span>
@@ -102,7 +138,7 @@
             </div>
 
             <section class="format-section" aria-labelledby="format-title">
-              <h2 id="format-title">Test format</h2>
+              <h2 id="format-title"><span class="section-heading-mark" aria-hidden="true">At a glance</span>Test format</h2>
               <dl class="format-list">
                 <div class="format-item">
                   <dt>33</dt>
@@ -127,7 +163,7 @@
 
             <div class="start-details">
               <section id="learn-panel" class="start-detail" role="tabpanel" aria-labelledby="learn-tab">
-                <h2 id="included-title">Practice features</h2>
+                <h2 id="included-title"><span class="section-heading-mark" aria-hidden="true">Built to teach</span>Practice features</h2>
                 <ul class="feature-list">
                   <li><span class="feature-mark">✓</span><span>Run a realistic 33-question exam simulation with a 60-minute timer and no instant answer reveal.</span></li>
                   <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus all 16 Bundesland question sets in study mode.</span></li>
@@ -139,7 +175,7 @@
                 </ul>
               </section>
               <section id="progress-panel" class="start-detail" role="tabpanel" aria-labelledby="progress-tab">
-                <h2 id="progress-title">Your progress</h2>
+                <h2 id="progress-title"><span class="section-heading-mark" aria-hidden="true">Your journey</span>Your progress</h2>
                 <div class="progress-summary" aria-live="polite">
                   <div class="progress-stat">
                     <b id="answered-stat">0</b>
@@ -185,7 +221,7 @@
               <section id="catalogue-panel" class="start-detail catalogue-browser is-hidden" role="tabpanel" aria-labelledby="catalogue-tab">
                 <div class="catalogue-heading">
                   <div>
-                    <h2 id="catalogue-title">Question catalogue</h2>
+                    <h2 id="catalogue-title"><span class="section-heading-mark" aria-hidden="true">Explore all 460</span>Question catalogue</h2>
                     <p id="catalogue-summary" class="meta">Search all questions or jump to a question number.</p>
                   </div>
                   <form id="jump-form" class="jump-form" aria-label="Jump to question by number">
@@ -240,6 +276,10 @@
           </div>
 
           <aside class="catalogue-preview" aria-label="Question preview">
+            <div class="preview-window-bar" aria-hidden="true">
+              <span></span><span></span><span></span>
+              <b>Study preview</b>
+            </div>
             <div class="preview-top">
               <p class="preview-title">Question preview</p>
               <span class="preview-badge">Bundesland set</span>
@@ -304,7 +344,7 @@
         </footer>
       </section>
 
-      <section id="result-screen" class="app-panel is-hidden" aria-labelledby="result-title">
+      <section id="result-screen" class="app-panel result-panel is-hidden" aria-labelledby="result-title" data-result="neutral">
         <div class="result-topbar">
           <p class="eyebrow">Result</p>
           <button id="result-home-button" class="toolbar-action result-home-action" type="button" title="Back to home" aria-label="Back to home">
@@ -312,13 +352,25 @@
             <span class="toolbar-label">Start page</span>
           </button>
         </div>
-        <h1 id="result-title">Result</h1>
-        <p id="result-context" class="meta result-context"></p>
-        <p id="result-score" class="score">0 / 33</p>
-        <div id="result-status" class="result-status">
-          <p class="meta">Einbürgerung threshold: 17 correct answers.</p>
+        <div class="result-hero">
+          <div class="result-heading">
+            <span class="result-emblem" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="m12 2 2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2L12 2Z"/><path d="m19 16 .9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9L19 16Z"/></svg>
+            </span>
+            <div>
+              <h1 id="result-title">Result</h1>
+              <p id="result-context" class="meta result-context"></p>
+            </div>
+          </div>
+          <div class="result-score-card">
+            <p id="result-score" class="score">0 / 33</p>
+            <span>correct answers</span>
+          </div>
+          <div id="result-status" class="result-status">
+            <p class="meta">Einbürgerung threshold: 17 correct answers.</p>
+          </div>
+          <p id="result-time" class="meta result-time"></p>
         </div>
-        <p id="result-time" class="meta result-time"></p>
         <h2 id="review-heading" class="review-heading">Missed questions</h2>
         <div id="review-list" class="review-list"></div>
         <div class="quiz-bottom">

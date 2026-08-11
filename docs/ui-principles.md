@@ -2,6 +2,8 @@
 
 These principles define the intended interaction and visual direction for the app. They are deliberately practical: each principle should be visible in the interface and testable during review.
 
+The companion [visual identity](visual-identity.md) defines the brand idea, palette, typography, shape, graphic language, component expression, motion, and voice used to apply these principles consistently.
+
 ## 1. Make the current task unmistakable
 
 Each screen should have one dominant purpose and one visually strongest next action. Status information, question-level tools, session navigation, and primary navigation should not compete for attention.

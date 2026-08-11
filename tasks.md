@@ -2,6 +2,13 @@
 
 ## High Priority
 
+- [x] Establish and apply a complete visual identity.
+  - Define the brand idea, personality, logo use, palette, typography, shape, depth, graphic language, component expression, motion, accessibility guardrails, and interface voice.
+  - Add a recognizable product lockup and stronger hero/launch hierarchy to the start screen.
+  - Extend the same visual language across progress, catalogue, learning, quiz, results, review cards, consent, and legal dialogs.
+  - Keep the visual system responsive, accessible, restrained enough for sustained study, and free of decorative imagery that competes with question content.
+  - Verify the start, quiz, catalogue, result, and overlay experiences at mobile and desktop widths.
+
 - [x] Polish and clarify the quiz interface.
   - Define a research-informed set of reusable UI principles for hierarchy, grouping, consistency, touch targets, visible state, accessibility, and responsive behavior.
   - Separate question tools from session navigation instead of allowing unrelated controls to wrap into an ambiguous cluster.

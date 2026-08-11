@@ -69,7 +69,7 @@ export function showModalDialog(options) {
   modal.setAttribute("aria-labelledby", labelledBy);
   close.className = "icon-action";
   close.type = "button";
-  close.textContent = "x";
+  close.textContent = "×";
   close.setAttribute("aria-label", "Close");
   heading.id = labelledBy;
   heading.textContent = title;

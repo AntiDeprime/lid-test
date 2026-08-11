@@ -103,6 +103,9 @@ fi
   if (document.querySelector('#result-title')?.textContent !== 'Passed') {
     throw new Error('All-correct exam did not pass');
   }
+  if (document.querySelector('#result-screen')?.dataset.result !== 'pass' || !document.querySelector('.result-hero')) {
+    throw new Error('Passed result is missing the visual result identity');
+  }
   if (!document.querySelector('#result-context')?.textContent.includes('30 general')) {
     throw new Error('Result context does not describe exam composition');
   }
@@ -113,6 +116,9 @@ fi
   if (document.querySelector('#result-title')?.textContent !== 'Not passed') {
     throw new Error('All-wrong exam did not fail');
   }
+  if (document.querySelector('#result-screen')?.dataset.result !== 'fail') {
+    throw new Error('Failed result is missing its visual result state');
+  }
 
   click('#result-home-button');
   click('[data-start-tab=\"catalogue\"]');
@@ -122,6 +128,9 @@ fi
   }
   if (document.querySelector('#catalogue-panel')?.getAttribute('role') !== 'tabpanel') {
     throw new Error('Catalogue panel is missing tabpanel semantics');
+  }
+  if (!document.querySelector('#catalogue-panel .section-heading-mark')) {
+    throw new Error('Catalogue screen is missing the shared section-heading treatment');
   }
   const firstCatalogueItem = document.querySelector('.catalogue-item');
   if (!firstCatalogueItem) throw new Error('Catalogue item missing');
@@ -153,6 +162,9 @@ fi
   const legalCopy = document.querySelector('.legal-modal')?.textContent || '';
   if (/placeholder|Add the production/i.test(legalCopy)) {
     throw new Error('Legal copy still contains placeholder launch text');
+  }
+  if (getComputedStyle(document.querySelector('.legal-modal')).borderRadius === '0px') {
+    throw new Error('Legal modal is missing the visual surface treatment');
   }
   click('.legal-modal .icon-action');
 

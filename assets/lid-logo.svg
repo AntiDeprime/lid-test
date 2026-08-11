@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">LiD logo</title>
   <desc id="desc">Lowercase lid written as a connected pen stroke on the app cyan background.</desc>
-  <rect width="512" height="512" rx="96" fill="#4fb3a5"/>
+  <rect width="512" height="512" rx="96" fill="#58c9b5"/>
   <path
     d="M126 327
        C102 298 111 227 151 197

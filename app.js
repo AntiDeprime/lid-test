@@ -972,6 +972,7 @@ import {
 
   function renderResult() {
     if (state.mode !== "exam") {
+      resultScreen.dataset.result = "practice";
       resultTitle.textContent = state.mode === "weak-review"
         ? "Weak review complete"
         : state.mode === "bookmarks"
@@ -993,6 +994,7 @@ import {
     }
 
     const passed = getPassResult(state.score);
+    resultScreen.dataset.result = passed ? "pass" : "fail";
     resultTitle.textContent = passed ? "Passed" : "Not passed";
     resultScore.textContent = `${state.score} / ${state.run.length}`;
     resultContext.textContent = `Bundesland: ${state.selectedState || bundeslandSelect.value}. 30 general questions, 3 residence-based Bundesland questions, 60-minute limit.`;
@@ -1242,11 +1244,16 @@ import {
     }
 
     const banner = document.createElement("section");
+    const copy = document.createElement("div");
+    const badge = document.createElement("span");
     const text = document.createElement("p");
     const allow = document.createElement("button");
     const decline = document.createElement("button");
     banner.className = "consent-banner";
     banner.setAttribute("aria-label", "Analytics privacy choice");
+    copy.className = "consent-copy";
+    badge.className = "consent-badge";
+    badge.textContent = "Privacy first";
     text.textContent = "Help improve this free study app by allowing privacy-conscious Google Analytics. Analytics stays off unless you consent.";
     allow.className = "primary-action";
     allow.type = "button";
@@ -1264,7 +1271,8 @@ import {
       analyticsStatus.textContent = "Analytics off";
       banner.remove();
     });
-    banner.append(text, allow, decline);
+    copy.append(badge, text);
+    banner.append(copy, allow, decline);
     document.body.append(banner);
   }
 
