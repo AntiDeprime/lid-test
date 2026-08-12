@@ -1034,6 +1034,10 @@ h1 {
   margin-top: 22px;
 }
 
+.image-grid.image-count-1 img {
+  max-height: none;
+}
+
 figure {
   margin: 0;
   padding: 10px;

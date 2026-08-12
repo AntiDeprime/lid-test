@@ -99,6 +99,14 @@ questions.forEach((question, questionIndex) => {
   if (!Array.isArray(question.images)) {
     fail(`Question ${question.id} images must be an array.`);
   } else {
+    const hasNumberedImageOptions = question.options
+      ?.map((option) => option.text)
+      .join("|") === "1|2|3|4";
+
+    if (hasNumberedImageOptions && question.images.length === 0) {
+      fail(`Question ${question.id} uses numbered image options but has no image.`);
+    }
+
     question.images.forEach((image) => {
       if (!image || typeof image.src !== "string") {
         fail(`Question ${question.id} has an invalid image entry.`);

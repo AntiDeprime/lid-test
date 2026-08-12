@@ -94,6 +94,26 @@ curl --fail --silent --show-error "$URL" >/dev/null
     throw new Error('A catalogue question did not receive its bespoke explanation');
   }
 
+  document.querySelector('[data-start-tab=\"catalogue\"]').click();
+  document.querySelector('#jump-question').value = '130';
+  document.querySelector('#jump-form').requestSubmit();
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const ballotImage = document.querySelector('#image-grid img');
+  if (document.querySelector('#question-title')?.textContent.indexOf('Stimmzettel') === -1) {
+    throw new Error('Catalogue jump did not open ballot question 130');
+  }
+  if (!ballotImage || !ballotImage.complete || ballotImage.naturalWidth < 1000) {
+    throw new Error('Question 130 ballot image did not load at useful resolution');
+  }
+  if (ballotImage.getBoundingClientRect().height < 280) {
+    throw new Error('Question 130 ballot image is too small to read at 390px');
+  }
+  if (document.documentElement.scrollWidth > window.innerWidth) {
+    throw new Error('Question 130 causes horizontal overflow at 390px');
+  }
+  document.querySelector('#home-button').click();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
   document.querySelector('#practice-button').click();
   await new Promise((resolve) => setTimeout(resolve, 0));
   const toolbar = document.querySelector('#quiz-toolbar');

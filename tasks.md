@@ -2,6 +2,11 @@
 
 ## High Priority
 
+- [x] Restore the missing ballot illustration for general question 130.
+  - Add the official four-ballot graphic referenced by the question.
+  - Validate that questions with numbered image choices cannot omit their image data.
+  - Verify the question flow and image legibility at a mobile viewport.
+
 - [x] Establish and apply a complete visual identity.
   - Define the brand idea, personality, logo use, palette, typography, shape, depth, graphic language, component expression, motion, accessibility guardrails, and interface voice.
   - Add a recognizable product lockup and stronger hero/launch hierarchy to the start screen.
