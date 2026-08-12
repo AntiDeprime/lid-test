@@ -2,6 +2,11 @@
 
 ## High Priority
 
+- [x] Complete the official question-image catalogue.
+  - Audit all 460 questions against the BAMF catalogue dated 7 May 2025.
+  - Restore the six missing general-question visuals for questions 70, 176, 181, 187, 216, and 235.
+  - Validate the exact 43 official image-dependent questions and check every image flow at a 390px viewport.
+
 - [x] Restore the missing ballot illustration for general question 130.
   - Add the official four-ballot graphic referenced by the question.
   - Validate that questions with numbered image choices cannot omit their image data.

@@ -94,25 +94,38 @@ curl --fail --silent --show-error "$URL" >/dev/null
     throw new Error('A catalogue question did not receive its bespoke explanation');
   }
 
-  document.querySelector('[data-start-tab=\"catalogue\"]').click();
-  document.querySelector('#jump-question').value = '130';
-  document.querySelector('#jump-form').requestSubmit();
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  const ballotImage = document.querySelector('#image-grid img');
-  if (document.querySelector('#question-title')?.textContent.indexOf('Stimmzettel') === -1) {
-    throw new Error('Catalogue jump did not open ballot question 130');
+  const imageQuestions = window.LID_QUESTIONS.filter((question) => question.images.length > 0);
+  if (imageQuestions.length !== 43) {
+    throw new Error('Expected 43 image-dependent questions, found ' + imageQuestions.length);
   }
-  if (!ballotImage || !ballotImage.complete || ballotImage.naturalWidth < 1000) {
-    throw new Error('Question 130 ballot image did not load at useful resolution');
+
+  for (const question of imageQuestions) {
+    document.querySelector('[data-start-tab=\"catalogue\"]').click();
+    document.querySelector('#jump-question').value = String(question.id);
+    document.querySelector('#jump-form').requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const renderedImages = [...document.querySelectorAll('#image-grid img')];
+    await Promise.all(renderedImages.map((image) => image.decode()));
+    if (document.querySelector('#question-title')?.textContent !== question.prompt) {
+      throw new Error('Catalogue jump did not open image question ' + question.id);
+    }
+    if (renderedImages.length !== question.images.length) {
+      throw new Error('Question ' + question.id + ' did not render every image');
+    }
+    if (renderedImages.some((image) => image.naturalWidth === 0 || !image.alt.trim())) {
+      throw new Error('Question ' + question.id + ' has a broken or unlabeled image');
+    }
+    if (document.documentElement.scrollWidth > window.innerWidth) {
+      throw new Error('Question ' + question.id + ' causes horizontal overflow at 390px');
+    }
+    if (question.id === 130 && renderedImages[0].getBoundingClientRect().height < 280) {
+      throw new Error('Question 130 ballot image is too small to read at 390px');
+    }
+
+    document.querySelector('#home-button').click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
-  if (ballotImage.getBoundingClientRect().height < 280) {
-    throw new Error('Question 130 ballot image is too small to read at 390px');
-  }
-  if (document.documentElement.scrollWidth > window.innerWidth) {
-    throw new Error('Question 130 causes horizontal overflow at 390px');
-  }
-  document.querySelector('#home-button').click();
-  await new Promise((resolve) => setTimeout(resolve, 0));
 
   document.querySelector('#practice-button').click();
   await new Promise((resolve) => setTimeout(resolve, 0));

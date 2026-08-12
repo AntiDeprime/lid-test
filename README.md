@@ -141,7 +141,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `docs/visual-identity.md` defines the reusable LiD Test Prep brand and visual system applied across every screen.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
-- `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and image references.
+- `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and the exact official image-question set and file references.
 
 ## Catalogue Notes
 

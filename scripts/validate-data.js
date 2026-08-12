@@ -20,6 +20,12 @@ require("../explanations.js");
 const questions = window.LID_QUESTIONS || [];
 const translations = window.LID_TRANSLATIONS_EN || {};
 const errors = [];
+const OFFICIAL_IMAGE_QUESTION_IDS = new Set([
+  21, 55, 70, 130, 176, 181, 187, 209, 216, 226, 235,
+  301, 308, 311, 318, 321, 328, 331, 338, 341, 348, 351, 358,
+  361, 368, 371, 378, 381, 388, 391, 398, 401, 408, 411, 418,
+  421, 428, 431, 438, 441, 448, 451, 458
+]);
 
 const explanationIds = explanationFiles.flatMap((file) => {
   const source = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
@@ -99,12 +105,12 @@ questions.forEach((question, questionIndex) => {
   if (!Array.isArray(question.images)) {
     fail(`Question ${question.id} images must be an array.`);
   } else {
-    const hasNumberedImageOptions = question.options
-      ?.map((option) => option.text)
-      .join("|") === "1|2|3|4";
+    if (OFFICIAL_IMAGE_QUESTION_IDS.has(question.id) && question.images.length === 0) {
+      fail(`Question ${question.id} is missing its official image.`);
+    }
 
-    if (hasNumberedImageOptions && question.images.length === 0) {
-      fail(`Question ${question.id} uses numbered image options but has no image.`);
+    if (!OFFICIAL_IMAGE_QUESTION_IDS.has(question.id) && question.images.length > 0) {
+      fail(`Question ${question.id} has an unexpected image.`);
     }
 
     question.images.forEach((image) => {
