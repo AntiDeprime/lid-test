@@ -223,14 +223,12 @@
   - Include the new helper module in the service-worker cache list.
 
 - [ ] Add production privacy and legal controls.
-  - Add a real production privacy page or section with controller/contact details, legal basis, local-storage behavior, analytics behavior, and retention notes.
-  - Add an explicit analytics revocation path after consent.
-  - Replace placeholder-style imprint copy with production-ready legal details before public launch.
+  - Done: the Privacy dialog now describes what the app really does (every storage key, the optional Google Analytics, legal basis, rights, how to withdraw), built from `site-config.js`; a footer control turns analytics off after consent (stops collection on the open page, removes the `_ga` cookies, keeps the tag from loading again) or back on; the privacy dialog scrolls on a phone; unit tests and a `privacy` browser section cover it.
+  - Still needs the owner: `operator.name`, `operator.address` and `operator.email` in `site-config.js`, a legal check of the wording and of the imprint requirement, and confirmation that analytics property `G-6LN5H6T5LW` is the operator's own. `node scripts/validate-site.mjs --production` fails until the operator fields are set.
 
 - [ ] Add production SEO assets.
-  - Add canonical URL support when the production domain is known.
-  - Add `robots.txt` and `sitemap.xml`.
-  - Use absolute production URLs for Open Graph and Twitter images.
+  - Done: `site-config.js` `origin` drives `scripts/generate-site.mjs`, which writes the canonical link, `og:url`, absolute Open Graph and Twitter image URLs, `robots.txt` and `sitemap.xml`; `scripts/validate-site.mjs` (also in CI) fails when they drift from the config; a 1200x630 share card (`assets/share-card.png`) with the LiD mark replaces the map question image as the social preview.
+  - Still needs the owner: the public address (`origin`). On a GitHub Pages project site `robots.txt` cannot be served from the path, so submit the sitemap in Search Console.
 
 - [ ] Improve catalogue search quality and spoiler handling.
   - Add diacritic-tolerant search and ranked matches.
@@ -261,8 +259,8 @@
   - Fix what it found: after a screen change focus now moves to the new screen's heading (question, result, start page) and to the question heading after Next and Previous, and choosing from the consent banner hands focus to the next control instead of dropping it to the page body.
   - Add a `visual` section that compares eleven key screens (phone, desktop, saved progress, dialog, result) with committed baselines in `scripts/browser/baselines/`, rendered in a pinned font with Chromium's hinting and LCD text off and a 0.8% pixel tolerance, and regenerates them with `UPDATE_BASELINES=1`.
 
-- [ ] Expand operational documentation.
-  - Document CI, release checks, cache-bump rules, production privacy requirements, and known limitations.
+- [x] Expand operational documentation.
+  - `docs/operations.md` covers the CI jobs, the font and baseline pitfalls, the cache-revision rule, releasing, the launch steps only the owner can do, what the app does for privacy, and known limitations.
 
 - [x] Address architecture and UX review follow-ups.
   - Extract reusable exam and answer rules from the main app wiring.

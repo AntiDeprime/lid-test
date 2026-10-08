@@ -4,6 +4,9 @@ import { createEmitter } from "../modules/emitter.js";
 import { EXPLANATION_ATTACH_FILE, EXPLANATION_TEXT_FILES, createContent } from "../modules/content.js";
 import { DEFAULT_LANGUAGE, LANGUAGES, detectLanguage, getLanguage, isSupportedLanguage } from "../modules/languages.js";
 import { LANGUAGE_KEY, loadLanguagePreference, saveLanguagePreference } from "../modules/preferences.js";
+import { ANALYTICS_CONSENT_KEY, ANALYTICS_ID, clearAnalyticsCookies, getAnalyticsCookieNames, getCookieDomains, setCollectionEnabled } from "../modules/analytics.js";
+import { buildLegalNotice, hasOperatorDetails } from "../modules/legal.js";
+import { applyHeadBlock, readHeadBlock, renderHeadBlock, renderRobots, renderSitemap, robotsIsReachable, validateOrigin } from "./site-files.mjs";
 import { MAX_BOX, REVIEW_INTERVAL_DAYS, isDue, scheduleAnswer } from "../modules/scheduling.js";
 import { GUESS_RATE, MIN_STUDIED_FOR_ESTIMATE, estimateQuestionProbability, estimateReadiness, getReadinessLabel } from "../modules/readiness.js";
 import { formatAnswer, formatDuration } from "../modules/format.js";
@@ -540,5 +543,70 @@ assert.equal(flakyExplanations.explanationsLoaded(), true, "explanations can be 
 const emptyGlobals = {};
 const missingGlobal = createContent({ load: async () => {}, globals: emptyGlobals });
 await assert.rejects(missingGlobal.ensureTranslations("ru"), /did not define/);
+
+// Analytics withdrawal.
+assert.deepEqual(getAnalyticsCookieNames("G-ABC123"), ["_ga", "_ga_ABC123"]);
+assert.deepEqual(getCookieDomains("www.example.org"), ["www.example.org", ".www.example.org", "example.org", ".example.org"]);
+assert.deepEqual(getCookieDomains("localhost"), ["localhost"]);
+assert.deepEqual(getCookieDomains("127.0.0.1"), ["127.0.0.1"]);
+assert.deepEqual(getCookieDomains(""), []);
+const cookieWrites = [];
+const fakeDocument = { set cookie(value) { cookieWrites.push(value); } };
+clearAnalyticsCookies({ doc: fakeDocument, hostname: "app.example.org", id: "G-ABC123" });
+assert.ok(cookieWrites.every((write) => write.includes("expires=Thu, 01 Jan 1970")), "every write expires the cookie");
+assert.ok(cookieWrites.includes("_ga=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.example.org"));
+assert.ok(cookieWrites.includes("_ga_ABC123=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/"));
+assert.equal(cookieWrites.length, 2 * (1 + 4), "both cookies, with and without each candidate domain");
+const gtagCalls = [];
+const fakeWindow = { gtag: (...args) => gtagCalls.push(args) };
+setCollectionEnabled(false, { win: fakeWindow, id: "G-ABC123" });
+assert.equal(fakeWindow["ga-disable-G-ABC123"], true);
+assert.deepEqual(gtagCalls[0], ["consent", "update", { analytics_storage: "denied" }]);
+setCollectionEnabled(true, { win: fakeWindow, id: "G-ABC123" });
+assert.equal(fakeWindow["ga-disable-G-ABC123"], false);
+assert.deepEqual(gtagCalls[1], ["consent", "update", { analytics_storage: "granted" }]);
+assert.doesNotThrow(() => setCollectionEnabled(false, { win: {}, id: ANALYTICS_ID }), "withdrawing before the tag loaded is fine");
+
+// Legal text.
+const flatten = (notice) => Object.values(notice).flatMap((entry) => entry.sections.flatMap((section) => [section.heading, ...section.paragraphs])).join("\n");
+const unconfigured = flatten(buildLegalNotice({ operator: { name: "", address: "", email: "" }, analyticsRetentionMonths: null }));
+assert.ok(unconfigured.includes("github.com/AntiDeprime/lid-test/issues"), "without operator details the maintainer contact is shown");
+assert.ok(!/undefined|null|\bNaN\b|placeholder|\{|\}/i.test(unconfigured), "no leftover template text");
+assert.equal(hasOperatorDetails({ name: "A", address: "B", email: "c@d.e" }), true);
+assert.equal(hasOperatorDetails({ name: "A", address: " ", email: "c@d.e" }), false);
+const configured = buildLegalNotice({ operator: { name: "Example GmbH", address: "Musterstraße 1\n10115 Berlin", email: "hello@example.org" }, analyticsRetentionMonths: 14 });
+const configuredText = flatten(configured);
+assert.ok(configuredText.includes("Example GmbH, Musterstraße 1, 10115 Berlin. Email: hello@example.org"));
+assert.ok(configuredText.includes("14 months"));
+assert.ok(!configuredText.includes("github.com/AntiDeprime"), "a configured operator replaces the maintainer fallback");
+[STORAGE_KEY, UNREADABLE_PROGRESS_KEY, EXAM_SESSION_KEY, LANGUAGE_KEY, ANALYTICS_CONSENT_KEY].forEach((key) => {
+  assert.ok(configuredText.includes(key), `the privacy text lists the ${key} storage key`);
+});
+assert.ok(/Turn off analytics/.test(configuredText) && /Google Analytics/.test(configuredText));
+
+// Files generated from the production origin.
+assert.equal(validateOrigin(""), null, "an empty origin means not configured yet");
+assert.equal(validateOrigin("https://learn.example.org/"), null);
+assert.equal(validateOrigin("https://example.org/lid-test/"), null);
+assert.match(validateOrigin("http://example.org/"), /https/);
+assert.match(validateOrigin("https://example.org"), /end with/);
+assert.match(validateOrigin("https://example.org/?a=1"), /query/);
+assert.match(validateOrigin("example.org/"), /not a URL/);
+assert.equal(robotsIsReachable("https://example.org/"), true);
+assert.equal(robotsIsReachable("https://example.org/lid-test/"), false);
+const unconfiguredBlock = renderHeadBlock("");
+assert.ok(!unconfiguredBlock.includes("canonical") && unconfiguredBlock.includes('content="assets/share-card.png"'));
+const productionBlock = renderHeadBlock("https://learn.example.org/");
+assert.ok(productionBlock.includes('<link rel="canonical" href="https://learn.example.org/">'));
+assert.ok(productionBlock.includes('<meta property="og:image" content="https://learn.example.org/assets/share-card.png">'));
+assert.ok(productionBlock.includes('<meta name="twitter:image" content="https://learn.example.org/assets/share-card.png">'));
+const page = `<head>\n${unconfiguredBlock}\n    <link rel="icon" href="x">\n</head>`;
+const rewritten = applyHeadBlock(page, productionBlock);
+assert.equal(readHeadBlock(rewritten), productionBlock);
+assert.equal(applyHeadBlock(rewritten, productionBlock), rewritten, "generating twice changes nothing");
+assert.equal(applyHeadBlock(rewritten, unconfiguredBlock), page, "the block can be reset");
+assert.throws(() => applyHeadBlock("<head></head>", productionBlock), /no <!-- site:start/);
+assert.equal(renderRobots("https://learn.example.org/"), "User-agent: *\nAllow: /\n\nSitemap: https://learn.example.org/sitemap.xml\n");
+assert.ok(renderSitemap("https://learn.example.org/").includes("<loc>https://learn.example.org/</loc>"));
 
 console.log("Progress and quiz-rule validation passed.");

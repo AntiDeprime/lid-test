@@ -25,6 +25,9 @@ jobs:
       - name: Validate PWA assets and cache revision
         run: node scripts/validate-pwa.js
 
+      - name: Validate launch configuration and generated site files
+        run: node scripts/validate-site.mjs
+
       - name: Smoke test static server
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/lid-test-http.log 2>&1 &

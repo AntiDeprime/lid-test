@@ -42,6 +42,13 @@ Validate the installable app and its offline cache (manifest icons, precached fi
 node scripts/validate-pwa.js
 ```
 
+Validate the launch configuration and the files generated from it (canonical link, social image URLs, `robots.txt`, `sitemap.xml`). It passes while the app is unconfigured and lists what is still to fill in; add `--production` to fail until everything is set:
+
+```sh
+node scripts/validate-site.mjs
+node scripts/validate-site.mjs --production
+```
+
 These validation commands also run in GitHub Actions on pushes and pull requests. The CI workflow additionally starts a local static server and checks that `index.html` is served successfully.
 
 Portable browser checks, which also run in GitHub Actions:
@@ -124,7 +131,7 @@ Codex sandbox notes:
 
 ## Analytics
 
-The page supports Google Analytics 4 with measurement ID `G-6LN5H6T5LW`, but the Google tag is not loaded until the user explicitly allows analytics in the consent banner.
+The page supports Google Analytics 4 with measurement ID `G-6LN5H6T5LW`, but the Google tag is not loaded until the user explicitly allows analytics in the consent banner. The choice can be changed at any time from the start page footer: turning analytics off stops collection on the open page, removes the analytics cookies, and keeps the tag from loading on later visits.
 
 The app stores progress locally in the user's browser. The Progress tab can export that progress to a JSON backup file and import it again, for example on a new device; saved progress is upgraded by migrations when the storage format changes, and data the app cannot read is kept under `lidTestPrepProgress.unreadable` rather than overwritten. The current analytics configuration denies advertising storage and personalization signals, enables analytics storage only after consent, and exposes visible privacy and imprint links with the local-data policy, analytics behavior, maintainer contact, and unofficial-app notice used by the static app.
 
@@ -162,6 +169,8 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `docs/ui-principles.md` defines the research-informed interaction and visual standards used for interface reviews.
 - `docs/visual-identity.md` defines the reusable LiD Test Prep brand and visual system applied across every screen.
 - `translations-en.js` and `translations-ru.js` contain the English and Russian translations of all 460 questions. They load when a learner turns translations on or searches the catalogue. `modules/languages.js` registers each language; `docs/data-provenance.md` explains how to add one, where the data comes from, and that the translations have not been reviewed by a professional translator.
+- `site-config.js` holds the facts that cannot be known from the code: the public address and the operator's name, address and email. `scripts/generate-site.mjs` writes the canonical link, social image URLs, `robots.txt` and `sitemap.xml` from it; `scripts/validate-site.mjs` checks them; `scripts/render-share-card.mjs` renders `assets/share-card.png` from `scripts/share-card.html`.
+- `docs/operations.md` explains CI, the cache-revision rule, releasing, the launch steps only the owner can do, and known limitations.
 - `docs/data-provenance.md` records the official catalogue source and date, the catalogue refresh workflow, and how explanations and translations are maintained.
 - `lid-v2-images/` contains image assets referenced by some questions.
 - `assets/` contains the logo, favicon, and PWA icons.

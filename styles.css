@@ -1294,6 +1294,19 @@ figcaption {
   font-size: 1.2rem;
 }
 
+/* The privacy text is longer than a phone screen. */
+.legal-modal {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.legal-modal h3 {
+  margin: 6px 0 -4px;
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
 @media (min-width: 560px) {
   .quiz-toolbar {
     display: flex;

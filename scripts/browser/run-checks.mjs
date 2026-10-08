@@ -8,7 +8,7 @@
 // Useful environment variables:
 //   CHROMIUM_PATH   reuse an installed Chromium instead of Playwright's download
 //   PORT            serve on a fixed port (default: a free port)
-//   ONLY            comma-separated sections to run (smoke,flow,offline,content,layout,fit,keyboard,visual,review,a11y)
+//   ONLY            comma-separated sections to run (smoke,flow,offline,content,privacy,layout,fit,keyboard,visual,review,a11y)
 //   KEEP_ARTIFACTS  set to 1 to keep screenshots of passing runs too
 //   UPDATE_BASELINES  set to 1 to rewrite scripts/browser/baselines/*.png (visual section)
 //   TEST_FONT       force a font family, e.g. "DejaVu Sans" to reproduce the
@@ -341,6 +341,79 @@ const sections = {
       expectNoProblems(failures, "Content failure check");
     } finally {
       await failing.context.close();
+    }
+  },
+
+  // Analytics consent can be given, declined, and withdrawn later: withdrawal
+  // stops collection on the open page, removes the cookies, and survives a
+  // reload. The Google tag is answered locally so no request leaves the machine.
+  async privacy({ browser, url }) {
+    const { context, page, problems } = await openPage(browser, { viewport: MOBILE });
+    const tagRequests = [];
+    await page.route("https://www.googletagmanager.com/**", (route) => {
+      tagRequests.push(route.request().url());
+      return route.fulfill({ status: 200, contentType: "text/javascript", body: "" });
+    });
+    const consent = () => page.evaluate(() => window.localStorage.getItem("lidAnalyticsConsent"));
+    const status = () => page.textContent("#analytics-status");
+    const toggleText = () => page.textContent("#analytics-toggle");
+    try {
+      await page.goto(url);
+      await page.click(".consent-banner .primary-action");
+      if (!(await page.waitForFunction(() => window.dataLayer?.length > 0).then(() => true))) throw new Error("The analytics tag did not start after consent");
+      if ((await status()) !== "Analytics on" || (await toggleText()) !== "Turn off analytics") throw new Error(`After consent the footer should offer to turn analytics off, saw "${await status()}" / "${await toggleText()}"`);
+      if (tagRequests.length !== 1) throw new Error(`Expected one tag request after consent, saw ${tagRequests.length}`);
+
+      await page.evaluate(() => { document.cookie = "_ga=GA1.1.1.1; path=/"; document.cookie = "_ga_6LN5H6T5LW=GS1.1.1; path=/"; });
+      await page.click("#analytics-toggle");
+      if ((await consent()) !== "denied") throw new Error("Withdrawing consent was not saved");
+      if ((await status()) !== "Analytics off" || (await toggleText()) !== "Allow analytics") throw new Error("The footer did not switch back to Allow analytics");
+      const afterWithdrawal = await page.evaluate(() => ({
+        disabled: window["ga-disable-G-6LN5H6T5LW"],
+        cookies: document.cookie,
+        update: window.dataLayer.some((entry) => entry[0] === "consent" && entry[1] === "update" && entry[2].analytics_storage === "denied")
+      }));
+      if (afterWithdrawal.disabled !== true) throw new Error("Collection was not disabled on the open page");
+      if (!afterWithdrawal.update) throw new Error("Google was not told that analytics storage is denied");
+      if (/_ga/.test(afterWithdrawal.cookies)) throw new Error(`Analytics cookies were not removed: ${afterWithdrawal.cookies}`);
+
+      await page.reload();
+      await page.waitForSelector("#start-button");
+      if (await page.locator(".consent-banner").count()) throw new Error("The consent banner came back after withdrawal");
+      if (tagRequests.length !== 1) throw new Error("The analytics tag loaded again after withdrawal and a reload");
+      if ((await status()) !== "Analytics off") throw new Error("Analytics should stay off after a reload");
+
+      await page.click("#analytics-toggle");
+      await page.waitForFunction(() => window.dataLayer?.length > 0);
+      if ((await consent()) !== "granted" || (await status()) !== "Analytics on") throw new Error("Allowing analytics again from the footer did not work");
+      if (tagRequests.length !== 2) throw new Error(`Allowing analytics again should load the tag, saw ${tagRequests.length} requests`);
+
+      // The privacy text fits a phone screen and scrolls instead of clipping.
+      await page.click('[data-legal-panel="privacy"]');
+      const dialog = await page.evaluate(() => {
+        const box = document.querySelector(".legal-modal").getBoundingClientRect();
+        return { top: box.top, bottom: box.bottom, height: innerHeight, headings: [...document.querySelectorAll(".legal-modal h3")].map((h) => h.textContent) };
+      });
+      if (dialog.top < 0 || dialog.bottom > dialog.height) throw new Error(`The privacy dialog does not fit the screen: ${JSON.stringify(dialog)}`);
+      if (dialog.headings.length < 4) throw new Error(`The privacy dialog should explain who is responsible, storage, analytics, and rights; saw ${dialog.headings}`);
+      await page.keyboard.press("Escape");
+      expectNoProblems(problems, "Privacy check");
+    } finally {
+      await context.close();
+    }
+
+    // Declining in the banner works too and leaves the tag unloaded.
+    const declined = await openPage(browser, { viewport: MOBILE });
+    let loaded = false;
+    await declined.page.route("https://www.googletagmanager.com/**", (route) => { loaded = true; return route.abort(); });
+    try {
+      await declined.page.goto(url);
+      await declined.page.click(".consent-banner .secondary-action");
+      if (loaded) throw new Error("Declining analytics still loaded the tag");
+      if ((await declined.page.textContent("#analytics-toggle")) !== "Allow analytics") throw new Error("After declining, the footer should offer Allow analytics");
+      expectNoProblems(declined.problems, "Declined-analytics check");
+    } finally {
+      await declined.context.close();
     }
   },
 
