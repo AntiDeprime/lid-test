@@ -78,6 +78,11 @@ import {
   const bundeslandSelect = $("bundesland-select");
   const weakReviewButton = $("weak-review-button");
   const bookmarkReviewButton = $("bookmark-review-button");
+  const queueActions = $("queue-actions");
+  const consentSlot = $("consent-slot");
+  const progressEmpty = $("progress-empty");
+  const progressSummary = $("progress-summary");
+  const progressInsights = $("progress-insights");
   const homeButton = $("home-button");
   const restartButton = $("restart-button");
   const newTestButton = $("new-test-button");
@@ -253,17 +258,17 @@ import {
     passRateStat.textContent = `${summary.passRate}%`;
     weakStat.textContent = String(weakQuestionIds.length);
     bookmarkStat.textContent = String(bookmarkedQuestionIds.length);
-    weakReviewButton.classList.toggle("is-empty-queue", weakQuestionIds.length === 0);
-    weakReviewButton.setAttribute("aria-disabled", String(weakQuestionIds.length === 0));
-    weakReviewButton.textContent = weakQuestionIds.length
-      ? `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`
-      : "No weak questions yet";
-    bookmarkReviewButton.classList.toggle("is-empty-queue", bookmarkedQuestionIds.length === 0);
-    bookmarkReviewButton.setAttribute("aria-disabled", String(bookmarkedQuestionIds.length === 0));
-    bookmarkReviewButton.textContent = bookmarkedQuestionIds.length
-      ? `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`
-      : "No bookmarks yet";
-    resetProgressButton.disabled = summary.repeatedAnswers === 0 && summary.tests === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0;
+    weakReviewButton.classList.toggle("is-hidden", weakQuestionIds.length === 0);
+    weakReviewButton.textContent = `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`;
+    bookmarkReviewButton.classList.toggle("is-hidden", bookmarkedQuestionIds.length === 0);
+    bookmarkReviewButton.textContent = `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`;
+    queueActions.classList.toggle("is-hidden", weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0);
+
+    const hasProgress = summary.repeatedAnswers > 0 || summary.tests > 0 || weakQuestionIds.length > 0 || bookmarkedQuestionIds.length > 0;
+    progressEmpty.classList.toggle("is-hidden", hasProgress);
+    progressSummary.classList.toggle("is-hidden", !hasProgress);
+    progressInsights.classList.toggle("is-hidden", !hasProgress);
+    resetProgressButton.classList.toggle("is-hidden", !hasProgress);
     renderAreaStats();
     renderRecentTests();
     renderCatalogue({ preserveLimit: true });
@@ -1273,7 +1278,7 @@ import {
     });
     copy.append(badge, text);
     banner.append(copy, allow, decline);
-    document.body.append(banner);
+    (consentSlot || document.body).append(banner);
   }
 
   function registerServiceWorker() {

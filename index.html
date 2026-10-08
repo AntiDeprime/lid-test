@@ -92,11 +92,6 @@
               <p class="lede">
                 Master the Leben in Deutschland Test with guided study, thoughtful explanations, and realistic exam simulation.
               </p>
-              <div class="hero-proof" aria-label="App highlights">
-                <span class="hero-proof-item"><b>✓</b> Free</span>
-                <span class="hero-proof-item"><b>✓</b> Private by design</span>
-                <span class="hero-proof-item"><b>✓</b> All 16 states</span>
-              </div>
             </div>
 
             <div class="start-setup-card">
@@ -124,7 +119,7 @@
                   <span class="launch-arrow" aria-hidden="true">→</span>
                 </button>
               </div>
-              <div class="queue-actions" aria-label="Quick review queues">
+              <div id="queue-actions" class="queue-actions is-hidden" aria-label="Quick review queues">
                 <button id="weak-review-button" class="secondary-action queue-action" type="button">Review weak questions</button>
                 <button id="bookmark-review-button" class="secondary-action queue-action" type="button">Review bookmarked questions</button>
               </div>
@@ -137,6 +132,14 @@
                   <option value="bookmarked">Bookmarked questions</option>
                 </select>
               </label>
+            </div>
+
+            <div id="consent-slot"></div>
+
+            <div class="hero-proof" aria-label="App highlights">
+              <span class="hero-proof-item"><b>✓</b> Free</span>
+              <span class="hero-proof-item"><b>✓</b> Private by design</span>
+              <span class="hero-proof-item"><b>✓</b> All 16 states</span>
             </div>
 
             <section class="format-section" aria-labelledby="format-title">
@@ -178,7 +181,11 @@
               </section>
               <section id="progress-panel" class="start-detail" role="tabpanel" aria-labelledby="progress-tab">
                 <h2 id="progress-title"><span class="section-heading-mark" aria-hidden="true">Your journey</span>Your progress</h2>
-                <div class="progress-summary" aria-live="polite">
+                <div id="progress-empty" class="progress-empty-state">
+                  <strong>Nothing studied yet</strong>
+                  <p>Answer a question or finish an exam simulation. Your progress, weak questions, and bookmarks appear here.</p>
+                </div>
+                <div id="progress-summary" class="progress-summary is-hidden" aria-live="polite">
                   <div class="progress-stat">
                     <b id="answered-stat">0</b>
                     <span>unique studied</span>
@@ -208,7 +215,7 @@
                     <span>bookmarked</span>
                   </div>
                 </div>
-                <div class="progress-insights">
+                <div id="progress-insights" class="progress-insights is-hidden">
                   <section class="progress-insight" aria-labelledby="area-stats-title">
                     <h3 id="area-stats-title">Area performance</h3>
                     <div id="area-stats" class="area-stats" aria-live="polite"></div>
@@ -218,7 +225,7 @@
                     <div id="recent-tests" class="recent-tests" aria-live="polite"></div>
                   </section>
                 </div>
-                <button id="reset-progress-button" class="secondary-action reset-progress" type="button">Reset progress</button>
+                <button id="reset-progress-button" class="secondary-action reset-progress is-hidden" type="button">Reset progress</button>
               </section>
               <section id="catalogue-panel" class="start-detail catalogue-browser is-hidden" role="tabpanel" aria-labelledby="catalogue-tab">
                 <div class="catalogue-heading">
@@ -287,7 +294,7 @@
               <span class="preview-badge">Bundesland set</span>
             </div>
             <div class="preview-image">
-              <img src="lid-v2-images/328-welches-bundesland-berlin.png" alt="Map image used in a Bundesland question">
+              <img src="lid-v2-images/328-welches-bundesland-berlin.png" alt="Map image used in a Bundesland question" loading="lazy">
             </div>
             <div class="preview-options" aria-label="Example answers">
               <div class="preview-option">A. 1</div>

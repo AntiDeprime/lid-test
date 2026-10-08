@@ -150,14 +150,6 @@ h1 {
   gap: 10px;
 }
 
-.start-actions .is-empty-queue {
-  min-height: 38px;
-  border-style: dashed;
-  color: var(--muted);
-  font-size: 0.9rem;
-  opacity: 0.82;
-}
-
 .study-picker {
   display: grid;
   gap: 8px;
@@ -1458,7 +1450,7 @@ figcaption {
 }
 
 .hero-copy h1 span {
-  background: linear-gradient(110deg, var(--accent-strong), #c3f7ed 58%, var(--gold));
+  background: linear-gradient(110deg, var(--accent-strong), #c3f7ed);
   color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
@@ -1476,7 +1468,6 @@ figcaption {
   display: flex;
   gap: 8px 14px;
   flex-wrap: wrap;
-  margin-top: 20px;
 }
 
 .hero-proof-item {
@@ -1786,6 +1777,26 @@ figcaption {
 
 .area-stat,
 .recent-test,
+.progress-empty-state {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.02);
+}
+
+.progress-empty-state strong {
+  letter-spacing: -0.01em;
+}
+
+.progress-empty-state p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .progress-empty,
 .catalogue-item,
 .catalogue-empty {
@@ -2058,6 +2069,14 @@ figcaption {
   min-height: 44px;
 }
 
+.consent-banner {
+  position: static;
+  max-width: none;
+  margin: 0;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: none;
+}
+
 .consent-badge {
   justify-self: start;
   padding: 4px 8px;
@@ -2135,6 +2154,12 @@ figcaption {
   }
 }
 
+@media (max-width: 639px) {
+  .catalogue-preview {
+    display: none;
+  }
+}
+
 @media (max-width: 460px) {
   .brand-catalogue-count {
     width: auto;
@@ -2147,7 +2172,8 @@ figcaption {
   }
 
   .hero-copy h1 {
-    font-size: clamp(2.15rem, 11.2vw, 3rem);
+    font-size: clamp(1.7rem, 8.2vw, 2.6rem);
+    line-height: 1.04;
   }
 
   .queue-actions {

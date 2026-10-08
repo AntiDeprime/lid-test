@@ -2,6 +2,13 @@
 
 ## High Priority
 
+- [x] Streamline the first-run start screen.
+  - Show the analytics consent choice in the page flow below the launch cards instead of a fixed banner that covers them.
+  - Keep the mobile headline to two lines and move the proof points below the launch cards so both launch cards sit inside the first 844px screen at 390px.
+  - Replace the first-run progress zeros and disabled queue buttons with one "Nothing studied yet" note, and show queues and stats once there is progress.
+  - Hide the question preview card on mobile and keep the headline accent in the mint family so gold stays reserved for milestones.
+  - Verify at 390px and desktop widths and run the smoke and flow browser checks.
+
 - [x] Replace the app icon with a refined LiD mark.
   - Redraw the monogram so it reads as LiD at every size: L and i share one connected stroke, D stands apart, and the dot of the i is the paper-white accent on the mint tile.
   - Add PNG favicon, Apple touch, 192px, 512px, and maskable icons next to the SVG sources, and list them in the web app manifest and the `<head>`.
