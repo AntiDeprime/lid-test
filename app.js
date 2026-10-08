@@ -982,7 +982,7 @@ import {
       translation.dataset.translationIndex = String(index);
 
       copy.append(text, translation);
-      button.append(letter, copy);
+      button.append(letter, document.createTextNode(" "), copy);
       button.addEventListener("click", () => chooseAnswer(index));
 
       if (answeredEntry) {
@@ -1007,7 +1007,7 @@ import {
       if (index === answeredEntry.selectedIndex) {
         button.classList.add("is-selected");
         appendVisibleAnswerState(button, "Selected", "•");
-        button.setAttribute("aria-label", appendAnswerState(label, "Your selected answer."));
+        button.setAttribute("aria-label", appendAnswerState(label, "Selected answer."));
       } else {
         button.setAttribute("aria-label", label);
       }
@@ -1024,7 +1024,7 @@ import {
     if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) {
       button.classList.add("is-wrong");
       appendVisibleAnswerState(button, "Your answer", "×");
-      button.setAttribute("aria-label", appendAnswerState(label, "Your selected answer, incorrect."));
+      button.setAttribute("aria-label", appendAnswerState(label, "Your answer, incorrect."));
       return;
     }
 
