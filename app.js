@@ -76,6 +76,7 @@ import {
 
   const $ = (id) => document.getElementById(id);
   const startScreen = $("start-screen");
+  const startTitle = $("start-title");
   const quizScreen = $("quiz-screen");
   const resultScreen = $("result-screen");
   const startButton = $("start-button");
@@ -459,11 +460,14 @@ import {
     return note;
   }
 
-  function show(screen) {
+  // After a screen change the old focus target is hidden, so move focus to the
+  // new screen's heading; keyboard and screen reader users start there.
+  function show(screen, { focus = true } = {}) {
     startScreen.classList.toggle("is-hidden", screen !== "start");
     quizScreen.classList.toggle("is-hidden", screen !== "quiz");
     resultScreen.classList.toggle("is-hidden", screen !== "result");
     if (screen === "start") refreshResumableExam();
+    if (focus) ({ start: startTitle, quiz: questionTitle, result: resultTitle })[screen].focus();
   }
 
   function persistExamSession() {
@@ -1138,6 +1142,7 @@ import {
 
       state.index += 1;
       renderQuestion();
+      questionTitle.focus();
       return;
     }
 
@@ -1150,6 +1155,7 @@ import {
 
     state.index += 1;
     renderQuestion();
+    questionTitle.focus();
   }
 
   function previousQuestion() {
@@ -1157,6 +1163,7 @@ import {
 
     state.index -= 1;
     renderQuestion();
+    questionTitle.focus();
   }
 
   function finishTest(endedByTimeout, completedAt = Date.now()) {
@@ -1476,15 +1483,21 @@ import {
     decline.className = "secondary-action";
     decline.type = "button";
     decline.textContent = "Keep off";
+    // Removing the banner would drop focus to the page body, so hand it to the
+    // next control in reading order.
+    const closeBanner = () => {
+      banner.remove();
+      document.querySelector('.start-tab[tabindex="0"]')?.focus();
+    };
     allow.addEventListener("click", () => {
       setStorageItem(ANALYTICS_CONSENT_KEY, "granted");
-      banner.remove();
+      closeBanner();
       loadAnalytics();
     });
     decline.addEventListener("click", () => {
       setStorageItem(ANALYTICS_CONSENT_KEY, "denied");
       analyticsStatus.textContent = "Analytics off";
-      banner.remove();
+      closeBanner();
     });
     copy.append(badge, text);
     banner.append(copy, allow, decline);

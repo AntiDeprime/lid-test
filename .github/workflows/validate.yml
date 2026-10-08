@@ -59,6 +59,9 @@ jobs:
         working-directory: scripts/browser
         run: npx playwright install --with-deps chromium
 
+      - name: Install the font used by the screenshot baselines
+        run: sudo apt-get install --yes fonts-dejavu-core
+
       - name: Run browser checks
         working-directory: scripts/browser
         run: node run-checks.mjs

@@ -237,9 +237,11 @@
   - Focus the safe "Keep going" action first, dismiss with Escape, the close button, or the backdrop, and close any dialog that is replaced so its keyboard handler is released.
   - Cover the exam leave, study leave, and reset-progress dialogs in the browser flow check.
 
-- [ ] Add accessibility and visual regression checks.
-  - Check keyboard flow through quiz, result, catalogue, and modal interactions.
-  - Compare screenshots against reviewed baselines (the layout check saves them but does not compare yet).
+- [x] Add accessibility and visual regression checks.
+  - Scan thirteen app states with axe-core (done with the portable browser checks).
+  - Add a `keyboard` section that drives the app with real key presses: visible focus rings on the start page, the analytics choice, tab arrows, catalogue jump, answering with Space, a result-screen practice link, the leave dialog (safe focus, trap, Escape, focus restore), and a whole exam answered from the keyboard.
+  - Fix what it found: after a screen change focus now moves to the new screen's heading (question, result, start page) and to the question heading after Next and Previous, and choosing from the consent banner hands focus to the next control instead of dropping it to the page body.
+  - Add a `visual` section that compares eleven key screens (phone, desktop, saved progress, dialog, result) with committed baselines in `scripts/browser/baselines/`, rendered in a pinned font with a 0.4% pixel tolerance, and regenerates them with `UPDATE_BASELINES=1`.
 
 - [ ] Reduce first-load payload as content grows.
   - Consider lazy-loading translations and explanations.

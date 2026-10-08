@@ -760,6 +760,10 @@ h1 {
   transform: translateY(1px);
 }
 
+h1[tabindex="-1"]:focus {
+  outline: none;
+}
+
 .toolbar-action:focus-visible,
 .primary-action:focus-visible,
 .secondary-action:focus-visible,

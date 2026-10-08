@@ -8,8 +8,9 @@
 // Useful environment variables:
 //   CHROMIUM_PATH   reuse an installed Chromium instead of Playwright's download
 //   PORT            serve on a fixed port (default: a free port)
-//   ONLY            comma-separated sections to run (smoke,flow,offline,layout,fit,a11y)
+//   ONLY            comma-separated sections to run (smoke,flow,offline,layout,fit,keyboard,visual,a11y)
 //   KEEP_ARTIFACTS  set to 1 to keep screenshots of passing runs too
+//   UPDATE_BASELINES  set to 1 to rewrite scripts/browser/baselines/*.png (visual section)
 //   TEST_FONT       force a font family, e.g. "DejaVu Sans" to reproduce the
 //                   wider fallback font GitHub Actions renders without Inter
 
@@ -18,17 +19,27 @@ import http from "node:http";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import pixelmatch from "pixelmatch";
 import { chromium } from "playwright";
+import { PNG } from "pngjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "../..");
 const checksDir = path.join(here, "checks");
 const artifactsDir = path.join(here, "artifacts");
+const baselinesDir = path.join(here, "baselines");
 const require = createRequire(import.meta.url);
 const axeSource = fs.readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 
 const MOBILE = { width: 390, height: 844 };
 const DESKTOP = { width: 1280, height: 720 };
+
+// Visual baselines are rendered in one pinned font so they do not depend on
+// whether Inter is installed. A change of up to this share of pixels (font
+// antialiasing between machines) passes; anything larger is a layout change.
+const VISUAL_FONT = "DejaVu Sans";
+const VISUAL_VIEWPORT_DESKTOP = { width: 1280, height: 800 };
+const MAX_DIFF_RATIO = 0.004;
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -74,13 +85,14 @@ function runInPage(page, code) {
   return page.evaluate(/^(async\s*)?\(\)\s*=>/.test(source) ? `(${source})()` : source);
 }
 
-async function openPage(browser, { viewport, serviceWorkers = "block" }) {
-  const context = await browser.newContext({ viewport, serviceWorkers });
+async function openPage(browser, { viewport, serviceWorkers = "block", font = process.env.TEST_FONT, contextOptions = {}, init } = {}) {
+  const context = await browser.newContext({ viewport, serviceWorkers, ...contextOptions });
   const page = await context.newPage();
   const problems = [];
 
-  if (process.env.TEST_FONT) {
-    const css = `html, body, button, input, select, textarea { font-family: ${JSON.stringify(process.env.TEST_FONT)} !important; }`;
+  if (init) await context.addInitScript(init.script, init.arg);
+  if (font) {
+    const css = `html, body, button, input, select, textarea { font-family: ${JSON.stringify(font)} !important; }`;
     await context.addInitScript((styles) => {
       document.addEventListener("DOMContentLoaded", () => {
         const style = document.createElement("style");
@@ -115,7 +127,62 @@ async function clickAndSettle(page, selector) {
   await page.waitForTimeout(50);
 }
 
+// Compares a viewport screenshot with its committed baseline. With
+// UPDATE_BASELINES=1 it rewrites the baseline instead. Returns a failure
+// message, or null when the screenshot matches.
+async function compareToBaseline(page, name) {
+  const actualBuffer = await page.screenshot();
+  const file = path.join(baselinesDir, `${name}.png`);
+
+  if (process.env.UPDATE_BASELINES === "1") {
+    fs.mkdirSync(baselinesDir, { recursive: true });
+    fs.writeFileSync(file, actualBuffer);
+    return null;
+  }
+  if (!fs.existsSync(file)) return `${name}: no baseline yet; run with UPDATE_BASELINES=1 and review the new image`;
+
+  const expected = PNG.sync.read(fs.readFileSync(file));
+  const actual = PNG.sync.read(actualBuffer);
+  if (expected.width !== actual.width || expected.height !== actual.height) {
+    fs.mkdirSync(artifactsDir, { recursive: true });
+    fs.writeFileSync(path.join(artifactsDir, `${name}.actual.png`), actualBuffer);
+    return `${name}: size ${actual.width}x${actual.height} differs from the baseline ${expected.width}x${expected.height}`;
+  }
+
+  const diff = new PNG({ width: expected.width, height: expected.height });
+  const changed = pixelmatch(expected.data, actual.data, diff.data, expected.width, expected.height, { threshold: 0.15 });
+  const ratio = changed / (expected.width * expected.height);
+  if (process.env.VERBOSE) console.log(`  ${name}: ${(ratio * 100).toFixed(3)}% differs`);
+  if (ratio <= MAX_DIFF_RATIO) return null;
+
+  fs.mkdirSync(artifactsDir, { recursive: true });
+  fs.writeFileSync(path.join(artifactsDir, `${name}.actual.png`), actualBuffer);
+  fs.writeFileSync(path.join(artifactsDir, `${name}.diff.png`), PNG.sync.write(diff));
+  return `${name}: ${(ratio * 100).toFixed(2)}% of pixels differ from the baseline (limit ${(MAX_DIFF_RATIO * 100).toFixed(1)}%); see artifacts/${name}.diff.png`;
+}
+
+async function hasFont(page, family) {
+  return page.evaluate((name) => {
+    const canvas = document.createElement("canvas").getContext("2d");
+    const sample = "mmmmmmmmmmlliWW";
+    const widthOf = (font) => { canvas.font = font; return canvas.measureText(sample).width; };
+    return widthOf(`20px "${name}", monospace`) !== widthOf("20px monospace") && widthOf(`20px "${name}", serif`) !== widthOf("20px serif");
+  }, family);
+}
+
+const SEEDED_PROGRESS = {
+  version: 1,
+  questionStats: Object.fromEntries([[1, [3, 2, 1]], [2, [2, 2, 0]], [3, [4, 1, 3]], [4, [1, 1, 0]], [5, [2, 1, 1]], [6, [3, 3, 0]], [7, [2, 0, 2]], [8, [1, 1, 0]], [9, [2, 2, 0]], [10, [1, 0, 1]]].map(([id, [answered, correct, wrong]]) => [String(id), { answered, correct, wrong }])),
+  weakQuestions: { 3: { wrong: 3, correctStreak: 0, lastMissedAt: "2026-09-29T09:00:00.000Z" }, 7: { wrong: 2, correctStreak: 1, lastMissedAt: "2026-09-30T09:00:00.000Z" } },
+  bookmarkedQuestions: { 5: { addedAt: "2026-09-28T09:00:00.000Z" } },
+  testHistory: [
+    { completedAt: "2026-09-28T10:00:00.000Z", correct: 21, total: 33, passed: true, questionIds: [], wrongQuestionIds: [] },
+    { completedAt: "2026-09-30T10:00:00.000Z", correct: 15, total: 33, passed: false, questionIds: [], wrongQuestionIds: [] }
+  ]
+};
+
 const sections = {
+
   async smoke({ browser, url }) {
     const { context, page, problems } = await openPage(browser, { viewport: MOBILE });
     try {
@@ -301,6 +368,277 @@ const sections = {
       }
     }
     if (failures.length) throw new Error(failures.join("\n  "));
+  },
+
+  // Compares key screens with committed baselines (scripts/browser/baselines).
+  // Regenerate them with UPDATE_BASELINES=1 after an intended visual change and
+  // review the changed images in the diff.
+  async visual({ browser, url }) {
+    const failures = [];
+    const options = {
+      font: VISUAL_FONT,
+      contextOptions: { reducedMotion: "reduce", locale: "en-US", timezoneId: "Europe/Berlin", deviceScaleFactor: 1 }
+    };
+    const compare = async (page, name, scrollTo = null) => {
+      await page.evaluate((selector) => {
+        if (selector) document.querySelector(selector).scrollIntoView({ block: "start" });
+        else window.scrollTo(0, 0);
+        return document.fonts.ready;
+      }, scrollTo);
+      await page.waitForFunction(() => [...document.images].every((image) => {
+        const rect = image.getBoundingClientRect();
+        const onScreen = image.getClientRects().length > 0 && rect.top < innerHeight + 200;
+        return !onScreen || image.complete;
+      }));
+      await page.waitForTimeout(120);
+      const failure = await compareToBaseline(page, name);
+      if (failure) failures.push(failure);
+    };
+    const wrongAnswer = (page) => page.evaluate(() => {
+      const prompt = document.querySelector("#question-title").textContent;
+      const question = window.LID_QUESTIONS.find((item) => item.prompt === prompt);
+      document.querySelectorAll(".answer-option")[question.options.findIndex((option) => !option.correct)].click();
+    });
+    const sessions = [];
+    const open = async (settings) => {
+      const session = await openPage(browser, { ...options, ...settings });
+      sessions.push(session);
+      return session;
+    };
+
+    try {
+      // Fresh learner on a phone.
+      let { page, problems } = await open({ viewport: MOBILE });
+      await page.goto(url);
+      if (!(await hasFont(page, VISUAL_FONT))) {
+        if (process.env.CI) throw new Error(`${VISUAL_FONT} is not installed, so the visual baselines cannot be compared (apt-get install fonts-dejavu-core)`);
+        console.log(`  skipped: ${VISUAL_FONT} is not installed here, so baselines cannot be compared`);
+        return;
+      }
+      await compare(page, "start-390");
+      await page.click(".consent-banner .secondary-action");
+      await page.click("#catalogue-tab");
+      await compare(page, "catalogue-390");
+      await page.click("#practice-button");
+      await page.waitForSelector("#quiz-screen:not(.is-hidden)");
+      await wrongAnswer(page);
+      await compare(page, "quiz-answered-390");
+      await page.click("#translation-toggle");
+      await compare(page, "quiz-translation-390");
+      await page.click("#home-button");
+      await page.waitForSelector(".confirm-modal");
+      await compare(page, "leave-dialog-390");
+      await page.click(".confirm-leave");
+      await page.waitForSelector("#start-screen:not(.is-hidden)");
+      await page.click("#catalogue-tab");
+      await page.fill("#jump-question", "70");
+      await page.press("#jump-question", "Enter");
+      await page.waitForSelector("#quiz-screen:not(.is-hidden)");
+      await compare(page, "quiz-image-390");
+      await wrongAnswer(page);
+      await page.click("#next-button");
+      await page.waitForSelector("#result-screen:not(.is-hidden)");
+      await compare(page, "result-390");
+      expectNoProblems(problems, "Visual check (phone)");
+
+      // Learner with saved progress.
+      ({ page, problems } = await open({ viewport: MOBILE, init: { script: (data) => {
+        if (!localStorage.getItem("lidTestPrepProgress")) localStorage.setItem("lidTestPrepProgress", JSON.stringify(data));
+        localStorage.setItem("lidAnalyticsConsent", "denied");
+      }, arg: SEEDED_PROGRESS } }));
+      await page.goto(url);
+      await compare(page, "start-progress-390");
+      await page.click("#progress-tab");
+      await compare(page, "progress-390", "#progress-title");
+      expectNoProblems(problems, "Visual check (saved progress)");
+
+      // Desktop.
+      ({ page, problems } = await open({ viewport: VISUAL_VIEWPORT_DESKTOP }));
+      await page.goto(url);
+      await compare(page, "start-1280");
+      await page.click(".consent-banner .secondary-action");
+      await page.click("#practice-button");
+      await page.waitForSelector("#quiz-screen:not(.is-hidden)");
+      await wrongAnswer(page);
+      await compare(page, "quiz-answered-1280");
+      expectNoProblems(problems, "Visual check (desktop)");
+
+      if (failures.length) throw new Error(failures.join("\n  "));
+    } finally {
+      await Promise.all(sessions.map(({ context }) => context.close()));
+    }
+  },
+
+  // Drives the app with real key presses only: Tab, Shift+Tab, Enter, Space,
+  // Arrow keys, and Escape. Catches focus that is lost when a screen swaps,
+  // dialogs that trap or leak focus, and controls with no visible focus ring.
+  async keyboard({ browser, url }) {
+    const { context, page, problems } = await openPage(browser, { viewport: DESKTOP });
+    const failures = [];
+    const expect = (ok, message) => { if (!ok) failures.push(message); };
+    const describeFocus = () => page.evaluate(() => {
+      const element = document.activeElement;
+      if (!element || element === document.body) return "nothing (document body)";
+      return element.id ? `#${element.id}` : `${element.tagName.toLowerCase()}${element.className ? `.${String(element.className).split(" ")[0]}` : ""}`;
+    });
+    const focusIs = (selector) => page.evaluate((target) => Boolean(document.activeElement?.matches(target)), selector);
+    const press = async (key) => {
+      await page.keyboard.press(key);
+      await page.waitForTimeout(25);
+    };
+    const tabTo = async (selector, { max = 60, reverse = false } = {}) => {
+      for (let presses = 0; presses <= max; presses += 1) {
+        if (await focusIs(selector)) return true;
+        await press(reverse ? "Shift+Tab" : "Tab");
+      }
+      failures.push(`${selector} cannot be reached with ${reverse ? "Shift+Tab" : "Tab"}; focus is on ${await describeFocus()}`);
+      return false;
+    };
+    const hasFocusRing = () => page.evaluate(() => {
+      const style = getComputedStyle(document.activeElement);
+      return (style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0) || style.boxShadow !== "none";
+    });
+    const visible = (selector) => page.evaluate((target) => {
+      const element = document.querySelector(target);
+      return Boolean(element) && !element.closest(".is-hidden, [hidden]") && element.getClientRects().length > 0;
+    }, selector);
+    const waitFor = async (selector, what) => {
+      try {
+        await page.waitForSelector(selector, { timeout: 3000 });
+        return true;
+      } catch {
+        failures.push(`${what}: ${selector} did not appear; focus is on ${await describeFocus()}`);
+        return false;
+      }
+    };
+
+    try {
+      await page.goto(url);
+
+      // Every stop on the start page shows a focus ring, and the expected controls are reachable.
+      await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
+      const stops = [];
+      for (let presses = 0; presses < 45; presses += 1) {
+        await press("Tab");
+        const stop = await page.evaluate(() => {
+          const element = document.activeElement;
+          if (!element || element === document.body) return null;
+          return { name: element.id ? `#${element.id}` : element.textContent.trim().slice(0, 24) || element.tagName.toLowerCase(), key: element.id || element.className };
+        });
+        if (!stop) break;
+        stops.push(stop.name);
+        expect(await hasFocusRing(), `${stop.name} has no visible focus ring on the start page`);
+      }
+      ["#bundesland-select", "#start-button", "#practice-button", "#study-filter"].forEach((id) => {
+        expect(stops.includes(id), `${id} is not in the start page Tab order`);
+      });
+      expect(stops.includes("Privacy") && stops.includes("Imprint"), "Privacy and Imprint links are not in the start page Tab order");
+
+      // The analytics choice works from the keyboard and focus stays in the page.
+      await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
+      if (await tabTo(".consent-banner .secondary-action")) {
+        await press("Enter");
+        expect(!(await visible(".consent-banner")), "Consent banner is still open after choosing from the keyboard");
+        expect(!(await focusIs("body")), "Focus is lost to the page body after the analytics choice");
+      }
+
+      // Tabs follow the arrow, Home, and End keys.
+      if (await tabTo('.start-tab[aria-selected="true"]')) {
+        await press("ArrowRight");
+        expect(await page.evaluate(() => document.activeElement.getAttribute("aria-selected") === "true" && document.activeElement.id === "catalogue-tab" || document.activeElement.id === "learn-tab"), "ArrowRight does not move to and select the next tab");
+        await press("End");
+        const endTab = await page.evaluate(() => document.activeElement.id);
+        await press("Home");
+        const homeTab = await page.evaluate(() => document.activeElement.id);
+        expect(endTab && homeTab && endTab !== homeTab, "Home and End do not move between the first and last tab");
+      }
+
+      // Catalogue: jump to a question number and land on its title.
+      await page.evaluate(() => document.querySelector("#catalogue-tab").click());
+      if (await tabTo("#jump-question")) {
+        await page.keyboard.type("70");
+        await press("Enter");
+        await waitFor("#quiz-screen:not(.is-hidden)", "Opening a question from the catalogue");
+        expect(await focusIs("#question-title"), `Opening a question from the catalogue leaves focus on ${await describeFocus()} instead of the question title`);
+        expect(await page.evaluate(() => /Lehrer|Sch|Bild|\?/.test(document.querySelector("#question-title").textContent)), "Question 70 did not open from the catalogue");
+      }
+
+      // Quiz: choose with Space, move on with Enter, and keep focus on the new question.
+      if (await tabTo(".answer-option")) {
+        await press("Space");
+        expect(await visible("#feedback-verdict"), "Choosing an answer with Space did not show the verdict");
+        expect(await focusIs("#next-button"), `After answering, focus is on ${await describeFocus()} instead of Next`);
+        await press("Enter");
+        await waitFor("#result-screen:not(.is-hidden)", "Finishing the question");
+        expect(await focusIs("#result-title"), `After finishing, focus is on ${await describeFocus()} instead of the result title`);
+      }
+
+      // Result: practise a missed question from the keyboard.
+      if (await tabTo(".review-practice")) {
+        await press("Enter");
+        await waitFor("#quiz-screen:not(.is-hidden)", "Practising from the result");
+        expect(await focusIs("#question-title"), `Practising from the result leaves focus on ${await describeFocus()} instead of the question title`);
+      }
+
+      // Leave dialog (shown once an answer is saved): focus starts on the safe
+      // action, is trapped, and returns to Home on Escape.
+      if (await tabTo(".answer-option")) {
+        await press("Enter");
+      }
+      if (await tabTo("#home-button", { reverse: true })) {
+        await press("Enter");
+        await waitFor(".confirm-modal", "Pressing Home");
+        expect(await focusIs(".confirm-actions .primary-action"), `The leave dialog starts with focus on ${await describeFocus()}, not on the safe action`);
+        const seen = new Set();
+        for (let presses = 0; presses < 8; presses += 1) {
+          await press("Tab");
+          seen.add(await page.evaluate(() => Boolean(document.activeElement.closest(".confirm-modal"))));
+        }
+        expect(seen.size === 1 && seen.has(true), "Tab leaves the leave dialog; focus is not trapped");
+        await press("Escape");
+        expect(!(await visible(".confirm-modal")), "Escape does not close the leave dialog");
+        expect(await focusIs("#home-button"), `Closing the dialog leaves focus on ${await describeFocus()} instead of Home`);
+        await press("Enter");
+        await waitFor(".confirm-modal", "Pressing Home again");
+        if (await tabTo(".confirm-leave")) {
+          await press("Enter");
+          await waitFor("#start-screen:not(.is-hidden)", "Leaving from the dialog");
+          expect(await focusIs("#start-title"), `Back on the start page, focus is on ${await describeFocus()} instead of the page heading`);
+        }
+      }
+
+      // Exam simulation answered entirely from the keyboard, ending on the result.
+      if (await tabTo("#start-button")) {
+        await press("Enter");
+        await waitFor("#quiz-screen:not(.is-hidden)", "Starting an exam");
+        expect(await focusIs("#question-title"), `Starting an exam leaves focus on ${await describeFocus()} instead of the question title`);
+        for (let question = 1; question <= 33; question += 1) {
+          const kicker = await page.evaluate(() => document.querySelector("#question-kicker").textContent);
+          if (!(await tabTo(".answer-option", { max: 12 }))) break;
+          await press("Enter");
+          if (!(await focusIs("#next-button"))) {
+            failures.push(`Exam question ${question}: focus is on ${await describeFocus()} instead of Next after answering`);
+            break;
+          }
+          await press("Enter");
+          if (question < 33) {
+            const next = await page.evaluate(() => document.querySelector("#question-kicker").textContent);
+            if (next === kicker) { failures.push(`Exam question ${question}: Enter on Next did not advance`); break; }
+            if (!(await focusIs("#question-title"))) { failures.push(`Exam question ${question + 1}: focus is on ${await describeFocus()} instead of the question title`); break; }
+          }
+        }
+        await page.waitForSelector("#result-screen:not(.is-hidden)", { timeout: 3000 }).catch(() => failures.push("The keyboard-only exam did not reach the result screen"));
+        expect(await focusIs("#result-title"), `Exam result leaves focus on ${await describeFocus()} instead of the result title`);
+      }
+
+      expectNoProblems(problems, "Keyboard check");
+      if (failures.length) throw new Error(failures.join("\n  "));
+    } catch (error) {
+      await shot(page, "keyboard-failure").catch(() => {});
+      throw error;
+    } finally {
+      await context.close();
+    }
   },
 
   async a11y({ browser, url }) {
