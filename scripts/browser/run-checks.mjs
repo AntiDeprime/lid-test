@@ -152,7 +152,7 @@ async function compareToBaseline(page, name) {
   const diff = new PNG({ width: expected.width, height: expected.height });
   const changed = pixelmatch(expected.data, actual.data, diff.data, expected.width, expected.height, { threshold: 0.15 });
   const ratio = changed / (expected.width * expected.height);
-  if (process.env.VERBOSE) console.log(`  ${name}: ${(ratio * 100).toFixed(3)}% differs`);
+  if (process.env.VERBOSE || process.env.CI) console.log(`  ${name}: ${(ratio * 100).toFixed(3)}% differs`);
   if (ratio <= MAX_DIFF_RATIO) return null;
 
   fs.mkdirSync(artifactsDir, { recursive: true });
@@ -727,7 +727,10 @@ if (unknown.length) {
 
 fs.rmSync(artifactsDir, { recursive: true, force: true });
 const { server, url } = await startServer(Number(process.env.PORT) || 0);
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+// These flags keep text rendering the same on every machine (no OS hinting,
+// no LCD subpixel antialiasing), which the visual baselines depend on.
+const RENDERING_ARGS = ["--font-render-hinting=none", "--disable-lcd-text", "--disable-font-subpixel-positioning", "--force-color-profile=srgb"];
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: RENDERING_ARGS });
 const failures = [];
 
 try {
