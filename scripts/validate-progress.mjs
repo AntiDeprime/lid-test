@@ -7,6 +7,22 @@ import {
   searchCatalogueQuestions
 } from "../modules/catalogue.js";
 import {
+  STORAGE_KEY,
+  STORAGE_VERSION,
+  UNREADABLE_PROGRESS_KEY,
+  createEmptyProgress,
+  loadProgress,
+  migrateProgress,
+  normalizeProgress
+} from "../modules/storage.js";
+import {
+  BACKUP_FORMAT,
+  createBackup,
+  describeProgress,
+  getBackupFilename,
+  parseBackup
+} from "../modules/backup.js";
+import {
   EXAM_SESSION_KEY,
   clearExamSession,
   createExamSnapshot,
@@ -206,5 +222,68 @@ assert.equal(loadExamSession(sessionQuestions, { storage }), null);
 saveExamSession(snapshot, storage);
 assert.equal(clearExamSession(storage), true);
 assert.equal(loadExamSession(sessionQuestions, { storage }), null);
+
+const storedProgress = {
+  version: STORAGE_VERSION,
+  questionStats: { 1: { answered: 3, correct: 2, wrong: 1 }, 2: { answered: 1, correct: 0, wrong: 1 } },
+  weakQuestions: { 2: { wrong: 1, correctStreak: 0, lastMissedAt: "2026-01-01T00:00:00.000Z" } },
+  bookmarkedQuestions: { 1: { addedAt: "2026-01-01T00:00:00.000Z" } },
+  testHistory: [{ completedAt: "2026-01-02T00:00:00.000Z", correct: 20, total: 33, passed: true, questionIds: [1, 2], wrongQuestionIds: [2] }]
+};
+
+// Migrations carry saved progress forward instead of resetting it.
+const migrations = { 1: (saved) => ({ ...saved, questionStats: saved.questionStats }), 2: (saved) => ({ ...saved, upgraded: true }) };
+const upgraded = migrateProgress({ ...storedProgress, version: 1 }, { migrations, targetVersion: 3 });
+assert.equal(upgraded.version, 3);
+assert.equal(upgraded.upgraded, true);
+assert.deepEqual(upgraded.questionStats, storedProgress.questionStats);
+assert.equal(migrateProgress({ ...storedProgress, version: 1 }, { migrations: {}, targetVersion: 3 }), null);
+assert.equal(migrateProgress({ ...storedProgress, version: STORAGE_VERSION + 1 }), null);
+assert.equal(migrateProgress("nope"), null);
+assert.equal(migrateProgress({ questionStats: {} }), null);
+
+const cleaned = normalizeProgress({
+  questionStats: { 1: { answered: 3, correct: "2", wrong: -4, extra: true }, "not-an-id": { answered: 9 }, 2: "bad" },
+  weakQuestions: [],
+  bookmarkedQuestions: { 7: { addedAt: 5 } },
+  testHistory: [{ passed: "yes" }, { passed: false, correct: 3, total: 33, completedAt: "d", questionIds: [1, "x"] }]
+});
+assert.deepEqual(cleaned.questionStats, { 1: { answered: 3, correct: 0, wrong: 0 } });
+assert.deepEqual(cleaned.weakQuestions, {});
+assert.deepEqual(cleaned.bookmarkedQuestions, { 7: { addedAt: "" } });
+assert.equal(cleaned.testHistory.length, 1);
+assert.deepEqual(cleaned.testHistory[0].questionIds, [1]);
+
+const progressMemory = new Map();
+const progressStorage = {
+  getItem: (key) => (progressMemory.has(key) ? progressMemory.get(key) : null),
+  setItem: (key, value) => progressMemory.set(key, String(value)),
+  removeItem: (key) => progressMemory.delete(key)
+};
+assert.deepEqual(loadProgress(progressStorage), createEmptyProgress());
+progressMemory.set(STORAGE_KEY, JSON.stringify(storedProgress));
+assert.deepEqual(loadProgress(progressStorage), storedProgress);
+progressMemory.set(STORAGE_KEY, JSON.stringify({ ...storedProgress, version: STORAGE_VERSION + 1 }));
+assert.deepEqual(loadProgress(progressStorage), createEmptyProgress());
+assert.equal(JSON.parse(progressMemory.get(UNREADABLE_PROGRESS_KEY)).version, STORAGE_VERSION + 1);
+progressMemory.set(STORAGE_KEY, "{broken");
+assert.deepEqual(loadProgress(progressStorage), createEmptyProgress());
+assert.equal(progressMemory.get(UNREADABLE_PROGRESS_KEY), "{broken");
+
+const backup = createBackup(storedProgress, new Date("2026-10-08T09:30:00.000Z"));
+assert.equal(backup.format, BACKUP_FORMAT);
+assert.equal(backup.exportedAt, "2026-10-08T09:30:00.000Z");
+assert.equal(getBackupFilename(new Date("2026-10-08T09:30:00.000Z")), "lid-test-prep-progress-2026-10-08.json");
+const restored = parseBackup(JSON.stringify(backup));
+assert.equal(restored.ok, true);
+assert.deepEqual(restored.progress, storedProgress);
+assert.equal(parseBackup("{broken").ok, false);
+assert.equal(parseBackup("{broken").reason, "invalid");
+assert.equal(parseBackup(JSON.stringify({ format: "other", progress: storedProgress })).reason, "invalid");
+assert.equal(parseBackup(JSON.stringify({ format: BACKUP_FORMAT })).reason, "invalid");
+assert.equal(parseBackup(JSON.stringify({ ...backup, progress: { ...storedProgress, version: STORAGE_VERSION + 1 } })).reason, "version");
+assert.equal(describeProgress(storedProgress).text, "2 studied questions, 1 exam simulation, 1 weak question, 1 bookmark");
+assert.equal(describeProgress(createEmptyProgress()).hasProgress, false);
+assert.equal(describeProgress(createEmptyProgress()).text, "no progress");
 
 console.log("Progress and quiz-rule validation passed.");

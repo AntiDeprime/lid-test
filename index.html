@@ -235,6 +235,16 @@
                     <div id="recent-tests" class="recent-tests" aria-live="polite"></div>
                   </section>
                 </div>
+                <section class="backup-card" aria-labelledby="backup-title">
+                  <h3 id="backup-title">Back up your progress</h3>
+                  <p>Progress is saved only in this browser. Export a file to keep a copy or move it to another device.</p>
+                  <div class="backup-actions">
+                    <button id="export-progress-button" class="secondary-action" type="button">Export backup</button>
+                    <button id="import-progress-button" class="secondary-action" type="button">Import backup</button>
+                    <input id="import-progress-input" type="file" accept="application/json,.json" hidden>
+                  </div>
+                  <p id="backup-status" class="backup-status" role="status"></p>
+                </section>
                 <button id="reset-progress-button" class="secondary-action reset-progress is-hidden" type="button">Reset progress</button>
               </section>
               <section id="catalogue-panel" class="start-detail catalogue-browser is-hidden" role="tabpanel" aria-labelledby="catalogue-tab">

@@ -2195,6 +2195,54 @@ figcaption {
   }
 }
 
+/* Progress backup lives under the statistics so a new device can import first. */
+.backup-card {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.02);
+}
+
+.backup-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.backup-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.backup-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.backup-actions .secondary-action {
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.backup-card .backup-status {
+  min-height: 0;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.backup-card .backup-status:empty {
+  display: none;
+}
+
+.backup-card .backup-status.is-error {
+  color: #ffd1cc;
+}
+
 /* An unfinished exam is offered back as a calm card above the launch choices. */
 .resume-card {
   display: grid;

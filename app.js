@@ -1,4 +1,5 @@
 import { getStorageItem, loadProgress, saveProgress as persistProgress, setStorageItem } from "./modules/storage.js";
+import { MAX_BACKUP_BYTES, createBackup, describeProgress, getBackupFilename, parseBackup } from "./modules/backup.js";
 import { getStateNames, orderStudyQuestionsByProgress, sampleByCategory, shuffle } from "./modules/sampling.js";
 import { summarizeProgress } from "./modules/progress.js";
 import { getLearnerHint } from "./modules/hints.js";
@@ -97,6 +98,10 @@ import {
   const newTestButton = $("new-test-button");
   const resultHomeButton = $("result-home-button");
   const resetProgressButton = $("reset-progress-button");
+  const exportProgressButton = $("export-progress-button");
+  const importProgressButton = $("import-progress-button");
+  const importProgressInput = $("import-progress-input");
+  const backupStatus = $("backup-status");
   const nextButton = $("next-button");
   const previousButton = $("previous-button");
   const studyFilter = $("study-filter");
@@ -163,7 +168,7 @@ import {
   async function resetProgress() {
     const confirmed = await confirmDialog({
       title: "Reset saved progress?",
-      message: "This clears your answers, weak questions, bookmarks, and exam history in this browser. It cannot be undone.",
+      message: "This clears your answers, weak questions, bookmarks, and exam history in this browser. It cannot be undone, so export a backup first if you want a copy.",
       confirmLabel: "Reset progress",
       cancelLabel: "Keep progress",
       trigger: resetProgressButton
@@ -176,6 +181,68 @@ import {
     progress.testHistory = [];
     saveProgress();
     renderProgressSummary();
+    setBackupStatus("");
+  }
+
+  function setBackupStatus(message, isError = false) {
+    backupStatus.textContent = message;
+    backupStatus.classList.toggle("is-error", isError);
+  }
+
+  function exportProgress() {
+    const filename = getBackupFilename(new Date());
+    const blob = new Blob([JSON.stringify(createBackup(progress), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = filename;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setBackupStatus(`Backup saved as ${filename}.`);
+  }
+
+  async function importProgress() {
+    const file = importProgressInput.files && importProgressInput.files[0];
+    importProgressInput.value = "";
+    if (!file) return;
+
+    if (file.size > MAX_BACKUP_BYTES) {
+      setBackupStatus("That file is too large to be a LiD Test Prep backup.", true);
+      return;
+    }
+
+    const result = parseBackup(await file.text());
+    if (!result.ok) {
+      setBackupStatus(result.message, true);
+      return;
+    }
+
+    const incoming = describeProgress(result.progress);
+    const current = describeProgress(progress);
+    if (current.hasProgress) {
+      const confirmed = await confirmDialog({
+        title: "Replace your progress?",
+        message: `This backup has ${incoming.text}. It replaces the ${current.text} saved in this browser.`,
+        confirmLabel: "Replace progress",
+        cancelLabel: "Keep current progress",
+        trigger: importProgressButton
+      });
+      if (!confirmed) {
+        setBackupStatus("Import cancelled. Your current progress is unchanged.");
+        return;
+      }
+    }
+
+    progress.questionStats = result.progress.questionStats;
+    progress.weakQuestions = result.progress.weakQuestions;
+    progress.bookmarkedQuestions = result.progress.bookmarkedQuestions;
+    progress.testHistory = result.progress.testHistory;
+    saveProgress();
+    renderProgressSummary();
+    setBackupStatus(`Backup imported: ${incoming.text}.`);
   }
 
   function populateStateControls() {
@@ -284,6 +351,7 @@ import {
     queueActions.classList.toggle("is-hidden", weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0);
 
     const hasProgress = summary.repeatedAnswers > 0 || summary.tests > 0 || weakQuestionIds.length > 0 || bookmarkedQuestionIds.length > 0;
+    exportProgressButton.disabled = !hasProgress;
     progressEmpty.classList.toggle("is-hidden", hasProgress);
     progressSummary.classList.toggle("is-hidden", !hasProgress);
     progressInsights.classList.toggle("is-hidden", !hasProgress);
@@ -1485,6 +1553,9 @@ import {
   newTestButton.addEventListener("click", startRun);
   resultHomeButton.addEventListener("click", goHome);
   resetProgressButton.addEventListener("click", resetProgress);
+  exportProgressButton.addEventListener("click", exportProgress);
+  importProgressButton.addEventListener("click", () => importProgressInput.click());
+  importProgressInput.addEventListener("change", importProgress);
   resumeButton.addEventListener("click", resumeExam);
   resumeDiscardButton.addEventListener("click", discardResumableExam);
   document.addEventListener("visibilitychange", () => {

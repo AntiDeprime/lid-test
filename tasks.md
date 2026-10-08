@@ -2,6 +2,12 @@
 
 ## High Priority
 
+- [x] Protect saved progress with migrations and a file backup.
+  - Replace the "version mismatch resets everything" load path with a migration chain (`migrateProgress`), so a future storage version bump upgrades saved progress instead of discarding it.
+  - Keep progress the app cannot read under `lidTestPrepProgress.unreadable` instead of overwriting it, and sanitize loaded progress to the fields the app reads.
+  - Add "Export backup" and "Import backup" to the Progress tab: a JSON file with the progress, validated and confirmed before it replaces what is saved, with Export disabled until there is progress.
+  - Mention the backup in the reset confirmation, and cover migration, normalization, and backup parsing in `scripts/validate-progress.mjs` and the import flow in the browser flow check.
+
 - [x] Tighten the quiz layout.
   - Show the correct/not-quite verdict and the "Why" explanation directly under the answers, with a check or cross mark as well as colour.
   - Keep Previous and Next in a bar that sticks to the bottom of the screen on mobile so the next action never scrolls away.

@@ -266,6 +266,32 @@ fi
     throw new Error('Confirming reset did not clear saved progress');
   }
 
+  const importBackup = async (text) => {
+    const transfer = new DataTransfer();
+    transfer.items.add(new File([text], 'backup.json', { type: 'application/json' }));
+    const input = document.querySelector('#import-progress-input');
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await delay(150);
+  };
+  if (!document.querySelector('#export-progress-button').disabled) {
+    throw new Error('Export should be disabled when there is no progress to back up');
+  }
+  await importBackup('{\"hello\": 1}');
+  if (!document.querySelector('#backup-status').textContent.includes('not a LiD Test Prep backup')) {
+    throw new Error('Importing a non-backup file did not explain the problem');
+  }
+  await importBackup(JSON.stringify({
+    format: 'lid-test-prep-progress',
+    exportedAt: new Date().toISOString(),
+    progress: { version: 1, questionStats: { 1: { answered: 2, correct: 1, wrong: 1 } }, weakQuestions: {}, bookmarkedQuestions: {}, testHistory: [] }
+  }));
+  if (!document.querySelector('#backup-status').textContent.includes('Backup imported')
+    || document.querySelector('#answered-stat').textContent !== '1'
+    || document.querySelector('#export-progress-button').disabled) {
+    throw new Error('Importing a backup into an empty browser did not restore progress');
+  }
+
   return {
     passedFlow: true,
     title: document.title,

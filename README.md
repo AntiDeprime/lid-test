@@ -109,7 +109,7 @@ Codex sandbox notes:
 
 The page supports Google Analytics 4 with measurement ID `G-6LN5H6T5LW`, but the Google tag is not loaded until the user explicitly allows analytics in the consent banner.
 
-The app stores progress locally in the user's browser. The current analytics configuration denies advertising storage and personalization signals, enables analytics storage only after consent, and exposes visible privacy and imprint links with the local-data policy, analytics behavior, maintainer contact, and unofficial-app notice used by the static app.
+The app stores progress locally in the user's browser. The Progress tab can export that progress to a JSON backup file and import it again, for example on a new device; saved progress is upgraded by migrations when the storage format changes, and data the app cannot read is kept under `lidTestPrepProgress.unreadable` rather than overwritten. The current analytics configuration denies advertising storage and personalization signals, enables analytics storage only after consent, and exposes visible privacy and imprint links with the local-data policy, analytics behavior, maintainer contact, and unofficial-app notice used by the static app.
 
 ## PWA
 
@@ -134,7 +134,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `index.html` contains the one-page UI structure and metadata.
 - `styles.css` contains the app styling.
 - `app.js` contains the vanilla JavaScript app wiring and screen state.
-- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, confirmation dialogs, exam resume snapshots, and quiz rules.
+- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, confirmation dialogs, exam resume snapshots, progress backups, and quiz rules.
 - `questions.js` contains the question catalogue loaded by the page.
 - `explanation-texts-*.js` contains one reviewed, question-specific learner explanation for each catalogue item.
 - `explanations.js` attaches the reviewed explanation map to the question catalogue.
