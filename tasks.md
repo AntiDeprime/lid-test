@@ -194,10 +194,12 @@
   - Highlight matched text in catalogue results.
   - Decide whether hidden answer text should remain searchable before reveal.
 
-- [ ] Add resume support for interrupted exam simulations.
+- [x] Add resume support for interrupted exam simulations.
   - Persist in-progress exam run state, selected answers, selected Bundesland, and start time.
   - Resume or discard stale unfinished exams explicitly.
   - Keep the timer accurate after refresh or mobile browser suspension.
+  - Offer the unfinished exam as a "Resume your exam" card on the start page with Resume and Discard actions; an exam whose 60 minutes passed while away offers "See result" instead, dated to when the time ran out.
+  - Ask before a new exam replaces an unfinished one, clear the saved exam when it finishes or the learner leaves it, and cover the pure snapshot logic in `scripts/validate-progress.mjs` and the resume flows in the browser flow check.
 
 - [ ] Strengthen PWA and offline validation.
   - Add an offline browser check.

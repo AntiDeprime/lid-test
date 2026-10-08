@@ -7,6 +7,15 @@ import {
   searchCatalogueQuestions
 } from "../modules/catalogue.js";
 import {
+  EXAM_SESSION_KEY,
+  clearExamSession,
+  createExamSnapshot,
+  loadExamSession,
+  restoreExamSession,
+  saveExamSession
+} from "../modules/exam-session.js";
+import {
+  EXAM_DURATION_SECONDS,
   PASS_THRESHOLD,
   TOTAL_GENERAL,
   TOTAL_STATE,
@@ -119,5 +128,83 @@ assert.equal(getCatalogueSummary(1, 1, "berlin"), "1 question match your search.
 assert.equal(getCatalogueQuestions(catalogueQuestions, "state").length, 1);
 assert.equal(getCatalogueQuestions(catalogueQuestions, "bookmarked", { bookmarkedIds: new Set(["2"]) })[0].id, 2);
 assert.equal(searchCatalogueQuestions(catalogueQuestions, "coat of arms", catalogueTranslations)[0].id, 2);
+
+const sessionQuestions = [...generalQuestions, ...stateQuestions]
+  .filter((item) => item.state !== "Bayern")
+  .slice(0, TOTAL_GENERAL + TOTAL_STATE)
+  .map((item) => ({
+    ...item,
+    options: [{ text: "A", correct: false }, { text: "B", correct: true }, { text: "C", correct: false }]
+  }));
+const sessionStart = 1_700_000_000_000;
+const sessionAnswers = [
+  createAnswerEntry(sessionQuestions[0], 1),
+  createAnswerEntry(sessionQuestions[1], 0),
+  createUnansweredEntry(sessionQuestions[2])
+];
+const snapshot = createExamSnapshot({
+  run: sessionQuestions,
+  answers: sessionAnswers,
+  index: 1,
+  selectedState: "Berlin",
+  startedAt: sessionStart
+});
+
+assert.equal(snapshot.questionIds.length, TOTAL_GENERAL + TOTAL_STATE);
+assert.deepEqual(snapshot.answers, [
+  { questionId: sessionQuestions[0].id, selectedIndex: 1 },
+  { questionId: sessionQuestions[1].id, selectedIndex: 0 }
+]);
+
+const resumed = restoreExamSession(JSON.parse(JSON.stringify(snapshot)), sessionQuestions, sessionStart + 10 * 60 * 1000);
+assert.equal(resumed.expired, false);
+assert.equal(resumed.timeRemaining, EXAM_DURATION_SECONDS - 600);
+assert.equal(resumed.index, 1);
+assert.equal(resumed.score, 1);
+assert.equal(resumed.answers.length, 2);
+assert.equal(resumed.selectedState, "Berlin");
+assert.deepEqual(resumed.run.map((item) => item.id), snapshot.questionIds);
+assert.equal(resumed.answers[0].question, sessionQuestions[0]);
+
+const expired = restoreExamSession(snapshot, sessionQuestions, sessionStart + (EXAM_DURATION_SECONDS + 5) * 1000);
+assert.equal(expired.expired, true);
+assert.equal(expired.timeRemaining, 0);
+
+assert.equal(restoreExamSession(null, sessionQuestions), null);
+assert.equal(restoreExamSession({ ...snapshot, version: 99 }, sessionQuestions, sessionStart), null);
+assert.equal(restoreExamSession({ ...snapshot, startedAt: sessionStart + 10 * 60 * 1000 }, sessionQuestions, sessionStart), null);
+assert.equal(restoreExamSession({ ...snapshot, questionIds: snapshot.questionIds.slice(1) }, sessionQuestions, sessionStart), null);
+assert.equal(restoreExamSession({ ...snapshot, questionIds: [...snapshot.questionIds.slice(1), 9999] }, sessionQuestions, sessionStart), null);
+assert.equal(restoreExamSession({ ...snapshot, questionIds: [snapshot.questionIds[0], ...snapshot.questionIds.slice(0, -1)] }, sessionQuestions, sessionStart), null);
+
+const sloppy = restoreExamSession({
+  ...snapshot,
+  index: 99,
+  answers: [
+    { questionId: sessionQuestions[0].id, selectedIndex: 2 },
+    { questionId: sessionQuestions[0].id, selectedIndex: 1 },
+    { questionId: sessionQuestions[1].id, selectedIndex: 7 },
+    { questionId: 424242, selectedIndex: 0 },
+    null
+  ]
+}, sessionQuestions, sessionStart);
+assert.equal(sloppy.index, TOTAL_GENERAL + TOTAL_STATE - 1);
+assert.deepEqual(sloppy.answers.map((entry) => entry.selectedIndex), [2]);
+
+const memory = new Map();
+const storage = {
+  getItem: (key) => (memory.has(key) ? memory.get(key) : null),
+  setItem: (key, value) => memory.set(key, String(value)),
+  removeItem: (key) => memory.delete(key)
+};
+assert.equal(loadExamSession(sessionQuestions, { storage }), null);
+assert.equal(saveExamSession(snapshot, storage), true);
+assert.ok(memory.has(EXAM_SESSION_KEY));
+assert.equal(loadExamSession(sessionQuestions, { storage, now: sessionStart + 1000 }).answers.length, 2);
+memory.set(EXAM_SESSION_KEY, "{not json");
+assert.equal(loadExamSession(sessionQuestions, { storage }), null);
+saveExamSession(snapshot, storage);
+assert.equal(clearExamSession(storage), true);
+assert.equal(loadExamSession(sessionQuestions, { storage }), null);
 
 console.log("Progress and quiz-rule validation passed.");

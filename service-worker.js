@@ -19,6 +19,7 @@ const ASSETS = [
   "./modules/tabs.js",
   "./modules/dialog.js",
   "./modules/confirm-dialog.js",
+  "./modules/exam-session.js",
   "./modules/quiz-rules.js",
   "./modules/catalogue.js",
   "./assets/favicon.svg",

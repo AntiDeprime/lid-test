@@ -272,4 +272,64 @@ fi
     result: document.querySelector('#result-title')?.textContent
   };
 }"
+"$PWCLI" --session "$SESSION" eval "async () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  localStorage.clear();
+  sessionStorage.clear();
+  document.querySelector('.consent-banner .secondary-action')?.click();
+  document.querySelector('#start-button').click();
+  await delay(0);
+  for (let i = 0; i < 3; i += 1) {
+    document.querySelectorAll('.answer-option')[0].click();
+    document.querySelector('#next-button').click();
+    await delay(0);
+  }
+  sessionStorage.setItem('resume-title', document.querySelector('#question-title').textContent);
+  sessionStorage.setItem('resume-kicker', document.querySelector('#question-kicker').textContent);
+  if (!localStorage.getItem('lidTestPrepExamSession')) throw new Error('Running exam was not saved for resume');
+  return true;
+}"
+"$PWCLI" --session "$SESSION" open "$URL" --browser "$BROWSER"
+"$PWCLI" --session "$SESSION" eval "async () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const card = document.querySelector('#resume-card');
+  if (!card || card.classList.contains('is-hidden')) throw new Error('Resume card did not appear after a reload');
+  if (!document.querySelector('#resume-detail').textContent.includes('3 of 33 answered')) {
+    throw new Error('Resume card does not report progress: ' + document.querySelector('#resume-detail').textContent);
+  }
+  document.querySelector('#resume-button').click();
+  await delay(0);
+  if (document.querySelector('#question-title').textContent !== sessionStorage.getItem('resume-title')
+    || document.querySelector('#question-kicker').textContent !== sessionStorage.getItem('resume-kicker')) {
+    throw new Error('Resumed exam is not on the question it was left on');
+  }
+  document.querySelector('#home-button').click();
+  await delay(0);
+  document.querySelector('.confirm-leave').click();
+  await delay(0);
+  if (localStorage.getItem('lidTestPrepExamSession')) throw new Error('Leaving the exam did not clear the saved session');
+  if (!document.querySelector('#resume-card').classList.contains('is-hidden')) throw new Error('Resume card stayed visible after leaving the exam');
+
+  document.querySelector('#start-button').click();
+  await delay(0);
+  document.querySelectorAll('.answer-option')[0].click();
+  const saved = JSON.parse(localStorage.getItem('lidTestPrepExamSession'));
+  saved.startedAt -= 90 * 60 * 1000;
+  localStorage.setItem('lidTestPrepExamSession', JSON.stringify(saved));
+  return { resumeFlow: true };
+}"
+"$PWCLI" --session "$SESSION" open "$URL" --browser "$BROWSER"
+"$PWCLI" --session "$SESSION" eval "async () => {
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  if (!document.querySelector('#resume-title').textContent.includes('ran out of time')) {
+    throw new Error('Expired exam is not described as out of time');
+  }
+  document.querySelector('#resume-button').click();
+  await delay(0);
+  if (!document.querySelector('#result-status')?.textContent.includes('Time expired')) {
+    throw new Error('Expired exam did not open its timed-out result');
+  }
+  if (localStorage.getItem('lidTestPrepExamSession')) throw new Error('Finishing an expired exam did not clear the saved session');
+  return { expiredResume: true };
+}"
 "$PWCLI" --session "$SESSION" console

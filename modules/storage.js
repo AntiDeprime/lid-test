@@ -63,3 +63,13 @@ export function setStorageItem(key, value, storage = getDefaultStorage()) {
     return false;
   }
 }
+
+export function removeStorageItem(key, storage = getDefaultStorage()) {
+  try {
+    if (!storage) return false;
+    storage.removeItem(key);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}

@@ -5,6 +5,7 @@ import { getLearnerHint } from "./modules/hints.js";
 import { createTabController } from "./modules/tabs.js";
 import { showModalDialog } from "./modules/dialog.js";
 import { confirmDialog } from "./modules/confirm-dialog.js";
+import { clearExamSession, createExamSnapshot, loadExamSession, saveExamSession } from "./modules/exam-session.js";
 import {
   CATALOGUE_RESULT_LIMIT,
   getCatalogueQuestions as getCataloguePool,
@@ -34,7 +35,7 @@ import {
     privacy: {
       title: "Privacy",
       paragraphs: [
-        "This app stores study progress, weak questions, bookmarks, and analytics consent locally in this browser.",
+        "This app stores study progress, weak questions, bookmarks, an unfinished exam simulation, and analytics consent locally in this browser.",
         "Google Analytics loads only after explicit consent. The tag is configured without advertising storage, Google Signals, or ad personalization signals.",
         "No account is required, and this static app does not send your answers or saved progress to an app server."
       ]
@@ -70,6 +71,8 @@ import {
     selectedState: ""
   };
 
+  let resumableExam = null;
+
   const $ = (id) => document.getElementById(id);
   const startScreen = $("start-screen");
   const quizScreen = $("quiz-screen");
@@ -79,6 +82,11 @@ import {
   const bundeslandSelect = $("bundesland-select");
   const weakReviewButton = $("weak-review-button");
   const bookmarkReviewButton = $("bookmark-review-button");
+  const resumeCard = $("resume-card");
+  const resumeTitle = $("resume-title");
+  const resumeDetail = $("resume-detail");
+  const resumeButton = $("resume-button");
+  const resumeDiscardButton = $("resume-discard-button");
   const queueActions = $("queue-actions");
   const consentSlot = $("consent-slot");
   const progressEmpty = $("progress-empty");
@@ -246,7 +254,7 @@ import {
     if (state.mode !== "exam" || state.run.length !== TOTAL_GENERAL + TOTAL_STATE) return;
 
     progress.testHistory.push({
-      completedAt: new Date().toISOString(),
+      completedAt: new Date(state.completedAt || Date.now()).toISOString(),
       correct: state.score,
       total: state.run.length,
       passed: state.score >= PASS_THRESHOLD,
@@ -387,6 +395,85 @@ import {
     startScreen.classList.toggle("is-hidden", screen !== "start");
     quizScreen.classList.toggle("is-hidden", screen !== "quiz");
     resultScreen.classList.toggle("is-hidden", screen !== "result");
+    if (screen === "start") refreshResumableExam();
+  }
+
+  function persistExamSession() {
+    if (state.mode !== "exam" || !state.startedAt) return;
+
+    saveExamSession(createExamSnapshot({
+      run: state.run,
+      answers: state.answers,
+      index: state.index,
+      selectedState: state.selectedState,
+      startedAt: state.startedAt
+    }));
+  }
+
+  function refreshResumableExam() {
+    resumableExam = loadExamSession(questions);
+    renderResumeCard();
+  }
+
+  function renderResumeCard() {
+    resumeCard.classList.toggle("is-hidden", !resumableExam);
+    if (!resumableExam) return;
+
+    const answered = resumableExam.answers.length;
+    const total = resumableExam.run.length;
+    if (resumableExam.expired) {
+      resumeTitle.textContent = "Your exam ran out of time";
+      resumeDetail.textContent = `${answered} of ${total} answered. See the result, or discard it.`;
+      resumeButton.textContent = "See result";
+    } else {
+      resumeTitle.textContent = "Resume your exam";
+      resumeDetail.textContent = `${answered} of ${total} answered · ${formatDuration(resumableExam.timeRemaining)} left`;
+      resumeButton.textContent = "Resume exam";
+    }
+  }
+
+  function resumeExam() {
+    const saved = loadExamSession(questions);
+    if (!saved) {
+      refreshResumableExam();
+      return;
+    }
+
+    state.mode = "exam";
+    state.selectedState = saved.selectedState;
+    if (saved.selectedState) bundeslandSelect.value = saved.selectedState;
+    state.run = saved.run;
+    setTranslationsEnabled(false);
+    resetRunState();
+    state.answers = saved.answers;
+    state.score = saved.score;
+    state.index = saved.index;
+    resumableExam = null;
+
+    if (saved.expired) {
+      state.startedAt = saved.startedAt;
+      finishTest(true, saved.startedAt + EXAM_DURATION_SECONDS * 1000);
+      return;
+    }
+
+    startTimer(saved.startedAt);
+    renderQuestion();
+    show("quiz");
+  }
+
+  async function discardResumableExam() {
+    const confirmed = await confirmDialog({
+      title: "Discard your exam?",
+      message: "Your answers so far will be lost and no result will be saved.",
+      confirmLabel: "Discard exam",
+      cancelLabel: "Keep exam",
+      trigger: resumeDiscardButton
+    });
+    if (!confirmed) return;
+
+    clearExamSession();
+    resumableExam = null;
+    renderResumeCard();
   }
 
   function getStudyQuestions(filter) {
@@ -475,16 +562,28 @@ import {
   async function goHome() {
     if (!(await confirmDiscardActiveRun())) return;
 
+    if (state.mode === "exam" && !quizScreen.classList.contains("is-hidden")) clearExamSession();
     stopTimer();
     show("start");
   }
 
   async function startRun() {
     if (!(await confirmDiscardActiveRun())) return;
+    if (resumableExam) {
+      const replace = await confirmDialog({
+        title: "Start a new exam?",
+        message: "Your unfinished exam will be discarded.",
+        confirmLabel: "Start new exam",
+        cancelLabel: "Keep unfinished exam",
+        trigger: startButton
+      });
+      if (!replace) return;
+    }
 
     const selectedState = bundeslandSelect.value;
     const examRun = createExamRun(questions, selectedState, { sampleByCategory, shuffle });
     if (!examRun.length) return;
+    resumableExam = null;
 
     state.mode = "exam";
     state.selectedState = selectedState;
@@ -599,10 +698,10 @@ import {
     state.endedByTimeout = false;
   }
 
-  function startTimer() {
-    state.startedAt = Date.now();
+  function startTimer(startedAt = Date.now()) {
+    state.startedAt = startedAt;
     state.completedAt = null;
-    state.timeRemaining = EXAM_DURATION_SECONDS;
+    state.timeRemaining = Math.max(EXAM_DURATION_SECONDS - Math.floor((Date.now() - startedAt) / 1000), 0);
     state.endedByTimeout = false;
     renderTimer();
     state.timerId = window.setInterval(tickTimer, 1000);
@@ -731,6 +830,7 @@ import {
     renderFeedback(question);
     renderLearnerHint(question);
     renderTranslations();
+    persistExamSession();
   }
 
   function renderFeedback(question) {
@@ -772,6 +872,7 @@ import {
       questionHint.textContent = state.selected === null
         ? "Choose one answer. Correctness is shown after you finish."
         : "Answer saved. Continue when ready.";
+      nextButton.classList.toggle("is-hidden", state.selected === null);
       return;
     }
 
@@ -939,6 +1040,8 @@ import {
     state.answers.push(answerEntry);
     if (state.mode !== "exam") {
       recordAnswer(answerEntry);
+    } else {
+      persistExamSession();
     }
 
     [...answers.children].forEach((button, index) => {
@@ -988,14 +1091,15 @@ import {
     renderQuestion();
   }
 
-  function finishTest(endedByTimeout) {
+  function finishTest(endedByTimeout, completedAt = Date.now()) {
     stopTimer();
-    state.completedAt = Date.now();
+    state.completedAt = completedAt;
     state.endedByTimeout = endedByTimeout;
 
     if (state.mode === "exam") {
       completeUnansweredQuestions();
       recordCompletedTest();
+      clearExamSession();
     }
 
     renderResult();
@@ -1381,6 +1485,11 @@ import {
   newTestButton.addEventListener("click", startRun);
   resultHomeButton.addEventListener("click", goHome);
   resetProgressButton.addEventListener("click", resetProgress);
+  resumeButton.addEventListener("click", resumeExam);
+  resumeDiscardButton.addEventListener("click", discardResumableExam);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && !startScreen.classList.contains("is-hidden")) refreshResumableExam();
+  });
   previousButton.addEventListener("click", previousQuestion);
   nextButton.addEventListener("click", nextQuestion);
   translationToggle.addEventListener("click", toggleTranslations);
@@ -1397,6 +1506,7 @@ import {
   setupAnalyticsConsent();
   registerServiceWorker();
   renderProgressSummary();
+  refreshResumableExam();
 
   if (!questions.length) {
     startButton.disabled = true;

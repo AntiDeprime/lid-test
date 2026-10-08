@@ -2,7 +2,7 @@
 
 Static, mobile-first practice app for the German **Leben in Deutschland** / **Einbürgerungstest** question catalogue.
 
-The exam simulation samples 33 questions per run: 30 general questions and 3 questions from the Bundesland selected for the user's place of residence. It uses a 60-minute timer, withholds correctness and explanations until the result screen, and applies the Einbürgerung threshold of 17 correct answers out of 33.
+The exam simulation samples 33 questions per run: 30 general questions and 3 questions from the Bundesland selected for the user's place of residence. It uses a 60-minute timer, withholds correctness and explanations until the result screen, and applies the Einbürgerung threshold of 17 correct answers out of 33. A running exam is saved in the browser, so after a reload or a suspended mobile tab the start page offers to resume it (the 60-minute clock keeps counting real time) or discard it.
 
 Study mode lets users browse all questions, only general questions, all Bundesland questions, one selected Bundesland question set, or bookmarked questions. It starts with questions that have no saved attempts, then continues with already studied questions. Answers stay hidden until the user selects an option, and selected answers are saved immediately. Study and review modes include instant correctness, explanations, learner hints, English translations where available, weak-question tracking, and bookmarks.
 
@@ -134,7 +134,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `index.html` contains the one-page UI structure and metadata.
 - `styles.css` contains the app styling.
 - `app.js` contains the vanilla JavaScript app wiring and screen state.
-- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, confirmation dialogs, and quiz rules.
+- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, confirmation dialogs, exam resume snapshots, and quiz rules.
 - `questions.js` contains the question catalogue loaded by the page.
 - `explanation-texts-*.js` contains one reviewed, question-specific learner explanation for each catalogue item.
 - `explanations.js` attaches the reviewed explanation map to the question catalogue.
