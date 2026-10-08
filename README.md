@@ -36,6 +36,12 @@ Validate pure progress and quiz-rule behavior:
 node scripts/validate-progress.mjs
 ```
 
+Validate the installable app and its offline cache (manifest icons, precached files, and the cache revision):
+
+```sh
+node scripts/validate-pwa.js
+```
+
 These validation commands also run in GitHub Actions on pushes and pull requests. The CI workflow additionally starts a local static server and checks that `index.html` is served successfully.
 
 Preferred browser smoke check:
@@ -115,7 +121,9 @@ The app stores progress locally in the user's browser. The Progress tab can expo
 
 The app includes `manifest.webmanifest` and `service-worker.js` so it can be installed and can cache the shell, data files, modules, and visited assets for offline use after the first load.
 
-App icons live in `assets/`: SVG sources (`favicon.svg`, `icon-maskable.svg`) and the PNGs derived from them (`favicon-32.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`). After changing an SVG source, regenerate the PNGs with `node scripts/render-icons.mjs` (needs Playwright and a Chromium build; set `CHROMIUM_PATH` to reuse an installed browser), then bump `APP_REVISION` in `service-worker.js` so installed copies pick up the new files.
+App icons live in `assets/`: SVG sources (`favicon.svg`, `icon-maskable.svg`) and the PNGs derived from them (`favicon-32.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`). After changing an SVG source, regenerate the PNGs with `node scripts/render-icons.mjs` (needs Playwright and a Chromium build; set `CHROMIUM_PATH` to reuse an installed browser), then run `node scripts/update-asset-hash.js`.
+
+The service worker names its cache after `ASSET_HASH`, a short hash of every file in its `ASSETS` list. After changing any precached file (or the list itself), run `node scripts/update-asset-hash.js` so installed copies pick up the update; `node scripts/validate-pwa.js` fails in CI when the hash is stale, when a precached or manifest file is missing, or when a file the page or the app's imports load is not precached. Network-first requests revalidate with the server (`cache: "no-cache"`), so a stale HTTP cache entry cannot pair an old file with a new release.
 
 ## GitHub Pages
 
@@ -145,6 +153,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `lid-v2-images/` contains image assets referenced by some questions.
 - `assets/` contains the logo, favicon, and PWA icons.
 - `scripts/render-icons.mjs` renders the PNG icons from the SVG sources in `assets/`.
+- `scripts/validate-pwa.js` checks the manifest, the precache list, and the cache revision; `scripts/update-asset-hash.js` regenerates `ASSET_HASH` in `service-worker.js`, with shared helpers in `scripts/pwa-assets.js`.
 - `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and the exact official image-question set and file references.
 
 ## Catalogue Notes

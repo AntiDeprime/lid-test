@@ -2,6 +2,12 @@
 
 ## High Priority
 
+- [x] Validate PWA assets and derive the cache revision from the files.
+  - Add `scripts/validate-pwa.js`: every manifest icon and every `ASSETS` entry exists, everything `index.html` loads and every module `app.js` imports is precached under the exact URL it is requested with, and the manifest keeps its install-critical fields.
+  - Replace the hand-bumped `APP_REVISION` with `ASSET_HASH`, a hash of all precached files written by `node scripts/update-asset-hash.js` and checked in CI, so installed copies update whenever an asset changes.
+  - Revalidate network-first requests in the service worker so a stale HTTP cache entry cannot pair an old module with a new release.
+  - Document the release step in the README and run the check in GitHub Actions.
+
 - [x] Protect saved progress with migrations and a file backup.
   - Replace the "version mismatch resets everything" load path with a migration chain (`migrateProgress`), so a future storage version bump upgrades saved progress instead of discarding it.
   - Keep progress the app cannot read under `lidTestPrepProgress.unreadable` instead of overwriting it, and sanitize loaded progress to the fields the app reads.
@@ -207,10 +213,9 @@
   - Offer the unfinished exam as a "Resume your exam" card on the start page with Resume and Discard actions; an exam whose 60 minutes passed while away offers "See result" instead, dated to when the time ran out.
   - Ask before a new exam replaces an unfinished one, clear the saved exam when it finishes or the learner leaves it, and cover the pure snapshot logic in `scripts/validate-progress.mjs` and the resume flows in the browser flow check.
 
-- [ ] Strengthen PWA and offline validation.
-  - Add an offline browser check.
-  - Make service-worker cache revision updates part of the release checklist or generate them.
-  - Verify cache updates after asset changes.
+- [ ] Add an offline browser check.
+  - Load the app once, go offline, reload, and start a study run (verified by hand while building the cache hash; not automated yet).
+  - Run it in CI together with the portable browser flow checks.
 
 - [ ] Make browser flow tests easier to maintain.
   - Move large inline Playwright assertions out of the shell script.

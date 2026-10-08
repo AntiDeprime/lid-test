@@ -22,6 +22,9 @@ jobs:
       - name: Validate pure app logic
         run: node scripts/validate-progress.mjs
 
+      - name: Validate PWA assets and cache revision
+        run: node scripts/validate-pwa.js
+
       - name: Smoke test static server
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/lid-test-http.log 2>&1 &

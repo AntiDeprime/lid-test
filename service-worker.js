@@ -1,5 +1,7 @@
-const APP_REVISION = "2026-10-new-app-icon";
-const CACHE_NAME = `lid-test-prep-${APP_REVISION}`;
+// ASSET_HASH covers every file in ASSETS. Regenerate it with
+// `node scripts/update-asset-hash.js` after changing any of them.
+const ASSET_HASH = "5fc78b35244e";
+const CACHE_NAME = `lid-test-prep-${ASSET_HASH}`;
 const ASSETS = [
   "./",
   "./index.html",
@@ -67,7 +69,9 @@ function isFreshAsset(url) {
 }
 
 function networkFirst(request) {
-  return fetch(request)
+  // no-cache revalidates with the server, so a stale HTTP cache entry cannot
+  // pair an old file with the rest of a new release.
+  return fetch(request, { cache: "no-cache" })
     .then((response) => cacheResponse(request, response))
     .catch(() => caches.match(request).then((cached) => {
       return cached || caches.match("./index.html");
