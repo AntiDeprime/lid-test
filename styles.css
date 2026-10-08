@@ -2186,6 +2186,112 @@ figcaption {
   }
 }
 
+/* Quiz layout: feedback sits with the answers and navigation stays in reach. */
+.question-feedback {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.feedback-verdict {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-raised);
+  font-weight: 760;
+  line-height: 1.4;
+}
+
+.feedback-verdict.is-correct {
+  border-color: var(--correct-border);
+  background: var(--correct-bg);
+  color: #baf2ca;
+}
+
+.feedback-verdict.is-wrong {
+  border-color: var(--wrong-border);
+  background: var(--wrong-bg);
+  color: #ffd1cc;
+}
+
+.feedback-verdict-mark {
+  display: grid;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.feedback-why {
+  display: grid;
+  gap: 6px;
+}
+
+.feedback-label {
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 760;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.question-feedback .question-explanation {
+  margin-top: 0;
+}
+
+.quiz-hint {
+  margin-top: 14px;
+  font-size: 0.9rem;
+}
+
+.quiz-nav .navigation-actions {
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 639px) {
+  .quiz-nav {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin: 18px calc(-1 * clamp(18px, 5vw, 28px)) calc(-1 * clamp(18px, 5vw, 28px));
+    padding: 14px clamp(18px, 5vw, 28px) max(14px, env(safe-area-inset-bottom));
+    border-top-color: var(--line);
+    border-radius: 0 0 18px 18px;
+    background: linear-gradient(to top, var(--panel) 72%, rgb(20 26 25 / 0.92));
+    backdrop-filter: blur(8px);
+  }
+}
+
+@media (min-width: 640px) {
+  .quiz-nav {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 559px) {
+  .quiz-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .toolbar-action {
+    flex-direction: column;
+    gap: 4px;
+    min-height: 52px;
+    padding: 6px 4px;
+    font-size: 0.74rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

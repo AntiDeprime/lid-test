@@ -34,7 +34,7 @@ Controls with the same role use the same height, corner treatment, icon scale, t
 
 ## 5. Design for touch first
 
-Quiz actions target a minimum height of 44 CSS pixels and retain spacing from neighboring actions. The mobile layout is checked at 390px wide for overflow and accidental target crowding. This exceeds the WCAG 2.2 AA minimum target size and follows the stronger touch-target guidance commonly used by mobile platforms.
+Quiz actions target a minimum height of 44 CSS pixels and retain spacing from neighboring actions. The mobile layout is checked at 390px wide for overflow and accidental target crowding. This exceeds the WCAG 2.2 AA minimum target size and follows the stronger touch-target guidance commonly used by mobile platforms. On mobile the Previous and Next actions stay in a bar fixed to the bottom of the quiz panel so the next step is always in reach, and the toolbar stacks each icon over its label.
 
 ## 6. Make state visible in more than one way
 

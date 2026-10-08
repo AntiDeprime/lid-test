@@ -343,9 +343,15 @@
         <div id="quiz-progress" class="progress" role="progressbar" aria-label="Question progress" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1"><span id="progress-bar"></span></div>
         <div id="image-grid" class="image-grid is-hidden"></div>
         <div id="answers" class="answers" lang="de"></div>
-        <p id="question-explanation" class="review-explanation question-explanation is-hidden"></p>
-        <footer class="quiz-bottom">
-          <p id="question-hint" class="hint">Choose one answer.</p>
+        <section id="question-feedback" class="question-feedback is-hidden" aria-label="Answer feedback">
+          <p id="feedback-verdict" class="feedback-verdict" aria-live="polite"></p>
+          <div id="feedback-why" class="feedback-why">
+            <span class="feedback-label">Why</span>
+            <p id="question-explanation" class="review-explanation question-explanation is-hidden"></p>
+          </div>
+        </section>
+        <p id="question-hint" class="hint quiz-hint">Choose one answer.</p>
+        <footer class="quiz-bottom quiz-nav">
           <div class="navigation-actions">
             <button id="previous-button" class="secondary-action is-hidden" type="button">Previous</button>
             <button id="next-button" class="primary-action is-hidden" type="button">Next</button>

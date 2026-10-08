@@ -111,6 +111,9 @@ import {
   const imageGrid = $("image-grid");
   const answers = $("answers");
   const questionExplanation = $("question-explanation");
+  const questionFeedback = $("question-feedback");
+  const feedbackVerdict = $("feedback-verdict");
+  const feedbackWhy = $("feedback-why");
   const questionHint = $("question-hint");
   const resultTitle = $("result-title");
   const resultScore = $("result-score");
@@ -695,8 +698,6 @@ import {
     questionHint.textContent = "Choose one answer.";
     questionTranslation.replaceChildren();
     questionTranslation.classList.add("is-hidden");
-    questionExplanation.textContent = "";
-    questionExplanation.classList.add("is-hidden");
     previousButton.classList.add("is-hidden");
     nextButton.classList.add("is-hidden");
     nextButton.textContent = progress === total ? "Finish" : "Next";
@@ -708,8 +709,34 @@ import {
     renderBookmarkToggle(question);
     renderImages(question);
     renderAnswers(question);
+    renderFeedback(question);
     renderLearnerHint(question);
     renderTranslations();
+  }
+
+  function renderFeedback(question) {
+    const entry = getCurrentAnswerEntry(question);
+    const showFeedback = Boolean(entry) && state.mode !== "exam";
+    const showExplanation = showFeedback && Boolean(question.explanation);
+
+    questionFeedback.classList.toggle("is-hidden", !showFeedback);
+    feedbackWhy.classList.toggle("is-hidden", !showExplanation);
+    questionExplanation.classList.toggle("is-hidden", !showExplanation);
+    questionExplanation.textContent = showExplanation ? question.explanation : "";
+    feedbackVerdict.replaceChildren();
+    feedbackVerdict.classList.remove("is-correct", "is-wrong");
+    if (!showFeedback) return;
+
+    const mark = document.createElement("span");
+    const text = document.createElement("span");
+    mark.className = "feedback-verdict-mark";
+    mark.setAttribute("aria-hidden", "true");
+    mark.textContent = entry.isCorrect ? "✓" : "×";
+    text.textContent = entry.isCorrect
+      ? "Correct."
+      : `Not quite. The correct answer is ${LETTERS[entry.correctIndex]}.`;
+    feedbackVerdict.classList.add(entry.isCorrect ? "is-correct" : "is-wrong");
+    feedbackVerdict.append(mark, text);
   }
 
   function renderLearnerHint(question) {
@@ -742,11 +769,6 @@ import {
     previousButton.disabled = state.index === 0;
     nextButton.classList.remove("is-hidden");
     nextButton.textContent = progress === total ? "Back to start" : "Next";
-
-    if (state.selected !== null && question.explanation) {
-      questionExplanation.textContent = question.explanation;
-      questionExplanation.classList.remove("is-hidden");
-    }
   }
 
   function renderAnswers(question) {
@@ -909,13 +931,10 @@ import {
       scoreCounter.textContent = `${state.score} correct`;
     }
     progressBar.style.width = `${((state.index + 1) / state.run.length) * 100}%`;
-    questionHint.textContent = state.mode === "exam"
-      ? "Answer saved. Continue when ready."
-      : answerEntry.isCorrect ? "Correct answer." : "Wrong answer.";
-    if (state.mode !== "exam" && question.explanation) {
-      questionExplanation.textContent = question.explanation;
-      questionExplanation.classList.remove("is-hidden");
-    }
+    questionHint.textContent = state.mode === "study"
+      ? "Answer saved for this study session. Use Previous and Next to browse."
+      : "Answer saved. Continue when ready.";
+    renderFeedback(question);
     nextButton.classList.remove("is-hidden");
     nextButton.focus();
   }

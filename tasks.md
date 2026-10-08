@@ -2,6 +2,12 @@
 
 ## High Priority
 
+- [x] Tighten the quiz layout.
+  - Show the correct/not-quite verdict and the "Why" explanation directly under the answers, with a check or cross mark as well as colour.
+  - Keep Previous and Next in a bar that sticks to the bottom of the screen on mobile so the next action never scrolls away.
+  - Stack the toolbar buttons icon-over-label in two groups on mobile so the toolbar takes two short rows instead of four stretched ones, keeping labels and 44px targets.
+  - Keep the exam simulation free of feedback and verify study, review, and exam flows at 390px and desktop widths.
+
 - [x] Streamline the first-run start screen.
   - Show the analytics consent choice in the page flow below the launch cards instead of a fixed banner that covers them.
   - Keep the mobile headline to two lines and move the proof points below the launch cards so both launch cards sit inside the first 844px screen at 390px.

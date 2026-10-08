@@ -80,7 +80,7 @@ The first screen uses a brand lockup, an optimistic two-line promise, three trus
 
 ### Quiz
 
-The question is always visually dominant. Read-only status is compact; question tools and session navigation are separate grouped controls. Answer cards use calm surfaces and explicit selected/correct/wrong labels.
+The question is always visually dominant. Read-only status is compact; question tools and session navigation are separate grouped controls. Answer cards use calm surfaces and explicit selected/correct/wrong labels. Study feedback sits directly under the answers as a verdict line with a check or cross mark followed by the "Why" explanation.
 
 ### Progress and catalogue
 
