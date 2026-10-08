@@ -8,6 +8,7 @@
   - Add an offline check that stops the server and reloads from the service worker cache, a 390px layout check (launch cards in the first screen, compact toolbar, feedback under the answers, reachable Next, no overflow) with screenshots, and an axe-core scan of thirteen app states.
   - Fix what the scan found: answer buttons and the result "Start page" button now contain their visible text in their accessible name.
   - Run it as a second GitHub Actions job and keep the screenshots when it fails.
+  - Harden the layout against wide fonts and long German words, which the first CI run exposed (it renders DejaVu Sans, not Inter): grid tracks and answer text now shrink with `minmax(0, 1fr)` and wrap long words, the hero heading scales down on small phones, and a `fit` section checks all 460 questions at 360px and 390px. `TEST_FONT` reproduces the CI font locally.
 
 - [x] Validate PWA assets and derive the cache revision from the files.
   - Add `scripts/validate-pwa.js`: every manifest icon and every `ASSETS` entry exists, everything `index.html` loads and every module `app.js` imports is precached under the exact URL it is requested with, and the manifest keeps its install-critical fields.

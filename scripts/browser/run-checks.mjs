@@ -1,15 +1,17 @@
 #!/usr/bin/env node
 // Portable browser checks for the static app: smoke, deeper flows, offline
-// reload, 390px layout, and an accessibility scan. Runs on Linux, macOS, and
-// CI without the Codex Playwright wrapper.
+// reload, 390px layout, a fit scan over every question, and an accessibility
+// scan. Runs on Linux, macOS, and CI without the Codex Playwright wrapper.
 //
 //   cd scripts/browser && npm ci && npx playwright install chromium && node run-checks.mjs
 //
 // Useful environment variables:
 //   CHROMIUM_PATH   reuse an installed Chromium instead of Playwright's download
 //   PORT            serve on a fixed port (default: a free port)
-//   ONLY            comma-separated sections to run (smoke,flow,offline,layout,a11y)
+//   ONLY            comma-separated sections to run (smoke,flow,offline,layout,fit,a11y)
 //   KEEP_ARTIFACTS  set to 1 to keep screenshots of passing runs too
+//   TEST_FONT       force a font family, e.g. "DejaVu Sans" to reproduce the
+//                   wider fallback font GitHub Actions renders without Inter
 
 import fs from "node:fs";
 import http from "node:http";
@@ -76,6 +78,17 @@ async function openPage(browser, { viewport, serviceWorkers = "block" }) {
   const context = await browser.newContext({ viewport, serviceWorkers });
   const page = await context.newPage();
   const problems = [];
+
+  if (process.env.TEST_FONT) {
+    const css = `html, body, button, input, select, textarea { font-family: ${JSON.stringify(process.env.TEST_FONT)} !important; }`;
+    await context.addInitScript((styles) => {
+      document.addEventListener("DOMContentLoaded", () => {
+        const style = document.createElement("style");
+        style.textContent = styles;
+        document.head.append(style);
+      });
+    }, css);
+  }
 
   page.on("pageerror", (error) => problems.push(`page error: ${error.message}`));
   page.on("console", (message) => {
@@ -246,6 +259,48 @@ const sections = {
     } finally {
       await context.close();
     }
+  },
+
+  // Every question, with translations on and an answer picked, must fit the
+  // viewport width: long German compounds are what push a layout sideways.
+  async fit({ browser, url }) {
+    const failures = [];
+    for (const width of [360, MOBILE.width]) {
+      const { context, page, problems } = await openPage(browser, { viewport: { width, height: MOBILE.height } });
+      try {
+        await page.goto(url);
+        await page.click(".consent-banner .secondary-action");
+        const overflowing = await runInPage(page, `async () => {
+          const out = [];
+          const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+          for (const question of window.LID_QUESTIONS) {
+            document.querySelector('[data-start-tab="catalogue"]').click();
+            document.querySelector("#jump-question").value = String(question.id);
+            document.querySelector("#jump-form").requestSubmit();
+            await tick();
+            const toggle = document.querySelector("#translation-toggle");
+            if (toggle.getAttribute("aria-pressed") !== "true") toggle.click();
+            const before = document.documentElement.scrollWidth;
+            document.querySelectorAll(".answer-option")[0].click();
+            await tick();
+            const after = document.documentElement.scrollWidth;
+            if (before > innerWidth || after > innerWidth) out.push(question.id);
+            document.querySelector("#home-button").click();
+            await tick();
+            document.querySelector(".confirm-leave")?.click();
+            await tick();
+          }
+          return out;
+        }`);
+        if (overflowing.length) {
+          failures.push(`${overflowing.length} question(s) overflow horizontally at ${width}px, first: ${overflowing.slice(0, 10).join(", ")}`);
+        }
+        expectNoProblems(problems, `Fit check at ${width}px`);
+      } finally {
+        await context.close();
+      }
+    }
+    if (failures.length) throw new Error(failures.join("\n  "));
   },
 
   async a11y({ browser, url }) {
