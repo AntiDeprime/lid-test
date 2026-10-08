@@ -2,6 +2,13 @@
 
 ## High Priority
 
+- [x] Run portable browser checks in CI.
+  - Add `scripts/browser/run-checks.mjs`, a Node and Playwright runner with its own `package.json` and lockfile: it serves the repo itself, so it needs no Python server or Codex wrapper.
+  - Share the in-page assertions with the two Codex shell scripts through `scripts/browser/checks/`.
+  - Add an offline check that stops the server and reloads from the service worker cache, a 390px layout check (launch cards in the first screen, compact toolbar, feedback under the answers, reachable Next, no overflow) with screenshots, and an axe-core scan of thirteen app states.
+  - Fix what the scan found: answer buttons and the result "Start page" button now contain their visible text in their accessible name.
+  - Run it as a second GitHub Actions job and keep the screenshots when it fails.
+
 - [x] Validate PWA assets and derive the cache revision from the files.
   - Add `scripts/validate-pwa.js`: every manifest icon and every `ASSETS` entry exists, everything `index.html` loads and every module `app.js` imports is precached under the exact URL it is requested with, and the manifest keeps its install-critical fields.
   - Replace the hand-bumped `APP_REVISION` with `ASSET_HASH`, a hash of all precached files written by `node scripts/update-asset-hash.js` and checked in CI, so installed copies update whenever an asset changes.
@@ -213,11 +220,7 @@
   - Offer the unfinished exam as a "Resume your exam" card on the start page with Resume and Discard actions; an exam whose 60 minutes passed while away offers "See result" instead, dated to when the time ran out.
   - Ask before a new exam replaces an unfinished one, clear the saved exam when it finishes or the learner leaves it, and cover the pure snapshot logic in `scripts/validate-progress.mjs` and the resume flows in the browser flow check.
 
-- [ ] Add an offline browser check.
-  - Load the app once, go offline, reload, and start a study run (verified by hand while building the cache hash; not automated yet).
-  - Run it in CI together with the portable browser flow checks.
-
-- [ ] Make browser flow tests easier to maintain.
+- [x] Make browser flow tests easier to maintain.
   - Move large inline Playwright assertions out of the shell script.
   - Keep fast smoke checks separate from deeper flow checks.
   - Make the deeper browser check practical to run in CI.
@@ -235,8 +238,7 @@
 
 - [ ] Add accessibility and visual regression checks.
   - Check keyboard flow through quiz, result, catalogue, and modal interactions.
-  - Add mobile viewport layout checks.
-  - Add contrast and screen-reader-oriented assertions where practical.
+  - Compare screenshots against reviewed baselines (the layout check saves them but does not compare yet).
 
 - [ ] Reduce first-load payload as content grows.
   - Consider lazy-loading translations and explanations.

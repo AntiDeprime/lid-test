@@ -18,7 +18,7 @@ python3 -m http.server 8000
 
 Then open `http://127.0.0.1:8000/`.
 
-The app is static and has no package manager or build step. A local server keeps local checks consistent with GitHub Pages and the repository agent workflow.
+The app itself is static and has no package manager or build step; only the browser checks under `scripts/browser/` have their own `package.json`. A local server keeps local checks consistent with GitHub Pages and the repository agent workflow.
 
 The app's interaction conventions are documented in [`docs/ui-principles.md`](docs/ui-principles.md). The companion [`docs/visual-identity.md`](docs/visual-identity.md) defines the brand idea, logo use, palette, typography, shape, depth, graphic language, components, motion, accessibility guardrails, and interface voice.
 
@@ -44,7 +44,18 @@ node scripts/validate-pwa.js
 
 These validation commands also run in GitHub Actions on pushes and pull requests. The CI workflow additionally starts a local static server and checks that `index.html` is served successfully.
 
-Preferred browser smoke check:
+Portable browser checks, which also run in GitHub Actions:
+
+```sh
+cd scripts/browser
+npm ci
+npx playwright install chromium
+node run-checks.mjs
+```
+
+The runner serves the repository with a built-in static server, drives Chromium through Playwright, and runs five sections: `smoke` (start page and quiz toolbar at 390px), `flow` (exam simulations, catalogue, dialogs, exam resume, and backup import), `offline` (loads the app, stops the server, and reloads from the service worker cache), `layout` (390px first-screen, toolbar, and feedback layout with screenshots in `scripts/browser/artifacts/`), and `a11y` (an axe-core scan of the start page, tabs, dialogs, study and exam questions, resume card, and result screen). Set `ONLY=a11y,layout` to run some sections, `CHROMIUM_PATH` to reuse an installed Chromium, and `KEEP_ARTIFACTS=1` to keep screenshots from passing runs. The in-page assertions live in `scripts/browser/checks/` and are shared with the two Codex scripts below.
+
+Codex browser smoke check:
 
 ```sh
 scripts/browser-smoke-check.sh
@@ -153,6 +164,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `lid-v2-images/` contains image assets referenced by some questions.
 - `assets/` contains the logo, favicon, and PWA icons.
 - `scripts/render-icons.mjs` renders the PNG icons from the SVG sources in `assets/`.
+- `scripts/browser/` holds the portable Playwright runner (`run-checks.mjs`), its `package.json`, and the in-page assertions in `checks/` that the Codex shell scripts reuse.
 - `scripts/validate-pwa.js` checks the manifest, the precache list, and the cache revision; `scripts/update-asset-hash.js` regenerates `ASSET_HASH` in `service-worker.js`, with shared helpers in `scripts/pwa-assets.js`.
 - `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and the exact official image-question set and file references.
 

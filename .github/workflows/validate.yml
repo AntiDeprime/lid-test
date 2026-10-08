@@ -37,3 +37,36 @@ jobs:
             sleep 0.2
           done
           curl --fail --silent --show-error http://127.0.0.1:8000/ | grep -q "Leben in Deutschland Test"
+
+  browser-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: scripts/browser/package-lock.json
+
+      - name: Install browser check dependencies
+        working-directory: scripts/browser
+        run: npm ci
+
+      - name: Install Chromium
+        working-directory: scripts/browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser checks
+        working-directory: scripts/browser
+        run: node run-checks.mjs
+
+      - name: Keep screenshots from a failed run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-check-screenshots
+          path: scripts/browser/artifacts
+          if-no-files-found: ignore
