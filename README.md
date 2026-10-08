@@ -115,6 +115,8 @@ The app stores progress locally in the user's browser. The current analytics con
 
 The app includes `manifest.webmanifest` and `service-worker.js` so it can be installed and can cache the shell, data files, modules, and visited assets for offline use after the first load.
 
+App icons live in `assets/`: SVG sources (`favicon.svg`, `icon-maskable.svg`) and the PNGs derived from them (`favicon-32.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`). After changing an SVG source, regenerate the PNGs with `node scripts/render-icons.mjs` (needs Playwright and a Chromium build; set `CHROMIUM_PATH` to reuse an installed browser), then bump `APP_REVISION` in `service-worker.js` so installed copies pick up the new files.
+
 ## GitHub Pages
 
 Deploy from the repository root:
@@ -141,6 +143,8 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `docs/visual-identity.md` defines the reusable LiD Test Prep brand and visual system applied across every screen.
 - `translations-en.js` contains local English translations for the bundled questions.
 - `lid-v2-images/` contains image assets referenced by some questions.
+- `assets/` contains the logo, favicon, and PWA icons.
+- `scripts/render-icons.mjs` renders the PNG icons from the SVG sources in `assets/`.
 - `scripts/validate-data.js` validates catalogue structure, translation coverage, learner explanations, and the exact official image-question set and file references.
 
 ## Catalogue Notes

@@ -2,6 +2,13 @@
 
 ## High Priority
 
+- [x] Replace the app icon with a refined LiD mark.
+  - Redraw the monogram so it reads as LiD at every size: L and i share one connected stroke, D stands apart, and the dot of the i is the paper-white accent on the mint tile.
+  - Add PNG favicon, Apple touch, 192px, 512px, and maskable icons next to the SVG sources, and list them in the web app manifest and the `<head>`.
+  - Precache the new icon files and bump the service-worker revision so installed copies update.
+  - Update `docs/visual-identity.md` and the README with the new mark and the `scripts/render-icons.mjs` regeneration step.
+  - Verify the start-screen lockup, favicon, and manifest icons through a local static server.
+
 - [x] Complete the official question-image catalogue.
   - Audit all 460 questions against the BAMF catalogue dated 7 May 2025.
   - Restore the six missing general-question visuals for questions 70, 176, 181, 187, 216, and 235.
@@ -220,6 +227,7 @@
 - [x] Add a site logo and favicon.
   - Created a lowercase connected pen-stroke LiD mark on the app's primary cyan button background.
   - Added the SVG favicon and wired it into the app metadata.
+  - The mark was later redrawn; see "Replace the app icon with a refined LiD mark."
 
 - [x] Add answer explanations.
   - Add short explanations for important or confusing questions.

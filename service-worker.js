@@ -1,4 +1,4 @@
-const APP_REVISION = "2026-08-complete-question-images";
+const APP_REVISION = "2026-10-new-app-icon";
 const CACHE_NAME = `lid-test-prep-${APP_REVISION}`;
 const ASSETS = [
   "./",
@@ -21,6 +21,11 @@ const ASSETS = [
   "./modules/quiz-rules.js",
   "./modules/catalogue.js",
   "./assets/favicon.svg",
+  "./assets/favicon-32.png",
+  "./assets/apple-touch-icon.png",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./assets/icon-maskable-512.png",
   "./assets/lid-logo.svg",
   "./manifest.webmanifest"
 ];
