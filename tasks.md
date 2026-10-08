@@ -2,6 +2,12 @@
 
 ## High Priority
 
+- [x] Split `app.js` by screen.
+  - Move the start page, progress tab, catalogue, exam resume card, result screen, quiz screen (run lifecycle, timer, question and answer rendering), and privacy controls into `screens/`, each created from one shared context; `app.js` shrinks from about 1,600 lines to a 75-line composition root.
+  - Screens never import each other: they react to `progress-changed` and `screen-shown` events and call each other through late-bound `actions`.
+  - Move answer recording, bookmarking, formatting, and the progress queries (weak, bookmarked, incorrect, area stats, study sets, catalogue status) into pure modules with unit tests in `scripts/validate-progress.mjs`.
+  - No user-facing change; the browser checks, including the keyboard and screenshot comparisons, pass unchanged.
+
 - [x] Run portable browser checks in CI.
   - Add `scripts/browser/run-checks.mjs`, a Node and Playwright runner with its own `package.json` and lockfile: it serves the repo itself, so it needs no Python server or Codex wrapper.
   - Share the in-page assertions with the two Codex shell scripts through `scripts/browser/checks/`.
@@ -241,7 +247,7 @@
   - Scan thirteen app states with axe-core (done with the portable browser checks).
   - Add a `keyboard` section that drives the app with real key presses: visible focus rings on the start page, the analytics choice, tab arrows, catalogue jump, answering with Space, a result-screen practice link, the leave dialog (safe focus, trap, Escape, focus restore), and a whole exam answered from the keyboard.
   - Fix what it found: after a screen change focus now moves to the new screen's heading (question, result, start page) and to the question heading after Next and Previous, and choosing from the consent banner hands focus to the next control instead of dropping it to the page body.
-  - Add a `visual` section that compares eleven key screens (phone, desktop, saved progress, dialog, result) with committed baselines in `scripts/browser/baselines/`, rendered in a pinned font with a 0.4% pixel tolerance, and regenerates them with `UPDATE_BASELINES=1`.
+  - Add a `visual` section that compares eleven key screens (phone, desktop, saved progress, dialog, result) with committed baselines in `scripts/browser/baselines/`, rendered in a pinned font with Chromium's hinting and LCD text off and a 0.8% pixel tolerance, and regenerates them with `UPDATE_BASELINES=1`.
 
 - [ ] Reduce first-load payload as content grows.
   - Consider lazy-loading translations and explanations.

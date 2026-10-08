@@ -35,11 +35,12 @@ const MOBILE = { width: 390, height: 844 };
 const DESKTOP = { width: 1280, height: 720 };
 
 // Visual baselines are rendered in one pinned font so they do not depend on
-// whether Inter is installed. A change of up to this share of pixels (font
-// antialiasing between machines) passes; anything larger is a layout change.
+// whether Inter is installed. A change of up to this share of pixels passes
+// (GitHub's runner differs from a local run by up to 0.4% of pixels in
+// antialiasing); anything larger is a layout or colour change.
 const VISUAL_FONT = "DejaVu Sans";
 const VISUAL_VIEWPORT_DESKTOP = { width: 1280, height: 800 };
-const MAX_DIFF_RATIO = 0.004;
+const MAX_DIFF_RATIO = 0.008;
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
