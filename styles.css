@@ -1180,7 +1180,8 @@ figcaption {
 }
 
 .consent-banner,
-.legal-modal {
+.legal-modal,
+.confirm-modal {
   position: fixed;
   z-index: 20;
   right: 12px;
@@ -1217,23 +1218,27 @@ figcaption {
 }
 
 .consent-banner p,
-.legal-modal p {
+.legal-modal p,
+.confirm-modal p {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
 }
 
-.legal-modal {
+.legal-modal,
+.confirm-modal {
   top: 50%;
   bottom: auto;
   transform: translateY(-50%);
 }
 
-.legal-modal .icon-action {
+.legal-modal .icon-action,
+.confirm-modal .icon-action {
   justify-self: end;
 }
 
-.legal-modal h2 {
+.legal-modal h2,
+.confirm-modal h2 {
   margin: 0;
   font-size: 1.2rem;
 }
@@ -2041,7 +2046,8 @@ figcaption {
 
 /* Privacy and legal surfaces feel deliberate rather than appended. */
 .consent-banner,
-.legal-modal {
+.legal-modal,
+.confirm-modal {
   border-color: var(--line-strong);
   border-radius: 18px;
   background:
@@ -2095,19 +2101,22 @@ figcaption {
   backdrop-filter: blur(5px);
 }
 
-.legal-modal {
+.legal-modal,
+.confirm-modal {
   gap: 14px;
   max-width: 620px;
   padding: clamp(20px, 5vw, 30px);
 }
 
-.legal-modal .icon-action {
+.legal-modal .icon-action,
+.confirm-modal .icon-action {
   border-radius: 11px;
   color: var(--muted);
   font-size: 1.35rem;
 }
 
-.legal-modal h2 {
+.legal-modal h2,
+.confirm-modal h2 {
   font-size: 1.55rem;
   letter-spacing: -0.03em;
 }
@@ -2183,6 +2192,33 @@ figcaption {
   .format-item {
     min-height: 90px;
     padding: 12px;
+  }
+}
+
+/* Confirmation dialogs reuse the legal modal surface with a keep/leave pair. */
+.confirm-modal {
+  max-width: 460px;
+}
+
+.confirm-modal h2 {
+  font-size: 1.35rem;
+}
+
+.confirm-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.confirm-leave {
+  border-color: var(--warn-border);
+  color: #ffd98f;
+}
+
+@media (min-width: 640px) {
+  .confirm-actions {
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    justify-content: end;
   }
 }
 

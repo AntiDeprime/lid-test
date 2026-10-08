@@ -52,7 +52,7 @@ Deeper browser flow check:
 scripts/browser-flow-check.sh
 ```
 
-The flow check completes passing and failing exam simulations, verifies the visual result states and withheld exam feedback, checks timeout handling, catalogue structure and answer reveal behavior, catalogue search, legal-modal presentation and focus, translation fallback, bookmarked review queue updates, and reset-safe localStorage setup.
+The flow check completes passing and failing exam simulations, verifies the visual result states and withheld exam feedback, checks timeout handling, catalogue structure and answer reveal behavior, catalogue search, legal-modal presentation and focus, the leave-run and reset-progress confirmation dialogs, translation fallback, bookmarked review queue updates, and reset-safe localStorage setup.
 
 Useful overrides:
 
@@ -134,7 +134,7 @@ GitHub Pages will serve `index.html` as the app entry point.
 - `index.html` contains the one-page UI structure and metadata.
 - `styles.css` contains the app styling.
 - `app.js` contains the vanilla JavaScript app wiring and screen state.
-- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, and quiz rules.
+- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, confirmation dialogs, and quiz rules.
 - `questions.js` contains the question catalogue loaded by the page.
 - `explanation-texts-*.js` contains one reviewed, question-specific learner explanation for each catalogue item.
 - `explanations.js` attaches the reviewed explanation map to the question catalogue.

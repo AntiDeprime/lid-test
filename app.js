@@ -4,6 +4,7 @@ import { summarizeProgress } from "./modules/progress.js";
 import { getLearnerHint } from "./modules/hints.js";
 import { createTabController } from "./modules/tabs.js";
 import { showModalDialog } from "./modules/dialog.js";
+import { confirmDialog } from "./modules/confirm-dialog.js";
 import {
   CATALOGUE_RESULT_LIMIT,
   getCatalogueQuestions as getCataloguePool,
@@ -151,8 +152,15 @@ import {
     persistProgress(progress);
   }
 
-  function resetProgress() {
-    if (!window.confirm("Reset all saved progress for this browser?")) return;
+  async function resetProgress() {
+    const confirmed = await confirmDialog({
+      title: "Reset saved progress?",
+      message: "This clears your answers, weak questions, bookmarks, and exam history in this browser. It cannot be undone.",
+      confirmLabel: "Reset progress",
+      cancelLabel: "Keep progress",
+      trigger: resetProgressButton
+    });
+    if (!confirmed) return;
 
     progress.questionStats = {};
     progress.weakQuestions = {};
@@ -445,23 +453,34 @@ import {
     return !quizScreen.classList.contains("is-hidden") && state.run.length > 0 && state.answers.length > 0;
   }
 
-  function confirmDiscardActiveRun() {
+  async function confirmDiscardActiveRun() {
     if (!hasActiveRun()) return true;
-    const message = state.mode === "exam"
-      ? "Leave the current exam simulation? This unfinished exam result will not be saved."
-      : "Leave the current run? Answers you already selected are saved, but unanswered questions in this run will be skipped.";
-    return window.confirm(message);
+    if (state.mode === "exam") {
+      return confirmDialog({
+        title: "Leave the exam?",
+        message: "Your exam is not finished, so no result will be saved.",
+        confirmLabel: "Leave exam",
+        cancelLabel: "Keep going"
+      });
+    }
+
+    return confirmDialog({
+      title: "Leave this run?",
+      message: "Answers you already selected are saved. Unanswered questions in this run will be skipped.",
+      confirmLabel: "Leave run",
+      cancelLabel: "Keep studying"
+    });
   }
 
-  function goHome() {
-    if (!confirmDiscardActiveRun()) return;
+  async function goHome() {
+    if (!(await confirmDiscardActiveRun())) return;
 
     stopTimer();
     show("start");
   }
 
-  function startRun() {
-    if (!confirmDiscardActiveRun()) return;
+  async function startRun() {
+    if (!(await confirmDiscardActiveRun())) return;
 
     const selectedState = bundeslandSelect.value;
     const examRun = createExamRun(questions, selectedState, { sampleByCategory, shuffle });
@@ -477,8 +496,8 @@ import {
     show("quiz");
   }
 
-  function startPracticeRun() {
-    if (!confirmDiscardActiveRun()) return;
+  async function startPracticeRun() {
+    if (!(await confirmDiscardActiveRun())) return;
 
     const studyQuestions = getStudyQuestions(studyFilter.value);
     if (!studyQuestions.length) return;
@@ -510,8 +529,8 @@ import {
     show("quiz");
   }
 
-  function startPracticeQuestion(questionId) {
-    if (!confirmDiscardActiveRun()) return;
+  async function startPracticeQuestion(questionId) {
+    if (!(await confirmDiscardActiveRun())) return;
 
     const question = questions.find((item) => item.id === questionId);
     if (!question) return;
@@ -530,8 +549,8 @@ import {
     startPracticeQuestion(question.id);
   }
 
-  function startWeakReview() {
-    if (!confirmDiscardActiveRun()) return;
+  async function startWeakReview() {
+    if (!(await confirmDiscardActiveRun())) return;
 
     const weakQuestions = getWeakQuestionIds()
       .map((questionId) => questions.find((item) => String(item.id) === questionId))
@@ -550,8 +569,8 @@ import {
     show("quiz");
   }
 
-  function startBookmarkReview() {
-    if (!confirmDiscardActiveRun()) return;
+  async function startBookmarkReview() {
+    if (!(await confirmDiscardActiveRun())) return;
 
     const bookmarkedQuestions = getBookmarkedQuestions();
     if (!bookmarkedQuestions.length) {

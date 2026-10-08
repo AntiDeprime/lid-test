@@ -92,7 +92,7 @@ Results use a contained hero surface with an emblem, a large score, and state-sp
 
 ### Consent and dialogs
 
-Privacy and legal surfaces use the same radius, border, typography, and depth as the product. They are calm and explicit, never styled like warnings or advertisements.
+Privacy and legal surfaces use the same radius, border, typography, and depth as the product. They are calm and explicit, never styled like warnings or advertisements. Confirmations use the same dialog surface with the safe action as the mint primary button and the leaving action as an amber-outlined secondary button, and never fall back to the browser's native confirm box.
 
 ## Motion
 

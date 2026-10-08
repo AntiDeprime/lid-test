@@ -18,6 +18,7 @@ const ASSETS = [
   "./modules/hints.js",
   "./modules/tabs.js",
   "./modules/dialog.js",
+  "./modules/confirm-dialog.js",
   "./modules/quiz-rules.js",
   "./modules/catalogue.js",
   "./assets/favicon.svg",

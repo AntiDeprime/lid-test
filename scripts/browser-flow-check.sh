@@ -70,17 +70,20 @@ fi
       if (beforeReveal) throw new Error('Exam simulation revealed correctness before result');
       clickAnswer(wantCorrect);
       if (i === 0 && wantCorrect) {
-        const realConfirm = window.confirm;
-        let confirmMessage = '';
-        window.confirm = (message) => {
-          confirmMessage = message;
-          return false;
-        };
         click('#home-button');
-        window.confirm = realConfirm;
-        if (!confirmMessage.includes('unfinished exam result will not be saved')) {
-          throw new Error('Exam leave confirmation copy is misleading: ' + confirmMessage);
+        await delay(0);
+        const dialog = document.querySelector('.confirm-modal');
+        if (!dialog) throw new Error('Leaving an exam did not open the confirmation dialog');
+        if (!dialog.textContent.includes('no result will be saved')) {
+          throw new Error('Exam leave confirmation copy is misleading: ' + dialog.textContent);
         }
+        if (document.activeElement !== dialog.querySelector('.primary-action')) {
+          throw new Error('Confirmation dialog should focus the safe keep action');
+        }
+        dialog.querySelector('.primary-action').click();
+        await delay(0);
+        if (document.querySelector('.confirm-modal')) throw new Error('Keep going did not close the confirmation dialog');
+        if (document.querySelector('#quiz-screen').classList.contains('is-hidden')) throw new Error('Keep going left the exam');
       }
       if (i < 32) {
         click('#next-button');
@@ -206,6 +209,7 @@ fi
   }
 
   click('#result-home-button');
+  await delay(0);
   document.querySelector('#progress-tab').focus();
   document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
   await delay(0);
@@ -225,6 +229,41 @@ fi
   }
   if (document.activeElement?.dataset.legalPanel !== 'privacy') {
     throw new Error('Legal modal did not restore focus to the opener');
+  }
+
+  click('#practice-button');
+  await delay(0);
+  click('.answer-option');
+  click('#home-button');
+  await delay(0);
+  if (!document.querySelector('.confirm-modal')) throw new Error('Leaving an answered study run did not open the confirmation dialog');
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  await delay(0);
+  if (document.querySelector('.confirm-modal') || document.querySelector('#quiz-screen').classList.contains('is-hidden')) {
+    throw new Error('Escape should dismiss the leave dialog and keep the run');
+  }
+  click('#home-button');
+  await delay(0);
+  click('.confirm-leave');
+  await delay(0);
+  if (!document.querySelector('#quiz-screen').classList.contains('is-hidden') || document.querySelector('.confirm-modal')) {
+    throw new Error('Confirming leave did not return to the start page');
+  }
+
+  click('#reset-progress-button');
+  await delay(0);
+  if (!document.querySelector('.confirm-modal')) throw new Error('Reset progress did not open the confirmation dialog');
+  click('.confirm-modal .primary-action');
+  await delay(0);
+  if (document.querySelector('.confirm-modal') || !document.querySelector('#progress-empty')?.classList.contains('is-hidden')) {
+    throw new Error('Keeping progress should close the dialog and leave progress untouched');
+  }
+  click('#reset-progress-button');
+  await delay(0);
+  click('.confirm-leave');
+  await delay(0);
+  if (document.querySelector('#progress-empty')?.classList.contains('is-hidden')) {
+    throw new Error('Confirming reset did not clear saved progress');
   }
 
   return {

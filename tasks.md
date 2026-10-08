@@ -214,9 +214,11 @@
   - Add validation expectations for future catalogue refreshes.
   - Document how explanations and translations are maintained separately from official answer data.
 
-- [ ] Replace native confirmation dialogs with app dialogs.
+- [x] Replace native confirmation dialogs with app dialogs.
   - Use the existing modal helper for reset-progress and leave-run confirmations.
   - Preserve focus management and mobile-friendly copy.
+  - Focus the safe "Keep going" action first, dismiss with Escape, the close button, or the backdrop, and close any dialog that is replaced so its keyboard handler is released.
+  - Cover the exam leave, study leave, and reset-progress dialogs in the browser flow check.
 
 - [ ] Add accessibility and visual regression checks.
   - Check keyboard flow through quiz, result, catalogue, and modal interactions.
