@@ -2206,6 +2206,65 @@ figcaption {
   }
 }
 
+/* Exam readiness: an estimate of the pass chance, with the number, a word, and a meter. */
+.readiness-card {
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgb(88 201 181 / 0.28);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgb(88 201 181 / 0.12), rgb(88 201 181 / 0.03));
+}
+
+.readiness-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.readiness-main b {
+  color: var(--accent-strong);
+  font-size: 2rem;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.readiness-main span {
+  font-weight: 800;
+}
+
+.readiness-meter {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.09);
+}
+
+.readiness-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.readiness-score {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.readiness-detail {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.queue-action-lead {
+  grid-column: 1 / -1;
+}
+
 /* Progress backup lives under the statistics so a new device can import first. */
 .backup-card {
   display: grid;

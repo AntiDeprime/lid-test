@@ -1,4 +1,5 @@
 import { WEAK_CLEAR_STREAK } from "./quiz-rules.js";
+import { scheduleAnswer } from "./scheduling.js";
 
 export function summarizeProgress(progress, totalQuestions) {
   const stats = Object.values(progress.questionStats);
@@ -63,6 +64,7 @@ export function applyAnswer(progress, entry, { countStats = true, trackWeak = tr
       wrong: 0
     };
 
+    Object.assign(current, scheduleAnswer(current, entry.isCorrect, now));
     current.answered += 1;
     if (entry.isCorrect) {
       current.correct += 1;

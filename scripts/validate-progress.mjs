@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import { applyAnswer, summarizeProgress, toggleBookmark } from "../modules/progress.js";
 import { createEmitter } from "../modules/emitter.js";
+import { MAX_BOX, REVIEW_INTERVAL_DAYS, isDue, scheduleAnswer } from "../modules/scheduling.js";
+import { GUESS_RATE, MIN_STUDIED_FOR_ESTIMATE, estimateQuestionProbability, estimateReadiness, getReadinessLabel } from "../modules/readiness.js";
 import { formatAnswer, formatDuration } from "../modules/format.js";
 import {
   getAreaStats,
   getBookmarkedQuestions,
   getCatalogueStatus,
+  getDueQuestions,
   getIncorrectQuestionIds,
   getStudyQuestions,
   getWeakQuestionIds
@@ -236,7 +239,10 @@ assert.equal(loadExamSession(sessionQuestions, { storage }), null);
 
 const storedProgress = {
   version: STORAGE_VERSION,
-  questionStats: { 1: { answered: 3, correct: 2, wrong: 1 }, 2: { answered: 1, correct: 0, wrong: 1 } },
+  questionStats: {
+    1: { answered: 3, correct: 2, wrong: 1, box: 2, dueAt: "2026-01-04T00:00:00.000Z", lastAnsweredAt: "2026-01-01T09:00:00.000Z" },
+    2: { answered: 1, correct: 0, wrong: 1, box: 1, dueAt: "", lastAnsweredAt: "" }
+  },
   weakQuestions: { 2: { wrong: 1, correctStreak: 0, lastMissedAt: "2026-01-01T00:00:00.000Z" } },
   bookmarkedQuestions: { 1: { addedAt: "2026-01-01T00:00:00.000Z" } },
   testHistory: [{ completedAt: "2026-01-02T00:00:00.000Z", correct: 20, total: 33, passed: true, questionIds: [1, 2], wrongQuestionIds: [2] }]
@@ -259,7 +265,7 @@ const cleaned = normalizeProgress({
   bookmarkedQuestions: { 7: { addedAt: 5 } },
   testHistory: [{ passed: "yes" }, { passed: false, correct: 3, total: 33, completedAt: "d", questionIds: [1, "x"] }]
 });
-assert.deepEqual(cleaned.questionStats, { 1: { answered: 3, correct: 0, wrong: 0 } });
+assert.deepEqual(cleaned.questionStats, { 1: { answered: 3, correct: 0, wrong: 0, box: 1, dueAt: "", lastAnsweredAt: "" } });
 assert.deepEqual(cleaned.weakQuestions, {});
 assert.deepEqual(cleaned.bookmarkedQuestions, { 7: { addedAt: "" } });
 assert.equal(cleaned.testHistory.length, 1);
@@ -308,10 +314,10 @@ const makeQuestion = (id, category = "general", state = null) => ({
 });
 const queryQuestions = [makeQuestion(1), makeQuestion(2), makeQuestion(301, "state", "Berlin"), makeQuestion(302, "state", "Hessen")];
 const tracked = createEmptyProgress();
-const at = new Date("2026-10-08T09:00:00.000Z");
+const at = new Date(2026, 9, 8, 9, 0, 0);
 
 assert.equal(applyAnswer(tracked, createAnswerEntry(queryQuestions[0], 0), {}, at), true);
-assert.deepEqual(tracked.questionStats[1], { answered: 1, correct: 0, wrong: 1 });
+assert.deepEqual(tracked.questionStats[1], { answered: 1, correct: 0, wrong: 1, box: 1, dueAt: new Date(2026, 9, 9).toISOString(), lastAnsweredAt: at.toISOString() });
 assert.deepEqual(tracked.weakQuestions[1], { wrong: 1, correctStreak: 0, lastMissedAt: at.toISOString() });
 assert.equal(applyAnswer(tracked, createAnswerEntry(queryQuestions[0], 0), {}, at), true);
 assert.equal(tracked.weakQuestions[1].wrong, 2);
@@ -321,7 +327,7 @@ for (let correctAnswer = 1; correctAnswer < WEAK_CLEAR_STREAK; correctAnswer += 
 }
 applyAnswer(tracked, createAnswerEntry(queryQuestions[0], 1), {}, at);
 assert.equal(tracked.weakQuestions[1], undefined, "a weak question clears after enough correct answers in a row");
-assert.deepEqual(tracked.questionStats[1], { answered: 2 + WEAK_CLEAR_STREAK, correct: WEAK_CLEAR_STREAK, wrong: 2 });
+assert.deepEqual({ answered: tracked.questionStats[1].answered, correct: tracked.questionStats[1].correct, wrong: tracked.questionStats[1].wrong }, { answered: 2 + WEAK_CLEAR_STREAK, correct: WEAK_CLEAR_STREAK, wrong: 2 });
 assert.equal(applyAnswer(tracked, createUnansweredEntry(queryQuestions[1]), { countStats: false, trackWeak: false }, at), false);
 assert.equal(tracked.questionStats[2], undefined, "unanswered timeouts do not touch stats");
 applyAnswer(tracked, createAnswerEntry(queryQuestions[1], 2), { trackWeak: false }, at);
@@ -356,6 +362,96 @@ assert.equal(areas.find((area) => area.label === "Hessen questions").role, "stro
 assert.equal(areas.find((area) => area.label === "Berlin questions").role, "weakest");
 assert.equal(areas.find((area) => area.label === "General questions").role, "");
 assert.equal(getAreaStats(createEmptyProgress(), queryQuestions).length, 0);
+
+// Review schedule: Leitner boxes, due dates on local midnight, legacy progress due once.
+const day = (year, month, date) => new Date(year, month - 1, date, 14, 30);
+const first = scheduleAnswer(undefined, true, day(2026, 10, 8));
+assert.equal(first.box, 1, "a first answer lands in box 1 even when correct");
+assert.equal(first.dueAt, new Date(2026, 9, 9).toISOString());
+const climbed = scheduleAnswer({ answered: 1, correct: 1, wrong: 0, box: 1 }, true, day(2026, 10, 9));
+assert.equal(climbed.box, 2);
+assert.equal(climbed.dueAt, new Date(2026, 9, 12).toISOString(), "box 2 waits 3 days");
+assert.equal(scheduleAnswer({ answered: 4, correct: 4, wrong: 0, box: MAX_BOX }, true, day(2026, 10, 9)).box, MAX_BOX, "the top box does not overflow");
+assert.equal(scheduleAnswer({ answered: 4, correct: 4, wrong: 0, box: MAX_BOX }, true, day(2026, 10, 9)).dueAt, new Date(2026, 10, 8).toISOString(), "box 5 waits 30 days");
+assert.equal(scheduleAnswer({ answered: 4, correct: 3, wrong: 1, box: 4 }, false, day(2026, 10, 9)).box, 1, "a wrong answer returns to box 1");
+assert.deepEqual(Object.values(REVIEW_INTERVAL_DAYS), [1, 3, 7, 14, 30]);
+const answeredStats = { answered: 2, correct: 1, wrong: 1, box: 1, dueAt: new Date(2026, 9, 9).toISOString(), lastAnsweredAt: "" };
+assert.equal(isDue(answeredStats, day(2026, 10, 8)), false, "not due the day before");
+assert.equal(isDue(answeredStats, new Date(2026, 9, 9, 0, 0, 0)), true, "due from the start of its day");
+assert.equal(isDue({ ...answeredStats, dueAt: "" }, day(2026, 10, 8)), true, "no date means due");
+assert.equal(isDue({ ...answeredStats, dueAt: "not a date" }, day(2026, 10, 8)), true, "an unreadable date means due");
+assert.equal(isDue({ answered: 0, correct: 0, wrong: 0, box: 1, dueAt: "" }, day(2026, 10, 8)), false, "unanswered questions are new, not due");
+assert.equal(isDue(undefined, day(2026, 10, 8)), false);
+
+const scheduled = createEmptyProgress();
+applyAnswer(scheduled, createAnswerEntry(queryQuestions[0], 1), {}, day(2026, 10, 8));
+assert.equal(scheduled.questionStats[1].box, 1);
+applyAnswer(scheduled, createAnswerEntry(queryQuestions[0], 1), {}, day(2026, 10, 9));
+assert.equal(scheduled.questionStats[1].box, 2);
+applyAnswer(scheduled, createAnswerEntry(queryQuestions[0], 0), {}, day(2026, 10, 12));
+assert.equal(scheduled.questionStats[1].box, 1, "a miss resets the box");
+assert.equal(scheduled.questionStats[1].answered, 3);
+applyAnswer(scheduled, createUnansweredEntry(queryQuestions[1]), { countStats: false, trackWeak: false }, day(2026, 10, 12));
+assert.equal(scheduled.questionStats[2], undefined, "timeouts are not scheduled");
+
+const dueProgress = createEmptyProgress();
+dueProgress.questionStats = {
+  1: { answered: 2, correct: 2, wrong: 0, box: 3, dueAt: new Date(2026, 9, 5).toISOString(), lastAnsweredAt: "" },
+  2: { answered: 1, correct: 1, wrong: 0, box: 1, dueAt: new Date(2026, 9, 20).toISOString(), lastAnsweredAt: "" },
+  301: { answered: 3, correct: 1, wrong: 2, box: 1, dueAt: "", lastAnsweredAt: "" },
+  302: { answered: 1, correct: 0, wrong: 1, box: 1, dueAt: new Date(2026, 9, 5).toISOString(), lastAnsweredAt: "" },
+  999: { answered: 1, correct: 0, wrong: 1, box: 1, dueAt: "", lastAnsweredAt: "" }
+};
+assert.deepEqual(getDueQuestions(dueProgress, queryQuestions, day(2026, 10, 8)).map((question) => question.id), [301, 302, 1], "undated first, then longest-waiting, then lowest box; unknown ids ignored; future dates excluded");
+
+// Version 1 progress migrates with a box from its record and a due-once schedule.
+const legacy = { version: 1, questionStats: { 1: { answered: 5, correct: 5, wrong: 0 }, 2: { answered: 2, correct: 0, wrong: 2 }, 3: "bad" }, weakQuestions: {}, bookmarkedQuestions: {}, testHistory: [] };
+const migratedLegacy = normalizeProgress(migrateProgress(legacy));
+assert.equal(migratedLegacy.version, STORAGE_VERSION);
+assert.deepEqual(migratedLegacy.questionStats[1], { answered: 5, correct: 5, wrong: 0, box: MAX_BOX, dueAt: "", lastAnsweredAt: "" });
+assert.deepEqual(migratedLegacy.questionStats[2], { answered: 2, correct: 0, wrong: 2, box: 1, dueAt: "", lastAnsweredAt: "" });
+assert.equal(migratedLegacy.questionStats[3], undefined);
+assert.equal(parseBackup(JSON.stringify({ format: BACKUP_FORMAT, exportedAt: "2026-10-01T00:00:00.000Z", progress: legacy })).ok, true, "a version 1 backup still imports");
+const legacyStorage = new Map([[STORAGE_KEY, JSON.stringify(legacy)]]);
+const loadedLegacy = loadProgress({ getItem: (key) => legacyStorage.get(key) ?? null, setItem: (key, value) => legacyStorage.set(key, value) });
+assert.equal(loadedLegacy.questionStats[1].box, MAX_BOX, "stored version 1 progress is upgraded, not discarded");
+assert.equal(legacyStorage.has(UNREADABLE_PROGRESS_KEY), false);
+
+// Readiness: the estimated chance of passing from the learner's own answers.
+const readinessQuestions = [
+  ...Array.from({ length: 300 }, (_, index) => makeQuestion(index + 1)),
+  ...Array.from({ length: 10 }, (_, index) => makeQuestion(301 + index, "state", "Berlin")),
+  ...Array.from({ length: 10 }, (_, index) => makeQuestion(401 + index, "state", "Hessen"))
+];
+const noon = new Date(2026, 9, 8, 12);
+const nothing = estimateReadiness(createEmptyProgress(), readinessQuestions, "Berlin", noon);
+assert.equal(nothing.hasEstimate, false);
+assert.ok(nothing.passChance < 0.001, "guessing alone almost never passes");
+assert.ok(Math.abs(nothing.expectedScore - 33 * GUESS_RATE) < 1e-9);
+assert.equal(nothing.label, "Keep studying");
+const mastered = createEmptyProgress();
+readinessQuestions.forEach((question) => {
+  mastered.questionStats[question.id] = { answered: 12, correct: 12, wrong: 0, box: 5, dueAt: new Date(2026, 10, 1).toISOString(), lastAnsweredAt: "" };
+});
+const ready = estimateReadiness(mastered, readinessQuestions, "Berlin", noon);
+assert.equal(ready.hasEstimate, true);
+assert.ok(ready.passChance > 0.99, `fully studied should be ready, got ${ready.passChance}`);
+assert.equal(ready.label, "Looking ready");
+assert.equal(ready.studied, readinessQuestions.length);
+const halfway = createEmptyProgress();
+readinessQuestions.slice(0, 160).forEach((question) => {
+  halfway.questionStats[question.id] = { answered: 6, correct: 5, wrong: 1, box: 3, dueAt: new Date(2026, 10, 1).toISOString(), lastAnsweredAt: "" };
+});
+const partial = estimateReadiness(halfway, readinessQuestions, "Berlin", noon);
+assert.ok(partial.passChance > nothing.passChance && partial.passChance < ready.passChance, "readiness grows with study");
+const overdue = createEmptyProgress();
+overdue.questionStats = Object.fromEntries(Object.entries(halfway.questionStats).map(([id, stats]) => [id, { ...stats, dueAt: new Date(2026, 8, 1).toISOString() }]));
+assert.ok(estimateReadiness(overdue, readinessQuestions, "Berlin", noon).passChance < partial.passChance, "questions that are due count for less");
+assert.ok(estimateQuestionProbability({ answered: 1, correct: 1, wrong: 0, box: 1, dueAt: new Date(2026, 10, 1).toISOString() }, noon) < estimateQuestionProbability({ answered: 8, correct: 8, wrong: 0, box: 4, dueAt: new Date(2026, 10, 1).toISOString() }, noon), "more correct answers raise the estimate");
+assert.ok(estimateQuestionProbability({ answered: 4, correct: 3, wrong: 1, box: 1, dueAt: new Date(2026, 10, 1).toISOString() }, noon) <= 0.5, "a question last missed is capped");
+assert.equal(estimateQuestionProbability(undefined, noon), GUESS_RATE);
+assert.equal(MIN_STUDIED_FOR_ESTIMATE, 10);
+assert.deepEqual([0.1, 0.3, 0.7, 0.9].map(getReadinessLabel), ["Keep studying", "Getting closer", "Nearly ready", "Looking ready"]);
 
 // Formatting and events.
 assert.equal(formatDuration(3600), "60:00");

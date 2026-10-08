@@ -1,6 +1,7 @@
 import { LETTERS, formatDuration } from "../modules/format.js";
 import { applyAnswer, toggleBookmark } from "../modules/progress.js";
-import { getBookmarkedQuestions, getStudyQuestions, getWeakQuestions, isBookmarked } from "../modules/progress-queries.js";
+import { getBookmarkedQuestions, getDueQuestions, getStudyQuestions, getWeakQuestions, isBookmarked } from "../modules/progress-queries.js";
+import { DUE_REVIEW_LIMIT } from "../modules/scheduling.js";
 import { getLearnerHint } from "../modules/hints.js";
 import { sampleByCategory, shuffle } from "../modules/sampling.js";
 import { confirmDialog } from "../modules/confirm-dialog.js";
@@ -201,21 +202,32 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     show("quiz");
   }
 
+  // "Restart this set" starts the same kind of run again.
   function restartCurrentRun() {
-    if (state.mode !== "study") {
-      startRun();
+    if (state.mode === "study") {
+      const studyQuestions = getStudyQuestions(state.studyFilter, questions, progress);
+      if (!studyQuestions.length) return;
+
+      state.run = studyQuestions;
+      resetRunState();
+      stopTimer();
+      renderTimer();
+      renderQuestion();
+      show("quiz");
       return;
     }
 
-    const studyQuestions = getStudyQuestions(state.studyFilter, questions, progress);
-    if (!studyQuestions.length) return;
-
-    state.run = studyQuestions;
-    resetRunState();
-    stopTimer();
-    renderTimer();
-    renderQuestion();
-    show("quiz");
+    const restart = {
+      exam: startRun,
+      "due-review": startDueReview,
+      "weak-review": startWeakReview,
+      bookmarks: startBookmarkReview
+    }[state.mode];
+    if (restart) {
+      restart();
+    } else if (state.run[0]) {
+      startPracticeQuestion(state.run[0].id);
+    }
   }
 
   async function startPracticeQuestion(questionId) {
@@ -244,6 +256,24 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
 
     state.mode = "weak-review";
     state.run = shuffle(weakQuestions);
+    resetRunState();
+    stopTimer();
+    renderTimer();
+    renderQuestion();
+    show("quiz");
+  }
+
+  async function startDueReview() {
+    if (!(await confirmDiscardActiveRun())) return;
+
+    const dueQuestions = getDueQuestions(progress, questions).slice(0, DUE_REVIEW_LIMIT);
+    if (!dueQuestions.length) {
+      start.selectTab("progress");
+      return;
+    }
+
+    state.mode = "due-review";
+    state.run = dueQuestions;
     resetRunState();
     stopTimer();
     renderTimer();
@@ -686,6 +716,7 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
 
   ctx.actions.startRun = startRun;
   ctx.actions.startPracticeRun = startPracticeRun;
+  ctx.actions.startDueReview = startDueReview;
   ctx.actions.startWeakReview = startWeakReview;
   ctx.actions.startBookmarkReview = startBookmarkReview;
   ctx.actions.goHome = goHome;

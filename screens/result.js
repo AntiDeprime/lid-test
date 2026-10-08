@@ -20,19 +20,23 @@ export function createResultScreen(ctx) {
   function render() {
     if (state.mode !== "exam") {
       resultScreen.dataset.result = "practice";
-      resultTitle.textContent = state.mode === "weak-review"
-        ? "Weak review complete"
-        : state.mode === "bookmarks"
-          ? "Bookmark review complete"
-          : "Practice complete";
+      resultTitle.textContent = state.mode === "due-review"
+        ? "Review complete"
+        : state.mode === "weak-review"
+          ? "Weak review complete"
+          : state.mode === "bookmarks"
+            ? "Bookmark review complete"
+            : "Practice complete";
       resultScore.textContent = `${state.score} / ${state.run.length}`;
       resultStatus.className = "result-status";
       resultStatus.replaceChildren(createReviewText(
-        state.mode === "weak-review"
-          ? `Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.`
-          : state.mode === "bookmarks"
-            ? "Bookmarked practice is untimed and stays separate from exam-simulation history."
-            : "Practice mode is untimed and separate from exam-simulation history."
+        state.mode === "due-review"
+          ? "Questions you got right come back after a longer wait; a miss brings the question back tomorrow."
+          : state.mode === "weak-review"
+            ? `Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.`
+            : state.mode === "bookmarks"
+              ? "Bookmarked practice is untimed and stays separate from exam-simulation history."
+              : "Practice mode is untimed and separate from exam-simulation history."
       ));
       resultTime.textContent = "";
       resultContext.textContent = "";

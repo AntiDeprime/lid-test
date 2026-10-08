@@ -130,6 +130,7 @@
                 </button>
               </div>
               <div id="queue-actions" class="queue-actions is-hidden" aria-label="Quick review queues">
+                <button id="due-review-button" class="secondary-action queue-action queue-action-lead is-hidden" type="button">Review due questions</button>
                 <button id="weak-review-button" class="secondary-action queue-action" type="button">Review weak questions</button>
                 <button id="bookmark-review-button" class="secondary-action queue-action" type="button">Review bookmarked questions</button>
               </div>
@@ -184,6 +185,7 @@
                   <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus all 16 Bundesland question sets in study mode.</span></li>
                   <li><span class="feature-mark">✓</span><span>Use instant feedback, explanations, hints, translations, and weak-question tracking while studying.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Come back to questions when they are due on a spaced schedule, and see an estimate of your chance of passing.</span></li>
                   <li><span class="feature-mark">✓</span><span>Bookmark difficult questions for later practice.</span></li>
                   <li><span class="feature-mark">✓</span><span>Search the catalogue, filter question sets, and jump by question number.</span></li>
                   <li><span class="feature-mark">✓</span><span>Save local progress across browser sessions.</span></li>
@@ -226,6 +228,16 @@
                   </div>
                 </div>
                 <div id="progress-insights" class="progress-insights is-hidden">
+                  <section id="readiness-card" class="progress-insight readiness-card" aria-labelledby="readiness-title">
+                    <h3 id="readiness-title">Exam readiness</h3>
+                    <div class="readiness-main">
+                      <b id="readiness-value">–</b>
+                      <span id="readiness-label">Not enough answers yet</span>
+                    </div>
+                    <div id="readiness-meter" class="readiness-meter is-hidden" role="meter" aria-labelledby="readiness-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="readiness-fill"></span></div>
+                    <p id="readiness-score" class="readiness-score is-hidden"></p>
+                    <p id="readiness-detail" class="readiness-detail"></p>
+                  </section>
                   <section class="progress-insight" aria-labelledby="area-stats-title">
                     <h3 id="area-stats-title">Area performance</h3>
                     <div id="area-stats" class="area-stats" aria-live="polite"></div>

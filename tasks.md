@@ -2,6 +2,13 @@
 
 ## High Priority
 
+- [x] Add a spaced-repetition "due" queue and an exam-readiness estimate.
+  - Schedule every study answer in a five-box Leitner schedule (`modules/scheduling.js`): correct answers move up a box and wait 1, 3, 7, 14, then 30 days; a miss returns to box 1; due dates fall on local midnight.
+  - Bump the storage version to 2 with a migration that gives saved questions a box from their record and a due-once date, and keep version 1 backups importable.
+  - Add "Review N due questions" to the start page (at most 25 per run, longest-waiting first) and make Restart repeat the same kind of run in every mode instead of starting an exam.
+  - Add an exam-readiness card to the Progress tab (`modules/readiness.js`): the chance of 17 or more of 33 correct from per-question smoothed accuracy, with the number, a word, a meter, the expected score, and the reason it is cautious; it needs 10 studied questions.
+  - Cover scheduling, migration, due ordering, and the readiness math in `scripts/validate-progress.mjs`, and add a `review` browser section that runs the whole flow from version 1 progress.
+
 - [x] Split `app.js` by screen.
   - Move the start page, progress tab, catalogue, exam resume card, result screen, quiz screen (run lifecycle, timer, question and answer rendering), and privacy controls into `screens/`, each created from one shared context; `app.js` shrinks from about 1,600 lines to a 75-line composition root.
   - Screens never import each other: they react to `progress-changed` and `screen-shown` events and call each other through late-bound `actions`.

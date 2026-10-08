@@ -1,5 +1,7 @@
+import { clampBox } from "./scheduling.js";
+
 export const STORAGE_KEY = "lidTestPrepProgress";
-export const STORAGE_VERSION = 1;
+export const STORAGE_VERSION = 2;
 export const UNREADABLE_PROGRESS_KEY = `${STORAGE_KEY}.unreadable`;
 
 export function createEmptyProgress() {
@@ -22,7 +24,22 @@ function getDefaultStorage() {
 
 // Each entry upgrades saved progress from that version to the next one, so a
 // storage version bump keeps learners' data instead of resetting it.
-const MIGRATIONS = {};
+const MIGRATIONS = {
+  // Version 2 added the review schedule. Saved questions get a box from their
+  // record and no due date, which makes them due once; scheduling starts from
+  // their next answer.
+  1: (saved) => ({
+    ...saved,
+    questionStats: isPlainObject(saved.questionStats)
+      ? Object.fromEntries(Object.entries(saved.questionStats).map(([questionId, entry]) => [
+        questionId,
+        isPlainObject(entry)
+          ? { ...entry, box: clampBox(1 + toCount(entry.correct) - toCount(entry.wrong)), dueAt: "", lastAnsweredAt: "" }
+          : entry
+      ]))
+      : saved.questionStats
+  })
+};
 const MAX_TEST_HISTORY = 500;
 const QUESTION_ID_PATTERN = /^[0-9]{1,6}$/;
 
@@ -88,7 +105,10 @@ export function normalizeProgress(saved) {
     questionStats: normalizeEntries(saved.questionStats, (entry) => ({
       answered: toCount(entry.answered),
       correct: toCount(entry.correct),
-      wrong: toCount(entry.wrong)
+      wrong: toCount(entry.wrong),
+      box: clampBox(entry.box),
+      dueAt: toText(entry.dueAt),
+      lastAnsweredAt: toText(entry.lastAnsweredAt)
     })),
     weakQuestions: normalizeEntries(saved.weakQuestions, (entry) => ({
       wrong: toCount(entry.wrong),

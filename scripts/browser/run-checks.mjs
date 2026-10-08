@@ -8,7 +8,7 @@
 // Useful environment variables:
 //   CHROMIUM_PATH   reuse an installed Chromium instead of Playwright's download
 //   PORT            serve on a fixed port (default: a free port)
-//   ONLY            comma-separated sections to run (smoke,flow,offline,layout,fit,keyboard,visual,a11y)
+//   ONLY            comma-separated sections to run (smoke,flow,offline,layout,fit,keyboard,visual,review,a11y)
 //   KEEP_ARTIFACTS  set to 1 to keep screenshots of passing runs too
 //   UPDATE_BASELINES  set to 1 to rewrite scripts/browser/baselines/*.png (visual section)
 //   TEST_FONT       force a font family, e.g. "DejaVu Sans" to reproduce the
@@ -639,6 +639,104 @@ const sections = {
       throw error;
     } finally {
       await context.close();
+    }
+  },
+
+  // Spaced repetition and readiness, driven through the real interface with
+  // progress saved by the previous storage version (so the migration runs too).
+  async review({ browser, url }) {
+    const failures = [];
+    const expect = (ok, message) => { if (!ok) failures.push(message); };
+    const sessions = [];
+    const open = async (progress) => {
+      const session = await openPage(browser, { viewport: DESKTOP, init: { script: (data) => {
+        if (!localStorage.getItem("lidTestPrepProgress")) localStorage.setItem("lidTestPrepProgress", JSON.stringify(data));
+        localStorage.setItem("lidAnalyticsConsent", "denied");
+      }, arg: progress } });
+      sessions.push(session);
+      return session;
+    };
+    const readiness = (page) => page.evaluate(() => ({
+      value: document.querySelector("#readiness-value").textContent,
+      label: document.querySelector("#readiness-label").textContent,
+      meterVisible: !document.querySelector("#readiness-meter").classList.contains("is-hidden"),
+      now: document.querySelector("#readiness-meter").getAttribute("aria-valuenow"),
+      score: Number((document.querySelector("#readiness-score").textContent.match(/about ([0-9.]+) of 33/) || [])[1]),
+      detail: document.querySelector("#readiness-detail").textContent
+    }));
+    const dueButton = (page) => page.evaluate(() => {
+      const button = document.querySelector("#due-review-button");
+      return { visible: !button.classList.contains("is-hidden"), text: button.textContent };
+    });
+    const answerCorrectly = (page) => page.evaluate(() => {
+      const prompt = document.querySelector("#question-title").textContent;
+      const question = window.LID_QUESTIONS.find((item) => item.prompt === prompt);
+      document.querySelectorAll(".answer-option")[question.options.findIndex((option) => option.correct)].click();
+      return question.id;
+    });
+
+    try {
+      // Saved by version 1 of the storage format: ten studied questions, no schedule.
+      const { page, problems } = await open(SEEDED_PROGRESS);
+      await page.goto(url);
+      const before = await readiness(page);
+      const due = await dueButton(page);
+      expect(due.visible && due.text === "Review 10 due questions", `Migrated progress should offer "Review 10 due questions", got ${JSON.stringify(due)}`);
+      expect(before.meterVisible && /^\d+%$/.test(before.value), `Readiness should show a percentage, got "${before.value}"`);
+      expect(Boolean(before.label) && before.now === before.value.replace("%", ""), "Readiness label or meter value is missing");
+      expect(/10 of 460 questions studied/.test(before.detail) && /10 questions are due/.test(before.detail), `Readiness detail says: ${before.detail}`);
+
+      await page.click("#due-review-button");
+      await page.waitForSelector("#quiz-screen:not(.is-hidden)");
+      expect(await page.evaluate(() => document.querySelector("#question-kicker").textContent.includes("1 / 10")), "A due review should hold the 10 due questions");
+      const firstId = await answerCorrectly(page);
+      const saved = await page.evaluate((id) => JSON.parse(localStorage.getItem("lidTestPrepProgress")), 0);
+      expect(saved.version === 2, `Saved progress should be version 2 after the first answer, got ${saved.version}`);
+      const entry = saved.questionStats[String(firstId)];
+      expect(entry && new Date(entry.dueAt).getTime() > Date.now() && entry.box >= 1 && Boolean(entry.lastAnsweredAt), `Answer ${firstId} should be scheduled in the future, got ${JSON.stringify(entry)}`);
+
+      for (let answered = 1; answered < 10; answered += 1) {
+        await page.click("#next-button");
+        await answerCorrectly(page);
+      }
+      await page.click("#next-button");
+      await page.waitForSelector("#result-screen:not(.is-hidden)");
+      expect(await page.evaluate(() => document.querySelector("#result-title").textContent) === "Review complete", "A due review should end with \"Review complete\"");
+      await page.click("#result-home-button");
+      await page.waitForSelector("#start-screen:not(.is-hidden)");
+      const after = await readiness(page);
+      expect(!(await dueButton(page)).visible, "No questions should be due after answering all ten correctly");
+      expect(after.score > before.score, `The expected score should rise after ten correct answers (${before.score} to ${after.score})`);
+      expect(Number(after.now) >= Number(before.now), `Readiness should not fall after ten correct answers (${before.value} to ${after.value})`);
+      expect(!/are due|is due/.test(after.detail), `Readiness detail still mentions due questions: ${after.detail}`);
+      expectNoProblems(problems, "Review check");
+
+      // More due questions than one run holds.
+      const many = { ...SEEDED_PROGRESS, questionStats: Object.fromEntries(Array.from({ length: 30 }, (_, index) => [String(index + 1), { answered: 2, correct: 1, wrong: 1 }])) };
+      const crowded = await open(many);
+      await crowded.page.goto(url);
+      const capped = await dueButton(crowded.page);
+      expect(capped.text === "Review 25 of 30 due questions", `A long backlog should be capped at 25, got "${capped.text}"`);
+      await crowded.page.click("#due-review-button");
+      await crowded.page.waitForSelector("#quiz-screen:not(.is-hidden)");
+      expect(await crowded.page.evaluate(() => document.querySelector("#question-kicker").textContent.includes("1 / 25")), "A capped review should hold 25 questions");
+      await answerCorrectly(crowded.page);
+      await crowded.page.click("#restart-button");
+      await crowded.page.waitForSelector(".confirm-modal");
+      await crowded.page.click(".confirm-leave");
+      await crowded.page.waitForTimeout(150);
+      expect(await crowded.page.evaluate(() => document.querySelector("#question-kicker").textContent.includes("/ 25")), "Restart in a due review should start another due review, not an exam");
+      expectNoProblems(crowded.problems, "Review check (backlog)");
+
+      // First-run learners see neither a queue nor an estimate.
+      const fresh = await open({ version: 2, questionStats: {}, weakQuestions: {}, bookmarkedQuestions: {}, testHistory: [] });
+      await fresh.page.goto(url);
+      expect(!(await dueButton(fresh.page)).visible, "A new learner should not see a due review");
+      expect(await fresh.page.evaluate(() => document.querySelector("#queue-actions").classList.contains("is-hidden")), "A new learner should not see review queues");
+
+      if (failures.length) throw new Error(failures.join("\n  "));
+    } finally {
+      await Promise.all(sessions.map(({ context }) => context.close()));
     }
   },
 

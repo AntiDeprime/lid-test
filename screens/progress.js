@@ -2,13 +2,17 @@ import { MAX_BACKUP_BYTES, createBackup, describeProgress, getBackupFilename, pa
 import { confirmDialog } from "../modules/confirm-dialog.js";
 import { formatHistoryDate } from "../modules/format.js";
 import { summarizeProgress } from "../modules/progress.js";
-import { getAreaStats, getBookmarkedQuestionIds, getWeakQuestionIds } from "../modules/progress-queries.js";
+import { getAreaStats, getBookmarkedQuestionIds, getDueQuestions, getWeakQuestionIds } from "../modules/progress-queries.js";
+import { MIN_STUDIED_FOR_ESTIMATE, estimateReadiness } from "../modules/readiness.js";
+import { PASS_THRESHOLD, TOTAL_GENERAL, TOTAL_STATE } from "../modules/quiz-rules.js";
+import { DUE_REVIEW_LIMIT } from "../modules/scheduling.js";
 
 // The progress tab on the start page: statistics, area performance, recent
 // exam results, the weak and bookmarked review queues, and backup and reset.
 export function createProgressPanel(ctx) {
   const { questions, progress } = ctx;
   const $ = (id) => document.getElementById(id);
+  const dueReviewButton = $("due-review-button");
   const weakReviewButton = $("weak-review-button");
   const bookmarkReviewButton = $("bookmark-review-button");
   const queueActions = $("queue-actions");
@@ -24,6 +28,12 @@ export function createProgressPanel(ctx) {
   const bookmarkStat = $("bookmark-stat");
   const areaStats = $("area-stats");
   const recentTests = $("recent-tests");
+  const readinessValue = $("readiness-value");
+  const readinessLabel = $("readiness-label");
+  const readinessMeter = $("readiness-meter");
+  const readinessFill = $("readiness-fill");
+  const readinessScore = $("readiness-score");
+  const readinessDetail = $("readiness-detail");
   const resetProgressButton = $("reset-progress-button");
   const exportProgressButton = $("export-progress-button");
   const importProgressButton = $("import-progress-button");
@@ -34,6 +44,7 @@ export function createProgressPanel(ctx) {
     const summary = summarizeProgress(progress, questions.length);
     const weakQuestionIds = getWeakQuestionIds(progress, questions);
     const bookmarkedQuestionIds = getBookmarkedQuestionIds(progress, questions);
+    const dueQuestions = getDueQuestions(progress, questions);
 
     answeredStat.textContent = String(summary.uniqueStudied);
     accuracyStat.textContent = `${summary.studyAccuracy}%`;
@@ -42,11 +53,15 @@ export function createProgressPanel(ctx) {
     passRateStat.textContent = `${summary.passRate}%`;
     weakStat.textContent = String(weakQuestionIds.length);
     bookmarkStat.textContent = String(bookmarkedQuestionIds.length);
+    dueReviewButton.classList.toggle("is-hidden", dueQuestions.length === 0);
+    dueReviewButton.textContent = dueQuestions.length > DUE_REVIEW_LIMIT
+      ? `Review ${DUE_REVIEW_LIMIT} of ${dueQuestions.length} due questions`
+      : `Review ${dueQuestions.length} due ${dueQuestions.length === 1 ? "question" : "questions"}`;
     weakReviewButton.classList.toggle("is-hidden", weakQuestionIds.length === 0);
     weakReviewButton.textContent = `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`;
     bookmarkReviewButton.classList.toggle("is-hidden", bookmarkedQuestionIds.length === 0);
     bookmarkReviewButton.textContent = `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`;
-    queueActions.classList.toggle("is-hidden", weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0);
+    queueActions.classList.toggle("is-hidden", dueQuestions.length === 0 && weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0);
 
     const hasProgress = summary.repeatedAnswers > 0 || summary.tests > 0 || weakQuestionIds.length > 0 || bookmarkedQuestionIds.length > 0;
     exportProgressButton.disabled = !hasProgress;
@@ -54,8 +69,32 @@ export function createProgressPanel(ctx) {
     progressSummary.classList.toggle("is-hidden", !hasProgress);
     progressInsights.classList.toggle("is-hidden", !hasProgress);
     resetProgressButton.classList.toggle("is-hidden", !hasProgress);
+    renderReadiness(dueQuestions.length);
     renderAreaStats();
     renderRecentTests();
+  }
+
+  function renderReadiness(dueCount = getDueQuestions(progress, questions).length) {
+    const readiness = estimateReadiness(progress, questions, ctx.actions.getSelectedState?.() || "");
+    const percent = Math.round(readiness.passChance * 100);
+    const dueText = dueCount ? ` ${dueCount} ${dueCount === 1 ? "question is" : "questions are"} due for review.` : "";
+
+    readinessMeter.classList.toggle("is-hidden", !readiness.hasEstimate);
+    readinessScore.classList.toggle("is-hidden", !readiness.hasEstimate);
+    if (!readiness.hasEstimate) {
+      readinessValue.textContent = "–";
+      readinessLabel.textContent = "Not enough answers yet";
+      readinessDetail.textContent = `Answer ${MIN_STUDIED_FOR_ESTIMATE} different questions to see an estimate of your chance of passing.${dueText}`;
+      return;
+    }
+
+    readinessValue.textContent = `${percent}%`;
+    readinessLabel.textContent = readiness.label;
+    readinessFill.style.width = `${percent}%`;
+    readinessScore.textContent = `Expected score: about ${readiness.expectedScore.toFixed(1)} of ${TOTAL_GENERAL + TOTAL_STATE}. You need ${PASS_THRESHOLD} to pass.`;
+    readinessMeter.setAttribute("aria-valuenow", String(percent));
+    readinessMeter.setAttribute("aria-valuetext", `${percent}% estimated chance of passing, ${readiness.label}`);
+    readinessDetail.textContent = `Estimated chance of passing the exam today, from ${readiness.studied} of ${readiness.total} questions studied. Questions you have not seen count as guesses, so this is cautious.${dueText}`;
   }
 
   function renderAreaStats() {
@@ -197,6 +236,7 @@ export function createProgressPanel(ctx) {
   importProgressButton.addEventListener("click", () => importProgressInput.click());
   importProgressInput.addEventListener("change", importProgress);
   ctx.events.on("progress-changed", render);
+  ctx.events.on("bundesland-changed", () => renderReadiness());
 
   return { render };
 }

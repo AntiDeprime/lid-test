@@ -9,6 +9,7 @@ export function createStartScreen(ctx) {
   const studyFilter = $("study-filter");
   const startButton = $("start-button");
   const practiceButton = $("practice-button");
+  const dueReviewButton = $("due-review-button");
   const weakReviewButton = $("weak-review-button");
   const bookmarkReviewButton = $("bookmark-review-button");
   const startTabs = [...document.querySelectorAll("[data-start-tab]")];
@@ -48,12 +49,15 @@ export function createStartScreen(ctx) {
   tabs.selectTab("progress");
   startButton.addEventListener("click", () => ctx.actions.startRun());
   practiceButton.addEventListener("click", () => ctx.actions.startPracticeRun());
+  dueReviewButton.addEventListener("click", () => ctx.actions.startDueReview());
   weakReviewButton.addEventListener("click", () => ctx.actions.startWeakReview());
+  bundeslandSelect.addEventListener("change", () => ctx.events.emit("bundesland-changed"));
   bookmarkReviewButton.addEventListener("click", () => ctx.actions.startBookmarkReview());
 
   if (!questions.length) {
     startButton.disabled = true;
     practiceButton.disabled = true;
+    dueReviewButton.disabled = true;
     weakReviewButton.disabled = true;
     startButton.textContent = "Question data missing";
   }

@@ -1,4 +1,5 @@
 import { orderStudyQuestionsByProgress } from "./sampling.js";
+import { getDueSortKey, isDue } from "./scheduling.js";
 
 function knownIds(questions) {
   return new Set(questions.map((question) => String(question.id)));
@@ -105,4 +106,15 @@ export function getStudyQuestions(filter, questions, progress) {
     });
 
   return orderStudyQuestionsByProgress(filtered, progress.questionStats);
+}
+
+// Questions due for review, longest-waiting first, then the lowest box.
+export function getDueQuestions(progress, questions, now = new Date()) {
+  return questions
+    .filter((question) => isDue(progress.questionStats[String(question.id)], now))
+    .sort((a, b) => {
+      const statsA = progress.questionStats[String(a.id)];
+      const statsB = progress.questionStats[String(b.id)];
+      return getDueSortKey(statsA) - getDueSortKey(statsB) || (statsA.box || 1) - (statsB.box || 1) || a.id - b.id;
+    });
 }
