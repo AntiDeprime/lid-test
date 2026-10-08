@@ -21,6 +21,12 @@ Only `questions.js` and the images may claim to be the official test. Explanatio
 - **Images:** 43 questions depend on an image (flags, coats of arms, maps, the ballot paper). They are the exact set listed in `OFFICIAL_IMAGE_QUESTION_IDS` in `scripts/validate-data.js`.
 - **How it got into the repository:** `gesamtfragenkatalog-lebenindeutschland-v2.md` is a Markdown extract of the PDF (300 general questions and Berlin's ten). `questions.js` holds all 460 and was produced from the PDF with tooling that is not kept in this repository, so there is no import script to re-run. A catalogue refresh is therefore a manual, reviewed edit, described next.
 
+## Terms of reuse
+
+No licence or terms of use for the catalogue were found on the BAMF pages checked on 8 October 2026 (download page, Online-Testcenter, Impressum). The BAMF Impressum states that images without a credit belong to BAMF and refers anyone who wants to use them to its press office. Five image questions (55, 70, 181, 216, 235) carry third-party photograph credits in the catalogue itself, which stay in the prompts. Republishing is therefore **not cleared**: see `docs/operations.md`, "What BAMF's published terms say about reuse", for the findings and the recommended written request. Record any answer from BAMF here, with its date and who gave it.
+
+The BAMF download page is dated 26 May 2025; the extract here is stamped 7 May 2025. Compare the two editions as described below before relying on the answer key.
+
 ## Refreshing the catalogue
 
 When BAMF publishes a new catalogue:

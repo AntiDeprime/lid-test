@@ -8,13 +8,15 @@ export const SITE = {
   // Pages project site include the repository path. Example shape only:
   // "https://learn.example.org/". Used for the canonical link, the social
   // preview image, robots.txt, and sitemap.xml (node scripts/generate-site.mjs).
-  origin: "",
+  origin: "https://alxy.sh/lid-test/",
   // Who is responsible for the site under GDPR and the German Telemedia
-  // rules. Shown in the Imprint and Privacy dialogs.
+  // rules. Shown in the Imprint and Privacy dialogs. The postal address is
+  // still missing and must not be guessed; until it is set the Imprint shows
+  // name and email only and `--production` keeps failing.
   operator: {
-    name: "",
+    name: "Aleksei Shchetinin",
     address: "",
-    email: ""
+    email: "antideprime@gmail.com"
   },
   // How long the Google Analytics property keeps event data, in months, as
   // configured in that property. Leave null if unknown; the Privacy dialog

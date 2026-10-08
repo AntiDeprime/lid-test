@@ -9,10 +9,16 @@ export function hasOperatorDetails(operator = {}) {
   return Boolean(operator.name?.trim() && operator.address?.trim() && operator.email?.trim());
 }
 
-function describeOperator(operator) {
-  return hasOperatorDetails(operator)
-    ? `${operator.name.trim()}, ${operator.address.trim().replace(/\s*\n\s*/g, ", ")}. Email: ${operator.email.trim()}`
-    : null;
+// Names whatever the operator has supplied: name, then address, then email.
+// The maintainer fallback is used only when there is neither a name nor an
+// email, so a partly filled site-config.js never shows a half-empty line.
+function describeOperator(operator = {}) {
+  const name = operator.name?.trim();
+  const address = operator.address?.trim().replace(/\s*\n\s*/g, ", ");
+  const email = operator.email?.trim();
+  if (!name && !email) return null;
+  const identity = [name, address].filter(Boolean).join(", ");
+  return [identity, email ? `Email: ${email}` : ""].filter(Boolean).join(". ");
 }
 
 // The Privacy and Imprint dialogs, as sections of plain paragraphs. They
@@ -23,7 +29,8 @@ export function buildLegalNotice(site = {}) {
   const retention = Number.isFinite(site.analyticsRetentionMonths) && site.analyticsRetentionMonths > 0
     ? `Google Analytics keeps this data for ${site.analyticsRetentionMonths} months, as set in the operator's Google Analytics property.`
     : "How long Google Analytics keeps this data is set in the operator's Google Analytics property.";
-  const contact = operator ? `Contact: ${site.operator.email.trim()}.` : "Use the contact in the Imprint.";
+  const contactEmail = site.operator?.email?.trim();
+  const contact = contactEmail ? `Contact: ${contactEmail}.` : "Use the contact in the Imprint.";
 
   return {
     privacy: {

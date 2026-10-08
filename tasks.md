@@ -224,11 +224,18 @@
 
 - [ ] Add production privacy and legal controls.
   - Done: the Privacy dialog now describes what the app really does (every storage key, the optional Google Analytics, legal basis, rights, how to withdraw), built from `site-config.js`; a footer control turns analytics off after consent (stops collection on the open page, removes the `_ga` cookies, keeps the tag from loading again) or back on; the privacy dialog scrolls on a phone; unit tests and a `privacy` browser section cover it.
-  - Still needs the owner: `operator.name`, `operator.address` and `operator.email` in `site-config.js`, a legal check of the wording and of the imprint requirement, and confirmation that analytics property `G-6LN5H6T5LW` is the operator's own. `node scripts/validate-site.mjs --production` fails until the operator fields are set.
+  - Set by the owner: `operator.name` (Aleksei Shchetinin), `operator.email` (antideprime@gmail.com), and ownership of analytics property `G-6LN5H6T5LW` is confirmed; partial operator details are shown as given instead of the maintainer fallback.
+  - Still needs the owner: `operator.address` (a postal address; never guess it), a legal check of the wording and of the imprint requirement (§ 5 DDG), and the settings in the analytics property (Google Signals and data sharing off, data-processing terms, retention months for `analyticsRetentionMonths`). `node scripts/validate-site.mjs --production` fails until the address is set.
 
 - [ ] Add production SEO assets.
   - Done: `site-config.js` `origin` drives `scripts/generate-site.mjs`, which writes the canonical link, `og:url`, absolute Open Graph and Twitter image URLs, `robots.txt` and `sitemap.xml`; `scripts/validate-site.mjs` (also in CI) fails when they drift from the config; a 1200x630 share card (`assets/share-card.png`) with the LiD mark replaces the map question image as the social preview.
-  - Still needs the owner: the public address (`origin`). On a GitHub Pages project site `robots.txt` cannot be served from the path, so submit the sitemap in Search Console.
+  - Set: `origin` is `https://alxy.sh/lid-test/`; the canonical link, `og:url`, absolute social image URLs, `robots.txt` and `sitemap.xml` are generated from it.
+  - Still needs the owner: `robots.txt` is ignored under a path, so serve the `Sitemap:` line from `https://alxy.sh/robots.txt` or submit `sitemap.xml` in Search Console.
+
+- [ ] Clear the rights to the BAMF questions and images.
+  - Researched: no licence or terms of use for the catalogue were found on the BAMF pages; the Impressum says uncredited images belong to BAMF and refers reuse requests to its press office; five questions carry third-party photograph credits (see `docs/operations.md`).
+  - Still needs the owner: a written answer from the BAMF press office on republishing the questions and images, recorded in `docs/data-provenance.md`, or a decision to launch without the images.
+  - Compare the catalogue dated 26 May 2025 (BAMF download page) with the 7 May 2025 extract used here; the PDF could not be downloaded from the build container.
 
 - [ ] Improve catalogue search quality and spoiler handling.
   - Add diacritic-tolerant search and ranked matches.

@@ -574,6 +574,11 @@ assert.ok(unconfigured.includes("github.com/AntiDeprime/lid-test/issues"), "with
 assert.ok(!/undefined|null|\bNaN\b|placeholder|\{|\}/i.test(unconfigured), "no leftover template text");
 assert.equal(hasOperatorDetails({ name: "A", address: "B", email: "c@d.e" }), true);
 assert.equal(hasOperatorDetails({ name: "A", address: " ", email: "c@d.e" }), false);
+const partialDetails = flatten(buildLegalNotice({ operator: { name: "Jane Doe", address: "", email: "jane@example.org" }, analyticsRetentionMonths: null }));
+assert.ok(partialDetails.includes("Jane Doe. Email: jane@example.org."), "a name and email without an address are shown as given");
+assert.ok(partialDetails.includes("Contact: jane@example.org."));
+assert.ok(!partialDetails.includes("github.com/AntiDeprime") && !/undefined|null|\bNaN\b|, \.|,\s*Email/.test(partialDetails), "partialDetails details leave no gaps or fallback text");
+assert.ok(flatten(buildLegalNotice({ operator: { name: "", address: "Somewhere 1", email: "" } })).includes("github.com/AntiDeprime"), "an address alone is not enough to name an operator");
 const configured = buildLegalNotice({ operator: { name: "Example GmbH", address: "Musterstraße 1\n10115 Berlin", email: "hello@example.org" }, analyticsRetentionMonths: 14 });
 const configuredText = flatten(configured);
 assert.ok(configuredText.includes("Example GmbH, Musterstraße 1, 10115 Berlin. Email: hello@example.org"));
