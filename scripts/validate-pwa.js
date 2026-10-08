@@ -95,25 +95,54 @@ const css = fs.readFileSync(path.join(ROOT, "styles.css"), "utf8");
   if (isLocal(reference)) requireFile(normalizeAsset(reference).file, "styles.css url()");
 });
 
-// The cache name must change whenever a precached file does.
-const recordedHash = readAssetHash(serviceWorker);
-const allAssetsExist = assets.every((asset) => exists(normalizeAsset(asset).file));
-const currentHash = allAssetsExist ? computeAssetHash(assets) : "unknown";
-if (!allAssetsExist) {
-  fail("service-worker.js ASSET_HASH was not checked because a precached file is missing.");
-} else if (!recordedHash) {
-  fail('service-worker.js needs a `const ASSET_HASH = "…";` line; run `node scripts/update-asset-hash.js`.');
-} else if (recordedHash !== currentHash) {
-  fail(`service-worker.js ASSET_HASH is ${recordedHash} but the precached files hash to ${currentHash}. Run \`node scripts/update-asset-hash.js\` so installed copies pick up the change.`);
-}
-if (!/const CACHE_NAME = `lid-test-prep-\$\{ASSET_HASH\}`;/.test(serviceWorker)) {
-  fail("service-worker.js CACHE_NAME must be derived from ASSET_HASH.");
+// Files that are loaded on demand (modules/content.js and the language
+// registry) are not in index.html, so they are checked from their lists.
+async function checkLazyContent() {
+  const { EXPLANATION_ATTACH_FILE, EXPLANATION_TEXT_FILES } = await import("../modules/content.js");
+  const { DEFAULT_LANGUAGE, LANGUAGES } = await import("../modules/languages.js");
+
+  [...EXPLANATION_TEXT_FILES, EXPLANATION_ATTACH_FILE].forEach((file) => {
+    requirePrecached(file, "modules/content.js lazy explanation file");
+  });
+  LANGUAGES.forEach((language) => {
+    requirePrecached(language.file, `modules/languages.js ${language.code} translations`);
+  });
+  if (!LANGUAGES.some((language) => language.code === DEFAULT_LANGUAGE)) {
+    fail(`modules/languages.js DEFAULT_LANGUAGE ${DEFAULT_LANGUAGE} is not in LANGUAGES.`);
+  }
+  // Nothing the page needs for its first screen should wait for these files.
+  const lazyKeys = new Set([...EXPLANATION_TEXT_FILES, EXPLANATION_ATTACH_FILE, ...LANGUAGES.map((language) => language.file)]);
+  [...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].forEach(([, src]) => {
+    if (lazyKeys.has(src)) fail(`index.html loads ${src} up front, but modules/content.js loads it on demand; remove the script tag.`);
+  });
 }
 
-if (errors.length) {
-  console.error(`PWA validation failed with ${errors.length} problem${errors.length === 1 ? "" : "s"}:`);
-  errors.forEach((message) => console.error(`- ${message}`));
+function finish() {
+  // The cache name must change whenever a precached file does.
+  const recordedHash = readAssetHash(serviceWorker);
+  const allAssetsExist = assets.every((asset) => exists(normalizeAsset(asset).file));
+  const currentHash = allAssetsExist ? computeAssetHash(assets) : "unknown";
+  if (!allAssetsExist) {
+    fail("service-worker.js ASSET_HASH was not checked because a precached file is missing.");
+  } else if (!recordedHash) {
+    fail('service-worker.js needs a `const ASSET_HASH = "…";` line; run `node scripts/update-asset-hash.js`.');
+  } else if (recordedHash !== currentHash) {
+    fail(`service-worker.js ASSET_HASH is ${recordedHash} but the precached files hash to ${currentHash}. Run \`node scripts/update-asset-hash.js\` so installed copies pick up the change.`);
+  }
+  if (!/const CACHE_NAME = `lid-test-prep-\$\{ASSET_HASH\}`;/.test(serviceWorker)) {
+    fail("service-worker.js CACHE_NAME must be derived from ASSET_HASH.");
+  }
+
+  if (errors.length) {
+    console.error(`PWA validation failed with ${errors.length} problem${errors.length === 1 ? "" : "s"}:`);
+    errors.forEach((message) => console.error(`- ${message}`));
+    process.exit(1);
+  }
+
+  console.log(`PWA validation passed: ${precached.size} precached files, cache revision ${currentHash}.`);
+}
+
+checkLazyContent().then(finish, (error) => {
+  console.error(`PWA validation could not check the lazy-loaded content: ${error.message}`);
   process.exit(1);
-}
-
-console.log(`PWA validation passed: ${precached.size} precached files, cache revision ${currentHash}.`);
+});

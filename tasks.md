@@ -2,6 +2,16 @@
 
 ## High Priority
 
+- [x] Load explanations and translations on demand, and add Russian translations.
+  - Remove the six data scripts from `index.html`: the first screen now loads only `questions.js` (176 KB instead of 344 KB of data). `modules/content.js` fetches the explanations in the background once the page is idle and translations when a learner turns them on or searches the catalogue; each file loads once, a failed fetch can be retried, and everything is still precached so it works offline.
+  - Add a language registry (`modules/languages.js`) and a picker under the German question; the choice is remembered, and a first visit uses the browser language when it is supported. The quiz toggle now shows the chosen language, and a loading or failed translation says so with a "Try again" button.
+  - Add `translations-ru.js` (all 460 questions) and fill the 150 Bundesland questions that had no English translation, so every question is translated in both languages. Both come from translation tables and a machine-translation pass that no native speaker has reviewed; the app labels them unofficial and `docs/data-provenance.md` lists the Russian wording to review first.
+  - Include a shown translation in each answer button's accessible name (it was missing before), and make the fit scan, the offline check, and the accessibility scan cover Russian.
+  - Validate every registered language for full coverage, empty or identical options, and the right writing system; check the lazily loaded files against the precache list; add a `content` browser section.
+
+- [x] Document data provenance and update workflow.
+  - `docs/data-provenance.md` records the BAMF catalogue (dated 7 May 2025) as the source, the id scheme, the manual refresh steps (there is no import script in the repository), what `scripts/validate-data.js` enforces, and how explanations and translations are written and maintained separately from the official data.
+
 - [x] Add a spaced-repetition "due" queue and an exam-readiness estimate.
   - Schedule every study answer in a five-box Leitner schedule (`modules/scheduling.js`): correct answers move up a box and wait 1, 3, 7, 14, then 30 days; a miss returns to box 1; due dates fall on local midnight.
   - Bump the storage version to 2 with a migration that gives saved questions a box from their record and a due-once date, and keep version 1 backups importable.
@@ -239,11 +249,6 @@
   - Keep fast smoke checks separate from deeper flow checks.
   - Make the deeper browser check practical to run in CI.
 
-- [ ] Document data provenance and update workflow.
-  - Record the official catalogue source, source date, and import/update process.
-  - Add validation expectations for future catalogue refreshes.
-  - Document how explanations and translations are maintained separately from official answer data.
-
 - [x] Replace native confirmation dialogs with app dialogs.
   - Use the existing modal helper for reset-progress and leave-run confirmations.
   - Preserve focus management and mobile-friendly copy.
@@ -255,10 +260,6 @@
   - Add a `keyboard` section that drives the app with real key presses: visible focus rings on the start page, the analytics choice, tab arrows, catalogue jump, answering with Space, a result-screen practice link, the leave dialog (safe focus, trap, Escape, focus restore), and a whole exam answered from the keyboard.
   - Fix what it found: after a screen change focus now moves to the new screen's heading (question, result, start page) and to the question heading after Next and Previous, and choosing from the consent banner hands focus to the next control instead of dropping it to the page body.
   - Add a `visual` section that compares eleven key screens (phone, desktop, saved progress, dialog, result) with committed baselines in `scripts/browser/baselines/`, rendered in a pinned font with Chromium's hinting and LCD text off and a 0.8% pixel tolerance, and regenerates them with `UPDATE_BASELINES=1`.
-
-- [ ] Reduce first-load payload as content grows.
-  - Consider lazy-loading translations and explanations.
-  - Keep first exam-start performance fast on mobile.
 
 - [ ] Expand operational documentation.
   - Document CI, release checks, cache-bump rules, production privacy requirements, and known limitations.

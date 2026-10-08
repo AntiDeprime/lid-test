@@ -78,6 +78,14 @@ export function createResultScreen(ctx) {
   function renderReview() {
     reviewList.replaceChildren();
     const missed = state.answers.filter((entry) => !entry.isCorrect);
+    if (missed.length && !ctx.content.explanationsLoaded()) {
+      // Explanations load in the background; fill them in once they arrive.
+      ctx.content.ensureExplanations().then(() => {
+        if (!resultScreen.classList.contains("is-hidden")) renderReview();
+      }, () => {
+        // The review is still useful without the explanations.
+      });
+    }
     reviewHeading.textContent = missed.length === 1 ? "1 missed question" : `${missed.length} missed questions`;
 
     if (missed.length === 0) {

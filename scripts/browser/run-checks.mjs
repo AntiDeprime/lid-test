@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 // Portable browser checks for the static app: smoke, deeper flows, offline
-// reload, 390px layout, a fit scan over every question, and an accessibility
-// scan. Runs on Linux, macOS, and CI without the Codex Playwright wrapper.
+// reload, lazy content loading, 390px layout, a fit scan over every question,
+// and an accessibility scan. Runs on Linux, macOS, and CI without the Codex Playwright wrapper.
 //
 //   cd scripts/browser && npm ci && npx playwright install chromium && node run-checks.mjs
 //
 // Useful environment variables:
 //   CHROMIUM_PATH   reuse an installed Chromium instead of Playwright's download
 //   PORT            serve on a fixed port (default: a free port)
-//   ONLY            comma-separated sections to run (smoke,flow,offline,layout,fit,keyboard,visual,review,a11y)
+//   ONLY            comma-separated sections to run (smoke,flow,offline,content,layout,fit,keyboard,visual,review,a11y)
 //   KEEP_ARTIFACTS  set to 1 to keep screenshots of passing runs too
 //   UPDATE_BASELINES  set to 1 to rewrite scripts/browser/baselines/*.png (visual section)
 //   TEST_FONT       force a font family, e.g. "DejaVu Sans" to reproduce the
@@ -32,6 +32,8 @@ const require = createRequire(import.meta.url);
 const axeSource = fs.readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 
 const MOBILE = { width: 390, height: 844 };
+// Languages whose translations the fit scan checks for horizontal overflow.
+const FIT_LANGUAGES = ["en", "ru"];
 const DESKTOP = { width: 1280, height: 720 };
 
 // Visual baselines are rendered in one pinned font so they do not depend on
@@ -248,12 +250,97 @@ const sections = {
       await page.click("#practice-button");
       await page.waitForSelector("#quiz-screen:not(.is-hidden)");
       await page.locator(".answer-option").first().click();
-      const explanation = await page.textContent("#question-explanation");
-      if (!explanation || !explanation.trim()) throw new Error("Offline study run did not show an explanation");
+      // Explanations and translations load on demand, here from the service worker cache.
+      await page.waitForFunction(() => document.querySelector("#question-explanation")?.textContent.trim(), null, { timeout: 10000 }).catch(() => {
+        throw new Error("Offline study run did not show an explanation");
+      });
+      await page.click("#translation-toggle");
+      await page.waitForSelector('#question-translation[data-state="ready"]', { timeout: 10000 }).catch(() => {
+        throw new Error("Offline study run did not show a translation");
+      });
+      await page.selectOption("#translation-language", "ru");
+      await page.waitForSelector('#question-translation[data-state="ready"][lang="ru"]', { timeout: 10000 }).catch(() => {
+        throw new Error("Offline study run did not show a Russian translation");
+      });
       expectNoProblems(problems.filter((problem) => !/Failed to load resource|net::ERR/.test(problem)), "Offline check");
     } finally {
       await context.close();
       if (server.listening) await new Promise((resolve) => server.close(resolve));
+    }
+  },
+
+  // Explanations and translations load on demand: nothing translated is fetched
+  // up front, a language switch loads its own file, a failed fetch offers a
+  // retry, and the choice is remembered.
+  async content({ browser, url }) {
+    const { context, page, problems } = await openPage(browser, { viewport: MOBILE });
+    const files = [];
+    page.on("request", (request) => {
+      const name = new URL(request.url()).pathname.split("/").pop();
+      if (/^(translations-|explanation)/.test(name)) files.push(name);
+    });
+    const ready = (language) => `#question-translation[data-state="ready"][lang="${language}"]`;
+    try {
+      await page.goto(url);
+      await page.waitForSelector("#start-button");
+      if (files.some((name) => name.startsWith("translations-"))) {
+        throw new Error(`Translations were fetched before anyone asked for them: ${files.join(", ")}`);
+      }
+      await page.waitForFunction(() => Boolean(window.LID_EXPLANATION_HELPERS), null, { timeout: 10000 });
+      if (files.filter((name) => name.startsWith("explanation")).length !== 5) {
+        throw new Error(`Expected the five explanation files to load once in the background, saw ${files.join(", ")}`);
+      }
+
+      await page.click(".consent-banner .secondary-action");
+      await page.click("#practice-button");
+      await page.waitForSelector("#quiz-screen:not(.is-hidden)");
+      await page.locator(".answer-option").first().click();
+      const explanation = await page.textContent("#question-explanation");
+      if (!explanation || !explanation.trim()) throw new Error("The explanation did not show after the first answer");
+
+      await page.click("#translation-toggle");
+      await page.waitForSelector(ready("en"));
+      if (!files.includes("translations-en.js") || files.includes("translations-ru.js")) {
+        throw new Error(`Turning translations on should load only the English file, saw ${files.join(", ")}`);
+      }
+      await page.selectOption("#translation-language", "ru");
+      await page.waitForSelector(ready("ru"));
+      if (!files.includes("translations-ru.js")) throw new Error("Choosing Russian did not load translations-ru.js");
+      const label = await page.textContent("#translation-label");
+      if (label !== "Русский") throw new Error(`The toolbar label should name the chosen language, saw ${label}`);
+      const accessibleName = await page.getAttribute("#translation-toggle", "aria-label");
+      if (!accessibleName.startsWith(label)) throw new Error(`The toggle's accessible name "${accessibleName}" should start with its visible text "${label}"`);
+      await page.reload();
+      await page.waitForSelector("#start-button");
+      const keptLanguage = await page.evaluate(() => window.localStorage.getItem("lidTranslationLanguage"));
+      if (keptLanguage !== "ru") throw new Error("The chosen translation language was not saved");
+      expectNoProblems(problems, "Content check");
+    } finally {
+      await context.close();
+    }
+
+    // A failed fetch shows an error with a retry; the retry succeeds once the file is reachable.
+    const failing = await openPage(browser, {
+      viewport: MOBILE,
+      init: { script: () => window.localStorage.setItem("lidTranslationLanguage", "ru") }
+    });
+    try {
+      let blocked = true;
+      await failing.page.route("**/translations-ru.js*", (route) => (blocked ? route.abort() : route.continue()));
+      await failing.page.goto(url);
+      await failing.page.click(".consent-banner .secondary-action");
+      await failing.page.click("#practice-button");
+      await failing.page.waitForSelector("#quiz-screen:not(.is-hidden)");
+      if ((await failing.page.textContent("#translation-label")) !== "Русский") throw new Error("A saved language should be used on the next visit");
+      await failing.page.click("#translation-toggle");
+      await failing.page.waitForSelector('#question-translation[data-state="error"]');
+      blocked = false;
+      await failing.page.click(".translation-retry");
+      await failing.page.waitForSelector(ready("ru"));
+      const failures = failing.problems.filter((problem) => !/Failed to load resource|net::ERR/.test(problem));
+      expectNoProblems(failures, "Content failure check");
+    } finally {
+      await failing.context.close();
     }
   },
 
@@ -329,8 +416,9 @@ const sections = {
     }
   },
 
-  // Every question, with translations on and an answer picked, must fit the
-  // viewport width: long German compounds are what push a layout sideways.
+  // Every question, with each language's translations on and an answer picked,
+  // must fit the viewport width: long German compounds are what push a layout
+  // sideways.
   async fit({ browser, url }) {
     const failures = [];
     for (const width of [360, MOBILE.width]) {
@@ -341,22 +429,36 @@ const sections = {
         const overflowing = await runInPage(page, `async () => {
           const out = [];
           const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
-          for (const question of window.LID_QUESTIONS) {
-            document.querySelector('[data-start-tab="catalogue"]').click();
-            document.querySelector("#jump-question").value = String(question.id);
-            document.querySelector("#jump-form").requestSubmit();
-            await tick();
-            const toggle = document.querySelector("#translation-toggle");
-            if (toggle.getAttribute("aria-pressed") !== "true") toggle.click();
-            const before = document.documentElement.scrollWidth;
-            document.querySelectorAll(".answer-option")[0].click();
-            await tick();
-            const after = document.documentElement.scrollWidth;
-            if (before > innerWidth || after > innerWidth) out.push(question.id);
-            document.querySelector("#home-button").click();
-            await tick();
-            document.querySelector(".confirm-leave")?.click();
-            await tick();
+          const until = async (test) => {
+            for (let waited = 0; !test(); waited += 10) {
+              if (waited >= 8000) throw new Error("Timed out waiting for lazy content");
+              await new Promise((resolve) => setTimeout(resolve, 10));
+            }
+          };
+          const picker = document.querySelector("#translation-language");
+          const panel = document.querySelector("#question-translation");
+          await until(() => window.LID_EXPLANATION_HELPERS);
+          for (const language of ${JSON.stringify(FIT_LANGUAGES)}) {
+            picker.value = language;
+            picker.dispatchEvent(new Event("change", { bubbles: true }));
+            for (const question of window.LID_QUESTIONS) {
+              document.querySelector('[data-start-tab="catalogue"]').click();
+              document.querySelector("#jump-question").value = String(question.id);
+              document.querySelector("#jump-form").requestSubmit();
+              await tick();
+              const toggle = document.querySelector("#translation-toggle");
+              if (toggle.getAttribute("aria-pressed") !== "true") toggle.click();
+              await until(() => panel.dataset.state === "ready" && panel.lang === language);
+              const before = document.documentElement.scrollWidth;
+              document.querySelectorAll(".answer-option")[0].click();
+              await tick();
+              const after = document.documentElement.scrollWidth;
+              if (before > innerWidth || after > innerWidth) out.push(language + "/" + question.id);
+              document.querySelector("#home-button").click();
+              await tick();
+              document.querySelector(".confirm-leave")?.click();
+              await tick();
+            }
           }
           return out;
         }`);
@@ -425,6 +527,7 @@ const sections = {
       await wrongAnswer(page);
       await compare(page, "quiz-answered-390");
       await page.click("#translation-toggle");
+      await page.waitForSelector('#question-translation[data-state="ready"]');
       await compare(page, "quiz-translation-390");
       await page.click("#home-button");
       await page.waitForSelector(".confirm-modal");
@@ -788,6 +891,11 @@ const sections = {
       await scan("study question");
       await page.locator(".answer-option").first().click();
       await scan("study question answered");
+      await page.click("#translation-toggle");
+      await page.selectOption("#translation-language", "ru");
+      await page.waitForSelector('#question-translation[data-state="ready"][lang="ru"]');
+      await scan("study question with a Russian translation");
+      await page.click("#translation-toggle");
       await page.click("#home-button");
       await page.waitForSelector(".confirm-modal");
       await scan("leave dialog");

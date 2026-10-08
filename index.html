@@ -30,7 +30,7 @@
             "applicationCategory": "EducationalApplication",
             "operatingSystem": "Any",
             "inLanguage": ["en", "de"],
-            "description": "A mobile-friendly practice app for the German Leben in Deutschland Test and Einbürgerungstest with study mode, selectable Bundesland questions, timed exam simulation, English translations, and missed-answer review.",
+            "description": "A mobile-friendly practice app for the German Leben in Deutschland Test and Einbürgerungstest with study mode, selectable Bundesland questions, timed exam simulation, English and Russian translations, and missed-answer review.",
             "offers": {
               "@type": "Offer",
               "price": "0",
@@ -183,7 +183,7 @@
                 <ul class="feature-list">
                   <li><span class="feature-mark">✓</span><span>Run a realistic 33-question exam simulation with a 60-minute timer and no instant answer reveal.</span></li>
                   <li><span class="feature-mark">✓</span><span>Browse all 300 general items plus all 16 Bundesland question sets in study mode.</span></li>
-                  <li><span class="feature-mark">✓</span><span>Use instant feedback, explanations, hints, translations, and weak-question tracking while studying.</span></li>
+                  <li><span class="feature-mark">✓</span><span>Use instant feedback, explanations, hints, English or Russian translations, and weak-question tracking while studying.</span></li>
                   <li><span class="feature-mark">✓</span><span>Review wrong answers after each run.</span></li>
                   <li><span class="feature-mark">✓</span><span>Come back to questions when they are due on a spaced schedule, and see an estimate of your chance of passing.</span></li>
                   <li><span class="feature-mark">✓</span><span>Bookmark difficult questions for later practice.</span></li>
@@ -348,6 +348,11 @@
             </div>
           </div>
           <h1 id="question-title" lang="de" tabindex="-1"></h1>
+          <div id="translation-bar" class="translation-bar is-hidden">
+            <label for="translation-language">Translate to</label>
+            <select id="translation-language"></select>
+            <small>Unofficial translation. The exam is in German.</small>
+          </div>
           <div id="question-translation" class="translation-panel is-hidden" aria-live="polite" lang="en"></div>
           <div id="quiz-toolbar" class="quiz-toolbar" aria-label="Question and session actions">
             <div class="toolbar-group" role="group" aria-label="Question tools">
@@ -355,9 +360,9 @@
                 <svg class="toolbar-icon bookmark-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.75 4.75A1.75 1.75 0 0 1 8.5 3h7A1.75 1.75 0 0 1 17.25 4.75v16L12 17.45l-5.25 3.3v-16Z"/></svg>
                 <span id="bookmark-label" class="toolbar-label">Bookmark</span>
               </button>
-              <button id="translation-toggle" class="toolbar-action" type="button" aria-pressed="false" title="Show English translations">
+              <button id="translation-toggle" class="toolbar-action" type="button" aria-pressed="false" title="English: show translation">
                 <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h10M9 3v2m3.5 0c-.7 3.8-3.2 7-6.5 8.7m2-5.7c1.1 2.3 2.8 4.2 5 5.5M14 21l3.4-8 3.4 8M15.2 18h4.4"/></svg>
-                <span class="toolbar-label">English</span>
+                <span id="translation-label" class="toolbar-label">English</span>
               </button>
             </div>
             <div class="toolbar-group" role="group" aria-label="Session navigation">
@@ -427,12 +432,6 @@
     </main>
 
     <script src="questions.js?v=catalogue"></script>
-    <script src="explanation-texts-001-115.js?v=catalogue"></script>
-    <script src="explanation-texts-116-230.js?v=catalogue"></script>
-    <script src="explanation-texts-231-345.js?v=catalogue"></script>
-    <script src="explanation-texts-346-460.js?v=catalogue"></script>
-    <script src="explanations.js?v=catalogue"></script>
-    <script src="translations-en.js?v=catalogue"></script>
     <script type="module" src="app.js?v=catalogue"></script>
   </body>
 </html>

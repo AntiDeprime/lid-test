@@ -1,4 +1,8 @@
 async () => {
+  // Explanations load in the background after the first screen.
+  for (let waited = 0; !window.LID_EXPLANATION_HELPERS && waited < 8000; waited += 25) {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
   const explanations = window.LID_SPECIFIC_EXPLANATIONS || {};
   if (Object.keys(explanations).length !== 460) {
     throw new Error('Expected 460 bespoke explanations');

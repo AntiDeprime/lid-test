@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { applyAnswer, summarizeProgress, toggleBookmark } from "../modules/progress.js";
 import { createEmitter } from "../modules/emitter.js";
+import { EXPLANATION_ATTACH_FILE, EXPLANATION_TEXT_FILES, createContent } from "../modules/content.js";
+import { DEFAULT_LANGUAGE, LANGUAGES, detectLanguage, getLanguage, isSupportedLanguage } from "../modules/languages.js";
+import { LANGUAGE_KEY, loadLanguagePreference, saveLanguagePreference } from "../modules/preferences.js";
 import { MAX_BOX, REVIEW_INTERVAL_DAYS, isDue, scheduleAnswer } from "../modules/scheduling.js";
 import { GUESS_RATE, MIN_STUDIED_FOR_ESTIMATE, estimateQuestionProbability, estimateReadiness, getReadinessLabel } from "../modules/readiness.js";
 import { formatAnswer, formatDuration } from "../modules/format.js";
@@ -466,5 +469,76 @@ emitter.emit("changed", 1);
 stopHearing();
 emitter.emit("changed", 2);
 assert.deepEqual(heard, [1]);
+
+// Languages and the translation preference.
+assert.ok(isSupportedLanguage("ru") && isSupportedLanguage("en") && !isSupportedLanguage("de") && !isSupportedLanguage(null));
+assert.equal(getLanguage("ru").nativeName, "Русский");
+assert.equal(getLanguage("xx").code, DEFAULT_LANGUAGE, "unknown codes fall back to the default");
+assert.equal(new Set(LANGUAGES.map((language) => language.code)).size, LANGUAGES.length, "language codes are unique");
+assert.equal(detectLanguage(["ru-RU", "en"]), "ru");
+assert.equal(detectLanguage(["de-DE", "RU", "en"]), "ru", "the first supported browser language wins, case-insensitively");
+assert.equal(detectLanguage(["de-DE", "tr"]), DEFAULT_LANGUAGE);
+assert.equal(detectLanguage([]), DEFAULT_LANGUAGE);
+
+const memoryStorage = () => {
+  const data = new Map();
+  return { getItem: (key) => (data.has(key) ? data.get(key) : null), setItem: (key, value) => data.set(key, String(value)) };
+};
+const languageStorage = memoryStorage();
+assert.equal(loadLanguagePreference({ storage: languageStorage }), DEFAULT_LANGUAGE);
+assert.equal(loadLanguagePreference({ storage: languageStorage, browserLanguages: ["ru-RU"] }), "ru", "no saved choice uses the browser language");
+assert.equal(saveLanguagePreference("ru", languageStorage), true);
+assert.equal(languageStorage.getItem(LANGUAGE_KEY), "ru");
+assert.equal(loadLanguagePreference({ storage: languageStorage, browserLanguages: ["en"] }), "ru", "a saved choice beats the browser language");
+assert.equal(saveLanguagePreference("klingon", languageStorage), false);
+languageStorage.setItem(LANGUAGE_KEY, "klingon");
+assert.equal(loadLanguagePreference({ storage: languageStorage }), DEFAULT_LANGUAGE, "an unknown saved code is ignored");
+const brokenStorage = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); } };
+assert.equal(loadLanguagePreference({ storage: brokenStorage }), DEFAULT_LANGUAGE);
+assert.equal(saveLanguagePreference("en", brokenStorage), false);
+
+// Lazy content loading: each file is requested once, failures can be retried,
+// and a translation file that does not define its global is an error.
+const requested = [];
+const fakeGlobals = {};
+let failNext = null;
+const fakeLoad = async (file) => {
+  requested.push(file);
+  if (failNext === file) {
+    failNext = null;
+    throw new Error(`offline: ${file}`);
+  }
+  const language = LANGUAGES.find((item) => item.file === file);
+  if (language && language.code !== "broken") fakeGlobals[language.global] = { 1: { prompt: "p", options: ["a"] } };
+};
+const content = createContent({ load: fakeLoad, globals: fakeGlobals });
+assert.equal(content.explanationsLoaded(), false);
+assert.equal(content.translationsFor("ru"), null, "translations are not available before they load");
+await Promise.all([content.ensureExplanations(), content.ensureExplanations()]);
+assert.equal(content.explanationsLoaded(), true);
+assert.deepEqual(requested, [...EXPLANATION_TEXT_FILES, EXPLANATION_ATTACH_FILE], "explanations load once, text files before the attach step");
+await content.ensureExplanations();
+assert.equal(requested.length, EXPLANATION_TEXT_FILES.length + 1, "loaded explanations are not requested again");
+requested.length = 0;
+await content.ensureTranslations("ru");
+await content.ensureTranslations("ru");
+assert.deepEqual(requested, [getLanguage("ru").file]);
+assert.equal(content.translationsFor("ru")[1].prompt, "p");
+assert.equal(content.translationsFor("en"), null, "other languages stay unloaded");
+
+const flaky = createContent({ load: fakeLoad, globals: fakeGlobals });
+failNext = getLanguage("en").file;
+await assert.rejects(flaky.ensureTranslations("en"), /offline/);
+await flaky.ensureTranslations("en");
+assert.equal(flaky.translationsFor("en")[1].prompt, "p", "a failed load can be retried");
+const flakyExplanations = createContent({ load: fakeLoad, globals: fakeGlobals });
+failNext = EXPLANATION_ATTACH_FILE;
+await assert.rejects(flakyExplanations.ensureExplanations(), /offline/);
+assert.equal(flakyExplanations.explanationsLoaded(), false);
+await flakyExplanations.ensureExplanations();
+assert.equal(flakyExplanations.explanationsLoaded(), true, "explanations can be retried after a failed load");
+const emptyGlobals = {};
+const missingGlobal = createContent({ load: async () => {}, globals: emptyGlobals });
+await assert.rejects(missingGlobal.ensureTranslations("ru"), /did not define/);
 
 console.log("Progress and quiz-rule validation passed.");

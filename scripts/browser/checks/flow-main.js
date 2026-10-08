@@ -9,6 +9,12 @@ async () => {
     const prompt = document.querySelector('#question-title')?.textContent;
     return window.LID_QUESTIONS.find((question) => question.prompt === prompt);
   };
+  const until = async (test, message, timeout = 8000) => {
+    for (let waited = 0; !test(); waited += 25) {
+      if (waited >= timeout) throw new Error(message);
+      await delay(25);
+    }
+  };
   const clickAnswer = (wantCorrect) => {
     const question = currentQuestion();
     if (!question) throw new Error('Current question not found');
@@ -130,9 +136,45 @@ async () => {
     throw new Error('Answer options are missing accessible labels before selection');
   }
   click('#translation-toggle');
-  if (!document.querySelector('#question-translation')?.textContent.trim()) {
-    throw new Error('Translation panel did not render in study mode');
+  await until(() => document.querySelector('#question-translation')?.dataset.state === 'ready', 'Translation panel did not render in study mode');
+  if (!document.querySelector('#question-translation').textContent.trim()) {
+    throw new Error('Translation panel is empty in study mode');
   }
+  if (document.querySelector('#translation-bar').classList.contains('is-hidden')) {
+    throw new Error('Language picker is hidden while translations are on');
+  }
+  const studyQuestion = currentQuestion();
+  const picker = document.querySelector('#translation-language');
+  picker.value = 'ru';
+  picker.dispatchEvent(new Event('change', { bubbles: true }));
+  await until(() => document.querySelector('#question-translation')?.dataset.state === 'ready' && document.querySelector('#question-translation').lang === 'ru', 'Russian translation did not render');
+  if (!/[а-яё]/i.test(document.querySelector('#question-translation').textContent)) {
+    throw new Error('Russian translation panel has no Cyrillic text');
+  }
+  if (document.querySelector('#translation-label').textContent !== 'Русский') {
+    throw new Error('Translation toolbar label did not follow the language choice');
+  }
+  if (!/[а-яё]/i.test(document.querySelector('.option-translation')?.textContent || '')) {
+    throw new Error('Russian option translations are not shown');
+  }
+  if (window.localStorage.getItem('lidTranslationLanguage') !== 'ru') {
+    throw new Error('Language choice was not saved');
+  }
+  // A question without a translation says so in the chosen language.
+  const savedRussian = window.LID_TRANSLATIONS_RU[studyQuestion.id];
+  delete window.LID_TRANSLATIONS_RU[studyQuestion.id];
+  picker.value = 'en';
+  picker.dispatchEvent(new Event('change', { bubbles: true }));
+  picker.value = 'ru';
+  picker.dispatchEvent(new Event('change', { bubbles: true }));
+  await delay(0);
+  if (!document.querySelector('#question-translation')?.textContent.includes('Russian translation is not available')) {
+    throw new Error('Missing translation did not show the fallback message');
+  }
+  window.LID_TRANSLATIONS_RU[studyQuestion.id] = savedRussian;
+  picker.value = 'en';
+  picker.dispatchEvent(new Event('change', { bubbles: true }));
+  await until(() => document.querySelector('#question-translation')?.dataset.state === 'ready' && document.querySelector('#question-translation').lang === 'en', 'English translation did not come back');
   click('#bookmark-toggle');
   click('#home-button');
   await delay(0);
@@ -149,7 +191,7 @@ async () => {
     throw new Error('Exam simulation did not disable the translation toggle');
   }
   if (!document.querySelector('#question-translation')?.classList.contains('is-hidden')) {
-    throw new Error('Exam simulation rendered an English translation');
+    throw new Error('Exam simulation rendered a translation');
   }
   const realNow = Date.now;
   Date.now = () => realNow() + 61 * 60 * 1000;

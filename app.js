@@ -1,6 +1,8 @@
 import { loadProgress, saveProgress as persistProgress } from "./modules/storage.js";
 import { getStateNames } from "./modules/sampling.js";
 import { createEmitter } from "./modules/emitter.js";
+import { createContent } from "./modules/content.js";
+import { loadLanguagePreference } from "./modules/preferences.js";
 import { EXAM_DURATION_SECONDS } from "./modules/quiz-rules.js";
 import { createCatalogueScreen } from "./screens/catalogue.js";
 import { createPrivacyControls } from "./screens/privacy.js";
@@ -16,7 +18,7 @@ import { createStartScreen } from "./screens/start.js";
   "use strict";
 
   const questions = window.LID_QUESTIONS || [];
-  const translations = window.LID_TRANSLATIONS_EN || {};
+  const content = createContent();
   const progress = loadProgress();
   const state = {
     mode: "exam",
@@ -26,6 +28,7 @@ import { createStartScreen } from "./screens/start.js";
     score: 0,
     answers: [],
     translationsEnabled: false,
+    translationLanguage: loadLanguagePreference({ browserLanguages: navigator.languages || [] }),
     timerId: null,
     startedAt: null,
     completedAt: null,
@@ -37,7 +40,8 @@ import { createStartScreen } from "./screens/start.js";
   const events = createEmitter();
   const ctx = {
     questions,
-    translations,
+    // Explanations and translations load on demand (see modules/content.js).
+    content,
     stateNames: getStateNames(questions),
     progress,
     state,
@@ -65,6 +69,20 @@ import { createStartScreen } from "./screens/start.js";
   registerServiceWorker();
   events.emit("progress-changed");
   resume.refresh();
+  prefetchExplanations();
+
+  // Explanations are only needed after an answer, so fetch them once the
+  // first screen is idle instead of blocking it.
+  function prefetchExplanations() {
+    const prefetch = () => content.ensureExplanations().catch(() => {
+      // They are requested again when the first answer needs them.
+    });
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(prefetch, { timeout: 4000 });
+    } else {
+      window.setTimeout(prefetch, 1500);
+    }
+  }
 
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return;

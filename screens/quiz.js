@@ -6,6 +6,7 @@ import { getLearnerHint } from "../modules/hints.js";
 import { sampleByCategory, shuffle } from "../modules/sampling.js";
 import { confirmDialog } from "../modules/confirm-dialog.js";
 import { clearExamSession, createExamSnapshot, loadExamSession, saveExamSession } from "../modules/exam-session.js";
+import { createTranslationControls } from "./translation.js";
 import {
   EXAM_DURATION_SECONDS,
   PASS_THRESHOLD,
@@ -31,12 +32,10 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
   const restartButton = $("restart-button");
   const nextButton = $("next-button");
   const previousButton = $("previous-button");
-  const translationToggle = $("translation-toggle");
   const bookmarkToggle = $("bookmark-toggle");
   const bookmarkLabel = $("bookmark-label");
   const questionKicker = $("question-kicker");
   const questionTitle = $("question-title");
-  const questionTranslation = $("question-translation");
   const timerCounter = $("timer-counter");
   const scoreCounter = $("score-counter");
   const quizProgress = $("quiz-progress");
@@ -48,6 +47,7 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
   const feedbackVerdict = $("feedback-verdict");
   const feedbackWhy = $("feedback-why");
   const questionHint = $("question-hint");
+  const translation = createTranslationControls(ctx, { onOptionsChanged: refreshAnswerLabels });
 
   function recordAnswer(entry, options = {}) {
     if (!applyAnswer(progress, entry, options)) return;
@@ -99,7 +99,7 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     state.selectedState = saved.selectedState;
     start.setSelectedState(saved.selectedState);
     state.run = saved.run;
-    setTranslationsEnabled(false);
+    translation.setEnabled(false);
     resetRunState();
     state.answers = saved.answers;
     state.score = saved.score;
@@ -178,7 +178,7 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     state.mode = "exam";
     state.selectedState = selectedState;
     state.run = examRun;
-    setTranslationsEnabled(false);
+    translation.setEnabled(false);
     resetRunState();
     startTimer();
     renderQuestion();
@@ -348,28 +348,6 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     timerCounter.textContent = formatDuration(isTimedTest ? state.timeRemaining : 0);
   }
 
-  function toggleTranslations() {
-    if (state.mode === "exam") return;
-    state.translationsEnabled = !state.translationsEnabled;
-    renderTranslationToggle();
-    renderTranslations();
-  }
-
-  function setTranslationsEnabled(enabled) {
-    state.translationsEnabled = enabled;
-    renderTranslationToggle();
-  }
-
-  function renderTranslationToggle() {
-    const disabled = state.mode === "exam";
-    translationToggle.disabled = disabled;
-    translationToggle.setAttribute("aria-pressed", String(!disabled && state.translationsEnabled));
-    translationToggle.title = disabled
-      ? "English translations are disabled in exam simulation"
-      : state.translationsEnabled ? "Hide English translations" : "Show English translations";
-    translationToggle.setAttribute("aria-label", translationToggle.title);
-  }
-
   function renderBookmarkToggle(question) {
     const bookmarked = isBookmarked(progress, question);
     bookmarkToggle.setAttribute("aria-pressed", String(bookmarked));
@@ -408,29 +386,39 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     quizProgress.setAttribute("aria-valuetext", `Question ${position} of ${total}`);
     progressBar.style.width = `${((position - 1) / total) * 100}%`;
     questionHint.textContent = "Choose one answer.";
-    questionTranslation.replaceChildren();
-    questionTranslation.classList.add("is-hidden");
     previousButton.classList.add("is-hidden");
     nextButton.classList.add("is-hidden");
     nextButton.textContent = position === total ? "Finish" : "Next";
     state.selected = getCurrentAnswerEntry(question)?.selectedIndex ?? null;
+    if (state.mode !== "exam" && !ctx.content.explanationsLoaded()) ctx.content.ensureExplanations().catch(() => {});
 
     renderTimer();
     renderModeChrome(question, position, total);
-    renderTranslationToggle();
+    translation.renderToggle();
     renderBookmarkToggle(question);
     renderImages(question);
     renderAnswers(question);
     renderFeedback(question);
     renderLearnerHint(question);
-    renderTranslations();
+    translation.render();
     persistExamSession();
+  }
+
+  // Explanations load in the background; a question answered before they have
+  // arrived gets its explanation as soon as they do.
+  function showExplanationWhenLoaded(question) {
+    ctx.content.ensureExplanations().then(() => {
+      if (state.run[state.index] === question && getCurrentAnswerEntry(question)) renderFeedback(question);
+    }, () => {
+      // Without the explanation the verdict and the correct answer still show.
+    });
   }
 
   function renderFeedback(question) {
     const entry = getCurrentAnswerEntry(question);
     const showFeedback = Boolean(entry) && state.mode !== "exam";
     const showExplanation = showFeedback && Boolean(question.explanation);
+    if (showFeedback && !ctx.content.explanationsLoaded()) showExplanationWhenLoaded(question);
 
     questionFeedback.classList.toggle("is-hidden", !showFeedback);
     feedbackWhy.classList.toggle("is-hidden", !showExplanation);
@@ -494,7 +482,7 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
       const letter = document.createElement("span");
       const copy = document.createElement("span");
       const text = document.createElement("span");
-      const translation = document.createElement("span");
+      const optionTranslation = document.createElement("span");
 
       button.className = "answer-option";
       button.type = "button";
@@ -504,10 +492,13 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
       letter.textContent = LETTERS[index];
       copy.className = "option-copy";
       text.textContent = option.text;
-      translation.className = "option-translation is-hidden";
-      translation.dataset.translationIndex = String(index);
+      optionTranslation.className = "option-translation is-hidden";
+      optionTranslation.dataset.translationIndex = String(index);
+      // The translation is part of the button's aria-label (composeAnswerLabel),
+      // so it is hidden from the tree to avoid reading it twice.
+      optionTranslation.setAttribute("aria-hidden", "true");
 
-      copy.append(text, translation);
+      copy.append(text, optionTranslation);
       button.append(letter, document.createTextNode(" "), copy);
       button.addEventListener("click", () => chooseAnswer(index));
 
@@ -523,38 +514,41 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
   }
 
   function applyAnswerAccessibility(button, option, index, answeredEntry) {
-    const label = `${LETTERS[index]}. ${option.text}`;
-    if (!answeredEntry) {
-      button.setAttribute("aria-label", label);
-      return;
-    }
-
-    if (state.mode === "exam") {
-      if (index === answeredEntry.selectedIndex) {
-        button.classList.add("is-selected");
-        appendVisibleAnswerState(button, "Selected", "•");
-        button.setAttribute("aria-label", appendAnswerState(label, "Selected answer."));
-      } else {
-        button.setAttribute("aria-label", label);
+    button.dataset.label = `${LETTERS[index]}. ${option.text}`;
+    if (answeredEntry) {
+      if (state.mode === "exam") {
+        if (index === answeredEntry.selectedIndex) {
+          button.classList.add("is-selected");
+          appendVisibleAnswerState(button, "Selected", "•");
+          button.dataset.stateText = "Selected answer.";
+        }
+      } else if (index === answeredEntry.correctIndex) {
+        button.classList.add("is-correct");
+        appendVisibleAnswerState(button, "Correct", "✓");
+        button.dataset.stateText = "Correct answer.";
+      } else if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) {
+        button.classList.add("is-wrong");
+        appendVisibleAnswerState(button, "Your answer", "×");
+        button.dataset.stateText = "Your answer, incorrect.";
       }
-      return;
     }
+    composeAnswerLabel(button);
+  }
 
-    if (index === answeredEntry.correctIndex) {
-      button.classList.add("is-correct");
-      appendVisibleAnswerState(button, "Correct", "✓");
-      button.setAttribute("aria-label", appendAnswerState(label, "Correct answer."));
-      return;
+  // The accessible name holds everything visible on the button: the option, a
+  // shown translation, and the answer state.
+  function composeAnswerLabel(button) {
+    let label = button.dataset.label;
+    const shown = button.querySelector(".option-translation");
+    if (shown && !shown.classList.contains("is-hidden") && shown.textContent.trim()) {
+      label = appendAnswerState(label, shown.textContent.trim());
     }
-
-    if (index === answeredEntry.selectedIndex && !answeredEntry.isCorrect) {
-      button.classList.add("is-wrong");
-      appendVisibleAnswerState(button, "Your answer", "×");
-      button.setAttribute("aria-label", appendAnswerState(label, "Your answer, incorrect."));
-      return;
-    }
-
+    if (button.dataset.stateText) label = appendAnswerState(label, button.dataset.stateText);
     button.setAttribute("aria-label", label);
+  }
+
+  function refreshAnswerLabels() {
+    answers.querySelectorAll(".answer-option").forEach(composeAnswerLabel);
   }
 
   function appendVisibleAnswerState(button, text, symbol) {
@@ -573,55 +567,6 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
   function getCurrentAnswerEntry(question = state.run[state.index]) {
     if (!question) return null;
     return state.answers.find((entry) => entry.question.id === question.id) || null;
-  }
-
-  function renderTranslations() {
-    const question = state.run[state.index];
-    if (!question) return;
-
-    if (state.mode === "exam" || !state.translationsEnabled) {
-      questionTranslation.classList.add("is-hidden");
-      answers.querySelectorAll(".option-translation").forEach((item) => {
-        item.classList.add("is-hidden");
-        item.textContent = "";
-      });
-      return;
-    }
-
-    const translation = ctx.translations[question.id];
-    if (translation) {
-      showTranslation(question, translation);
-    } else {
-      showTranslationFallback();
-    }
-  }
-
-  function showTranslation(question, translation) {
-    questionTranslation.replaceChildren();
-    const prompt = document.createElement("p");
-    prompt.textContent = translation.prompt;
-    questionTranslation.append(prompt);
-    questionTranslation.classList.remove("is-hidden");
-
-    question.options.forEach((option, index) => {
-      const item = answers.querySelector(`[data-translation-index="${index}"]`);
-      if (!item) return;
-      item.textContent = translation.options[index] || option.text;
-      item.classList.remove("is-hidden");
-    });
-  }
-
-  function showTranslationFallback() {
-    questionTranslation.replaceChildren();
-    const message = document.createElement("p");
-    message.textContent = "English translation is not available for this question yet.";
-    questionTranslation.append(message);
-    questionTranslation.classList.remove("is-hidden");
-
-    answers.querySelectorAll(".option-translation").forEach((item) => {
-      item.classList.add("is-hidden");
-      item.textContent = "";
-    });
   }
 
   function chooseAnswer(selectedIndex) {
@@ -726,7 +671,6 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
   restartButton.addEventListener("click", restartCurrentRun);
   previousButton.addEventListener("click", previousQuestion);
   nextButton.addEventListener("click", nextQuestion);
-  translationToggle.addEventListener("click", toggleTranslations);
   bookmarkToggle.addEventListener("click", toggleCurrentBookmark);
 
   return { show };

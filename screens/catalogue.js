@@ -20,6 +20,7 @@ export function createCatalogueScreen(ctx) {
   const jumpForm = $("jump-form");
   const jumpQuestion = $("jump-question");
   let visibleCount = CATALOGUE_RESULT_LIMIT;
+  let loadingCode = null;
 
   function resetLimit() {
     visibleCount = CATALOGUE_RESULT_LIMIT;
@@ -29,6 +30,28 @@ export function createCatalogueScreen(ctx) {
   function showMore() {
     visibleCount += CATALOGUE_RESULT_LIMIT;
     render({ preserveLimit: true });
+  }
+
+  // A search also matches the translated text of the chosen language. That file
+  // loads on the first search and the results refresh when it arrives.
+  function getSearchTranslations(query) {
+    if (!query) return {};
+    const code = ctx.state.translationLanguage;
+    const loaded = ctx.content.translationsFor(code);
+    if (loaded) return loaded;
+    if (loadingCode === code) return {};
+    loadingCode = code;
+    ctx.content.ensureTranslations(code).then(
+      () => {
+        loadingCode = null;
+        if (code === ctx.state.translationLanguage) render({ preserveLimit: true });
+      },
+      () => {
+        // German search keeps working without the translations.
+        loadingCode = null;
+      }
+    );
+    return {};
   }
 
   function render(options = {}) {
@@ -42,7 +65,8 @@ export function createCatalogueScreen(ctx) {
       incorrectIds: new Set(getIncorrectQuestionIds(progress, questions)),
       bookmarkedIds: new Set(getBookmarkedQuestionIds(progress, questions))
     });
-    const filteredQuestions = searchCatalogueQuestions(cataloguePool, query, ctx.translations);
+    const translations = getSearchTranslations(query);
+    const filteredQuestions = searchCatalogueQuestions(cataloguePool, query, translations);
     const visibleQuestions = filteredQuestions.slice(0, visibleCount);
     const hasMore = filteredQuestions.length > visibleQuestions.length;
 
@@ -148,6 +172,7 @@ export function createCatalogueScreen(ctx) {
   catalogueMoreButton.addEventListener("click", showMore);
   jumpForm.addEventListener("submit", jumpToQuestionNumber);
   ctx.events.on("progress-changed", () => render({ preserveLimit: true }));
+  ctx.events.on("language-changed", () => render({ preserveLimit: true }));
 
   return { render };
 }

@@ -826,6 +826,46 @@ h1[tabindex="-1"]:focus {
   font-weight: 760;
 }
 
+.translation-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.translation-bar label {
+  font-weight: 760;
+}
+
+.translation-bar select {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #18211f;
+  color: var(--text);
+  font: inherit;
+}
+
+.translation-bar select:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(79 179 165 / 0.14);
+  outline: none;
+}
+
+.translation-bar small {
+  flex-basis: 100%;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.translation-retry {
+  min-height: 44px;
+  margin-top: 10px;
+}
+
 .progress {
   overflow: hidden;
   height: 6px;
