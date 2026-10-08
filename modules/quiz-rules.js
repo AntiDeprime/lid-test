@@ -2,6 +2,8 @@ export const TOTAL_GENERAL = 30;
 export const TOTAL_STATE = 3;
 export const PASS_THRESHOLD = 17;
 export const EXAM_DURATION_SECONDS = 60 * 60;
+// A weak question clears after this many correct answers in a row.
+export const WEAK_CLEAR_STREAK = 2;
 
 export function createExamRun(questions, selectedState, helpers) {
   const { sampleByCategory, shuffle } = helpers;

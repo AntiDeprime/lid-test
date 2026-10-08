@@ -1,5 +1,15 @@
 import assert from "node:assert/strict";
-import { summarizeProgress } from "../modules/progress.js";
+import { applyAnswer, summarizeProgress, toggleBookmark } from "../modules/progress.js";
+import { createEmitter } from "../modules/emitter.js";
+import { formatAnswer, formatDuration } from "../modules/format.js";
+import {
+  getAreaStats,
+  getBookmarkedQuestions,
+  getCatalogueStatus,
+  getIncorrectQuestionIds,
+  getStudyQuestions,
+  getWeakQuestionIds
+} from "../modules/progress-queries.js";
 import {
   getCatalogueQuestions,
   getCatalogueSummary,
@@ -37,6 +47,7 @@ import {
   TOTAL_STATE,
   createAnswerEntry,
   createExamRun,
+  WEAK_CLEAR_STREAK,
   createUnansweredEntry,
   getPassResult
 } from "../modules/quiz-rules.js";
@@ -285,5 +296,79 @@ assert.equal(parseBackup(JSON.stringify({ ...backup, progress: { ...storedProgre
 assert.equal(describeProgress(storedProgress).text, "2 studied questions, 1 exam simulation, 1 weak question, 1 bookmark");
 assert.equal(describeProgress(createEmptyProgress()).hasProgress, false);
 assert.equal(describeProgress(createEmptyProgress()).text, "no progress");
+
+// Recording answers: stats, weak questions, and clearing a weak question.
+const makeQuestion = (id, category = "general", state = null) => ({
+  id,
+  category,
+  state,
+  prompt: `Question ${id}`,
+  images: [],
+  options: [{ text: "A", correct: false }, { text: "B", correct: true }, { text: "C", correct: false }, { text: "D", correct: false }]
+});
+const queryQuestions = [makeQuestion(1), makeQuestion(2), makeQuestion(301, "state", "Berlin"), makeQuestion(302, "state", "Hessen")];
+const tracked = createEmptyProgress();
+const at = new Date("2026-10-08T09:00:00.000Z");
+
+assert.equal(applyAnswer(tracked, createAnswerEntry(queryQuestions[0], 0), {}, at), true);
+assert.deepEqual(tracked.questionStats[1], { answered: 1, correct: 0, wrong: 1 });
+assert.deepEqual(tracked.weakQuestions[1], { wrong: 1, correctStreak: 0, lastMissedAt: at.toISOString() });
+assert.equal(applyAnswer(tracked, createAnswerEntry(queryQuestions[0], 0), {}, at), true);
+assert.equal(tracked.weakQuestions[1].wrong, 2);
+for (let correctAnswer = 1; correctAnswer < WEAK_CLEAR_STREAK; correctAnswer += 1) {
+  applyAnswer(tracked, createAnswerEntry(queryQuestions[0], 1), {}, at);
+  assert.equal(tracked.weakQuestions[1].correctStreak, correctAnswer);
+}
+applyAnswer(tracked, createAnswerEntry(queryQuestions[0], 1), {}, at);
+assert.equal(tracked.weakQuestions[1], undefined, "a weak question clears after enough correct answers in a row");
+assert.deepEqual(tracked.questionStats[1], { answered: 2 + WEAK_CLEAR_STREAK, correct: WEAK_CLEAR_STREAK, wrong: 2 });
+assert.equal(applyAnswer(tracked, createUnansweredEntry(queryQuestions[1]), { countStats: false, trackWeak: false }, at), false);
+assert.equal(tracked.questionStats[2], undefined, "unanswered timeouts do not touch stats");
+applyAnswer(tracked, createAnswerEntry(queryQuestions[1], 2), { trackWeak: false }, at);
+assert.equal(tracked.weakQuestions[2], undefined, "stats-only answers stay out of the weak list");
+assert.equal(tracked.questionStats[2].wrong, 1);
+
+assert.equal(toggleBookmark(tracked, 301, at), true);
+assert.deepEqual(tracked.bookmarkedQuestions[301], { addedAt: at.toISOString() });
+assert.equal(toggleBookmark(tracked, 301, at), false);
+assert.equal(tracked.bookmarkedQuestions[301], undefined);
+
+// Queries over progress and questions, ignoring ids that are not in the catalogue.
+const queried = createEmptyProgress();
+queried.weakQuestions = { 1: { wrong: 1, correctStreak: 0, lastMissedAt: "" }, 999: { wrong: 1, correctStreak: 0, lastMissedAt: "" } };
+queried.bookmarkedQuestions = { 302: { addedAt: "" }, 998: { addedAt: "" } };
+queried.questionStats = { 1: { answered: 2, correct: 1, wrong: 1 }, 2: { answered: 2, correct: 2, wrong: 0 }, 301: { answered: 1, correct: 0, wrong: 1 }, 302: { answered: 1, correct: 1, wrong: 0 }, 997: { answered: 1, correct: 0, wrong: 1 } };
+assert.deepEqual(getWeakQuestionIds(queried, queryQuestions), ["1"]);
+assert.deepEqual(getBookmarkedQuestions(queried, queryQuestions).map((question) => question.id), [302]);
+assert.deepEqual(getIncorrectQuestionIds(queried, queryQuestions).sort(), ["1", "301"]);
+assert.equal(getCatalogueStatus(queried, queryQuestions[3]), "Bookmarked");
+assert.equal(getCatalogueStatus(queried, queryQuestions[0]), "Incorrect before");
+assert.equal(getCatalogueStatus(queried, queryQuestions[1]), "Studied");
+assert.equal(getCatalogueStatus(createEmptyProgress(), queryQuestions[1]), "New");
+assert.deepEqual(getStudyQuestions("state:Berlin", queryQuestions, queried).map((question) => question.id), [301]);
+assert.deepEqual(getStudyQuestions("general", queryQuestions, createEmptyProgress()).map((question) => question.id), [1, 2]);
+assert.deepEqual(getStudyQuestions("general", queryQuestions, { ...createEmptyProgress(), questionStats: { 1: { answered: 1, correct: 1, wrong: 0 } } }).map((question) => question.id), [2, 1], "new questions come before studied ones");
+assert.deepEqual(getStudyQuestions("bookmarked", queryQuestions, queried).map((question) => question.id), [302]);
+
+const areas = getAreaStats(queried, queryQuestions);
+assert.equal(areas.find((area) => area.label === "General questions").accuracy, 75);
+assert.equal(areas.find((area) => area.label === "Hessen questions").role, "strongest");
+assert.equal(areas.find((area) => area.label === "Berlin questions").role, "weakest");
+assert.equal(areas.find((area) => area.label === "General questions").role, "");
+assert.equal(getAreaStats(createEmptyProgress(), queryQuestions).length, 0);
+
+// Formatting and events.
+assert.equal(formatDuration(3600), "60:00");
+assert.equal(formatDuration(65), "1:05");
+assert.equal(formatDuration(-4), "0:00");
+assert.equal(formatAnswer(queryQuestions[0], 1), "B. B");
+assert.equal(formatAnswer(queryQuestions[0], null), "No answer selected");
+const emitter = createEmitter();
+const heard = [];
+const stopHearing = emitter.on("changed", (value) => heard.push(value));
+emitter.emit("changed", 1);
+stopHearing();
+emitter.emit("changed", 2);
+assert.deepEqual(heard, [1]);
 
 console.log("Progress and quiz-rule validation passed.");

@@ -152,8 +152,9 @@ GitHub Pages will serve `index.html` as the app entry point.
 
 - `index.html` contains the one-page UI structure and metadata.
 - `styles.css` contains the app styling.
-- `app.js` contains the vanilla JavaScript app wiring and screen state.
-- `modules/` contains focused JavaScript helpers for storage, sampling, progress summaries, learner hints, tabs, dialogs, confirmation dialogs, exam resume snapshots, progress backups, and quiz rules.
+- `app.js` wires the screens together: it owns the shared quiz state, the run lifecycle, and the privacy controls.
+- `screens/` holds one module per part of the interface (start page, progress tab, catalogue, exam resume card, and result screen). Each takes a shared context (`questions`, `progress`, `state`, an event emitter, and late-bound `actions`) so screens never import each other.
+- `modules/` contains focused JavaScript helpers with no page dependencies where possible: storage, sampling, progress updates and queries, formatting, learner hints, tabs, dialogs, confirmation dialogs, exam resume snapshots, progress backups, an event emitter, and quiz rules.
 - `questions.js` contains the question catalogue loaded by the page.
 - `explanation-texts-*.js` contains one reviewed, question-specific learner explanation for each catalogue item.
 - `explanations.js` attaches the reviewed explanation map to the question catalogue.

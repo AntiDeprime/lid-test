@@ -1,6 +1,6 @@
 // ASSET_HASH covers every file in ASSETS. Regenerate it with
 // `node scripts/update-asset-hash.js` after changing any of them.
-const ASSET_HASH = "80621be21c59";
+const ASSET_HASH = "90faf33a137d";
 const CACHE_NAME = `lid-test-prep-${ASSET_HASH}`;
 const ASSETS = [
   "./",
@@ -25,6 +25,14 @@ const ASSETS = [
   "./modules/backup.js",
   "./modules/quiz-rules.js",
   "./modules/catalogue.js",
+  "./modules/emitter.js",
+  "./modules/format.js",
+  "./modules/progress-queries.js",
+  "./screens/catalogue.js",
+  "./screens/progress.js",
+  "./screens/result.js",
+  "./screens/resume.js",
+  "./screens/start.js",
   "./assets/favicon.svg",
   "./assets/favicon-32.png",
   "./assets/apple-touch-icon.png",

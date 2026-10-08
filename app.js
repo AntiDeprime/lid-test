@@ -1,19 +1,18 @@
 import { getStorageItem, loadProgress, saveProgress as persistProgress, setStorageItem } from "./modules/storage.js";
-import { MAX_BACKUP_BYTES, createBackup, describeProgress, getBackupFilename, parseBackup } from "./modules/backup.js";
-import { getStateNames, orderStudyQuestionsByProgress, sampleByCategory, shuffle } from "./modules/sampling.js";
-import { summarizeProgress } from "./modules/progress.js";
+import { getStateNames, sampleByCategory, shuffle } from "./modules/sampling.js";
+import { createEmitter } from "./modules/emitter.js";
+import { LETTERS, formatDuration } from "./modules/format.js";
+import { applyAnswer, toggleBookmark } from "./modules/progress.js";
+import {
+  getBookmarkedQuestions,
+  getStudyQuestions,
+  getWeakQuestions,
+  isBookmarked
+} from "./modules/progress-queries.js";
 import { getLearnerHint } from "./modules/hints.js";
-import { createTabController } from "./modules/tabs.js";
 import { showModalDialog } from "./modules/dialog.js";
 import { confirmDialog } from "./modules/confirm-dialog.js";
 import { clearExamSession, createExamSnapshot, loadExamSession, saveExamSession } from "./modules/exam-session.js";
-import {
-  CATALOGUE_RESULT_LIMIT,
-  getCatalogueQuestions as getCataloguePool,
-  getCatalogueSummary,
-  normalizeSearch,
-  searchCatalogueQuestions
-} from "./modules/catalogue.js";
 import {
   EXAM_DURATION_SECONDS,
   PASS_THRESHOLD,
@@ -21,17 +20,19 @@ import {
   TOTAL_STATE,
   createAnswerEntry,
   createExamRun,
-  createUnansweredEntry,
-  getPassResult
+  createUnansweredEntry
 } from "./modules/quiz-rules.js";
+import { createCatalogueScreen } from "./screens/catalogue.js";
+import { createProgressPanel } from "./screens/progress.js";
+import { createResultScreen } from "./screens/result.js";
+import { createResumeCard } from "./screens/resume.js";
+import { createStartScreen } from "./screens/start.js";
 
 (() => {
   "use strict";
 
   const ANALYTICS_ID = "G-6LN5H6T5LW";
   const ANALYTICS_CONSENT_KEY = "lidAnalyticsConsent";
-  const WEAK_CLEAR_STREAK = 2;
-  const LETTERS = ["A", "B", "C", "D"];
   const LEGAL_NOTICE = {
     privacy: {
       title: "Privacy",
@@ -72,47 +73,41 @@ import {
     selectedState: ""
   };
 
-  let resumableExam = null;
+  const events = createEmitter();
+  const ctx = {
+    questions,
+    translations,
+    stateNames,
+    progress,
+    state,
+    events,
+    // Late-bound calls between screens; each screen registers what it offers.
+    actions: {},
+    saveProgress() {
+      persistProgress(progress);
+    },
+    // Save progress and tell the screens that show it to redraw.
+    commitProgress() {
+      ctx.saveProgress();
+      events.emit("progress-changed");
+    }
+  };
+  const start = createStartScreen(ctx);
+  const resume = createResumeCard(ctx);
+  createProgressPanel(ctx);
+  createCatalogueScreen(ctx);
+  const resultView = createResultScreen(ctx);
 
   const $ = (id) => document.getElementById(id);
   const startScreen = $("start-screen");
   const startTitle = $("start-title");
   const quizScreen = $("quiz-screen");
   const resultScreen = $("result-screen");
-  const startButton = $("start-button");
-  const practiceButton = $("practice-button");
-  const bundeslandSelect = $("bundesland-select");
-  const weakReviewButton = $("weak-review-button");
-  const bookmarkReviewButton = $("bookmark-review-button");
-  const resumeCard = $("resume-card");
-  const resumeTitle = $("resume-title");
-  const resumeDetail = $("resume-detail");
-  const resumeButton = $("resume-button");
-  const resumeDiscardButton = $("resume-discard-button");
-  const queueActions = $("queue-actions");
   const consentSlot = $("consent-slot");
-  const progressEmpty = $("progress-empty");
-  const progressSummary = $("progress-summary");
-  const progressInsights = $("progress-insights");
   const homeButton = $("home-button");
   const restartButton = $("restart-button");
-  const newTestButton = $("new-test-button");
-  const resultHomeButton = $("result-home-button");
-  const resetProgressButton = $("reset-progress-button");
-  const exportProgressButton = $("export-progress-button");
-  const importProgressButton = $("import-progress-button");
-  const importProgressInput = $("import-progress-input");
-  const backupStatus = $("backup-status");
   const nextButton = $("next-button");
   const previousButton = $("previous-button");
-  const studyFilter = $("study-filter");
-  const catalogueSearch = $("catalogue-search");
-  const catalogueFilter = $("catalogue-filter");
-  const catalogueSummary = $("catalogue-summary");
-  const catalogueResults = $("catalogue-results");
-  const catalogueMoreButton = $("catalogue-more-button");
-  const jumpForm = $("jump-form");
-  const jumpQuestion = $("jump-question");
   const translationToggle = $("translation-toggle");
   const bookmarkToggle = $("bookmark-toggle");
   const bookmarkLabel = $("bookmark-label");
@@ -131,191 +126,11 @@ import {
   const feedbackWhy = $("feedback-why");
   const questionHint = $("question-hint");
   const resultTitle = $("result-title");
-  const resultScore = $("result-score");
-  const resultStatus = $("result-status");
-  const resultTime = $("result-time");
-  const reviewHeading = $("review-heading");
-  const reviewList = $("review-list");
-  const answeredStat = $("answered-stat");
-  const accuracyStat = $("accuracy-stat");
-  const testsStat = $("tests-stat");
-  const passRateStat = $("pass-rate-stat");
-  const masteryStat = $("mastery-stat");
-  const weakStat = $("weak-stat");
-  const bookmarkStat = $("bookmark-stat");
-  const areaStats = $("area-stats");
-  const recentTests = $("recent-tests");
-  const resultContext = $("result-context");
   const analyticsStatus = $("analytics-status");
-  const startTabs = [...document.querySelectorAll("[data-start-tab]")];
-  const startSections = {
-    progress: $("progress-title").closest(".start-detail"),
-    catalogue: $("catalogue-title").closest(".start-detail"),
-    learn: $("included-title").closest(".start-detail")
-  };
-  const faqSection = $("faq-title").closest(".faq-section");
-  const startTabController = createTabController(startTabs, startSections, {
-    onChange(selectedTab) {
-      faqSection.classList.toggle("is-hidden", selectedTab !== "learn");
-      faqSection.hidden = selectedTab !== "learn";
-    }
-  });
-  let catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
-
-  function saveProgress() {
-    persistProgress(progress);
-  }
-
-  async function resetProgress() {
-    const confirmed = await confirmDialog({
-      title: "Reset saved progress?",
-      message: "This clears your answers, weak questions, bookmarks, and exam history in this browser. It cannot be undone, so export a backup first if you want a copy.",
-      confirmLabel: "Reset progress",
-      cancelLabel: "Keep progress",
-      trigger: resetProgressButton
-    });
-    if (!confirmed) return;
-
-    progress.questionStats = {};
-    progress.weakQuestions = {};
-    progress.bookmarkedQuestions = {};
-    progress.testHistory = [];
-    saveProgress();
-    renderProgressSummary();
-    setBackupStatus("");
-  }
-
-  function setBackupStatus(message, isError = false) {
-    backupStatus.textContent = message;
-    backupStatus.classList.toggle("is-error", isError);
-  }
-
-  function exportProgress() {
-    const filename = getBackupFilename(new Date());
-    const blob = new Blob([JSON.stringify(createBackup(progress), null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = filename;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setBackupStatus(`Backup saved as ${filename}.`);
-  }
-
-  async function importProgress() {
-    const file = importProgressInput.files && importProgressInput.files[0];
-    importProgressInput.value = "";
-    if (!file) return;
-
-    if (file.size > MAX_BACKUP_BYTES) {
-      setBackupStatus("That file is too large to be a LiD Test Prep backup.", true);
-      return;
-    }
-
-    const result = parseBackup(await file.text());
-    if (!result.ok) {
-      setBackupStatus(result.message, true);
-      return;
-    }
-
-    const incoming = describeProgress(result.progress);
-    const current = describeProgress(progress);
-    if (current.hasProgress) {
-      const confirmed = await confirmDialog({
-        title: "Replace your progress?",
-        message: `This backup has ${incoming.text}. It replaces the ${current.text} saved in this browser.`,
-        confirmLabel: "Replace progress",
-        cancelLabel: "Keep current progress",
-        trigger: importProgressButton
-      });
-      if (!confirmed) {
-        setBackupStatus("Import cancelled. Your current progress is unchanged.");
-        return;
-      }
-    }
-
-    progress.questionStats = result.progress.questionStats;
-    progress.weakQuestions = result.progress.weakQuestions;
-    progress.bookmarkedQuestions = result.progress.bookmarkedQuestions;
-    progress.testHistory = result.progress.testHistory;
-    saveProgress();
-    renderProgressSummary();
-    setBackupStatus(`Backup imported: ${incoming.text}.`);
-  }
-
-  function populateStateControls() {
-    stateNames.forEach((stateName) => {
-      const testOption = document.createElement("option");
-      const studyOption = document.createElement("option");
-
-      testOption.value = stateName;
-      testOption.textContent = stateName;
-      studyOption.value = `state:${stateName}`;
-      studyOption.textContent = `${stateName} Bundesland questions`;
-
-      bundeslandSelect.append(testOption);
-      studyFilter.append(studyOption);
-    });
-
-    if (stateNames.includes("Berlin")) {
-      bundeslandSelect.value = "Berlin";
-    }
-  }
 
   function recordAnswer(entry, options = {}) {
-    const { countStats = true, trackWeak = true } = options;
-    if (!countStats && !trackWeak) return;
-
-    const questionId = String(entry.question.id);
-
-    if (countStats) {
-      const current = progress.questionStats[questionId] || {
-        answered: 0,
-        correct: 0,
-        wrong: 0
-      };
-
-      current.answered += 1;
-      if (entry.isCorrect) {
-        current.correct += 1;
-      } else {
-        current.wrong += 1;
-      }
-
-      progress.questionStats[questionId] = current;
-    }
-
-    if (trackWeak) updateWeakQuestion(entry, questionId);
-    saveProgress();
-    renderProgressSummary();
-  }
-
-  function updateWeakQuestion(entry, questionId) {
-    const current = progress.weakQuestions[questionId];
-    if (!entry.isCorrect) {
-      progress.weakQuestions[questionId] = {
-        wrong: current ? (current.wrong || 0) + 1 : 1,
-        correctStreak: 0,
-        lastMissedAt: new Date().toISOString()
-      };
-      return;
-    }
-
-    if (!current) return;
-
-    const correctStreak = (current.correctStreak || 0) + 1;
-    if (correctStreak >= WEAK_CLEAR_STREAK) {
-      delete progress.weakQuestions[questionId];
-      return;
-    }
-
-    progress.weakQuestions[questionId] = {
-      ...current,
-      correctStreak
-    };
+    if (!applyAnswer(progress, entry, options)) return;
+    ctx.commitProgress();
   }
 
   function recordCompletedTest() {
@@ -329,144 +144,14 @@ import {
       questionIds: state.run.map((question) => question.id),
       wrongQuestionIds: state.answers.filter((entry) => !entry.isCorrect).map((entry) => entry.question.id)
     });
-    saveProgress();
-    renderProgressSummary();
+    ctx.commitProgress();
   }
 
-  function renderProgressSummary() {
-    const summary = summarizeProgress(progress, questions.length);
-    const weakQuestionIds = getWeakQuestionIds();
-    const bookmarkedQuestionIds = getBookmarkedQuestionIds();
-
-    answeredStat.textContent = String(summary.uniqueStudied);
-    accuracyStat.textContent = `${summary.studyAccuracy}%`;
-    masteryStat.textContent = `${summary.mastery}%`;
-    testsStat.textContent = String(summary.tests);
-    passRateStat.textContent = `${summary.passRate}%`;
-    weakStat.textContent = String(weakQuestionIds.length);
-    bookmarkStat.textContent = String(bookmarkedQuestionIds.length);
-    weakReviewButton.classList.toggle("is-hidden", weakQuestionIds.length === 0);
-    weakReviewButton.textContent = `Review ${weakQuestionIds.length} weak ${weakQuestionIds.length === 1 ? "question" : "questions"}`;
-    bookmarkReviewButton.classList.toggle("is-hidden", bookmarkedQuestionIds.length === 0);
-    bookmarkReviewButton.textContent = `Review ${bookmarkedQuestionIds.length} bookmarked ${bookmarkedQuestionIds.length === 1 ? "question" : "questions"}`;
-    queueActions.classList.toggle("is-hidden", weakQuestionIds.length === 0 && bookmarkedQuestionIds.length === 0);
-
-    const hasProgress = summary.repeatedAnswers > 0 || summary.tests > 0 || weakQuestionIds.length > 0 || bookmarkedQuestionIds.length > 0;
-    exportProgressButton.disabled = !hasProgress;
-    progressEmpty.classList.toggle("is-hidden", hasProgress);
-    progressSummary.classList.toggle("is-hidden", !hasProgress);
-    progressInsights.classList.toggle("is-hidden", !hasProgress);
-    resetProgressButton.classList.toggle("is-hidden", !hasProgress);
-    renderAreaStats();
-    renderRecentTests();
-    renderCatalogue({ preserveLimit: true });
-  }
-
-  function renderAreaStats() {
-    const areas = getAreaStats();
-    areaStats.replaceChildren();
-
-    if (!areas.length) {
-      areaStats.append(createEmptyProgressNote("Answer questions to see your strongest and weakest areas."));
-      return;
-    }
-
-    areas.forEach((area) => {
-      const item = document.createElement("div");
-      const title = document.createElement("span");
-      const value = document.createElement("b");
-      const detail = document.createElement("small");
-
-      item.className = `area-stat ${area.role ? `is-${area.role}` : ""}`.trim();
-      title.textContent = area.label;
-      value.textContent = `${area.accuracy}%`;
-      detail.textContent = `${area.correct} of ${area.answered} correct${area.role ? `, ${area.role}` : ""}`;
-
-      item.append(title, value, detail);
-      areaStats.append(item);
-    });
-  }
-
-  function getAreaStats() {
-    const areaMap = new Map();
-
-    questions.forEach((question) => {
-      const stats = progress.questionStats[String(question.id)];
-      if (!stats || !stats.answered) return;
-
-      const key = question.category === "state" ? `state:${question.state || "Bundesland"}` : "general";
-      const current = areaMap.get(key) || {
-        label: question.category === "state" ? `${question.state || "Bundesland"} questions` : "General questions",
-        answered: 0,
-        correct: 0
-      };
-
-      current.answered += stats.answered || 0;
-      current.correct += stats.correct || 0;
-      areaMap.set(key, current);
-    });
-
-    const areas = [...areaMap.values()].map((area) => ({
-      ...area,
-      accuracy: Math.round((area.correct / area.answered) * 100)
-    }));
-
-    if (areas.length <= 1) return areas;
-
-    const ranked = areas
-      .filter((area) => area.answered > 0)
-      .sort((a, b) => b.accuracy - a.accuracy || b.answered - a.answered);
-    const strongest = ranked[0];
-    const weakest = ranked[ranked.length - 1];
-
-    return areas.map((area) => ({
-      ...area,
-      role: area === strongest
-        ? "strongest"
-        : area === weakest && weakest.accuracy < strongest.accuracy
-          ? "weakest"
-          : ""
-    }));
-  }
-
-  function renderRecentTests() {
-    recentTests.replaceChildren();
-
-    if (!progress.testHistory.length) {
-      recentTests.append(createEmptyProgressNote("Complete an exam simulation to see recent results here."));
-      return;
-    }
-
-    progress.testHistory.slice(-3).reverse().forEach((test) => {
-      const item = document.createElement("div");
-      const score = document.createElement("b");
-      const meta = document.createElement("span");
-      const status = document.createElement("span");
-
-      item.className = `recent-test ${test.passed ? "is-pass" : "is-fail"}`;
-      score.textContent = `${test.correct} / ${test.total}`;
-      meta.textContent = formatHistoryDate(test.completedAt);
-      status.textContent = test.passed ? "Passed" : "Not passed";
-
-      item.append(score, meta, status);
-      recentTests.append(item);
-    });
-  }
-
-  function createEmptyProgressNote(text) {
-    const note = document.createElement("p");
-    note.className = "progress-empty";
-    note.textContent = text;
-    return note;
-  }
-
-  // After a screen change the old focus target is hidden, so move focus to the
-  // new screen's heading; keyboard and screen reader users start there.
   function show(screen, { focus = true } = {}) {
     startScreen.classList.toggle("is-hidden", screen !== "start");
     quizScreen.classList.toggle("is-hidden", screen !== "quiz");
     resultScreen.classList.toggle("is-hidden", screen !== "result");
-    if (screen === "start") refreshResumableExam();
+    events.emit("screen-shown", screen);
     if (focus) ({ start: startTitle, quiz: questionTitle, result: resultTitle })[screen].focus();
   }
 
@@ -482,45 +167,23 @@ import {
     }));
   }
 
-  function refreshResumableExam() {
-    resumableExam = loadExamSession(questions);
-    renderResumeCard();
-  }
-
-  function renderResumeCard() {
-    resumeCard.classList.toggle("is-hidden", !resumableExam);
-    if (!resumableExam) return;
-
-    const answered = resumableExam.answers.length;
-    const total = resumableExam.run.length;
-    if (resumableExam.expired) {
-      resumeTitle.textContent = "Your exam ran out of time";
-      resumeDetail.textContent = `${answered} of ${total} answered. See the result, or discard it.`;
-      resumeButton.textContent = "See result";
-    } else {
-      resumeTitle.textContent = "Resume your exam";
-      resumeDetail.textContent = `${answered} of ${total} answered · ${formatDuration(resumableExam.timeRemaining)} left`;
-      resumeButton.textContent = "Resume exam";
-    }
-  }
-
   function resumeExam() {
     const saved = loadExamSession(questions);
     if (!saved) {
-      refreshResumableExam();
+      resume.refresh();
       return;
     }
 
     state.mode = "exam";
     state.selectedState = saved.selectedState;
-    if (saved.selectedState) bundeslandSelect.value = saved.selectedState;
+    start.setSelectedState(saved.selectedState);
     state.run = saved.run;
     setTranslationsEnabled(false);
     resetRunState();
     state.answers = saved.answers;
     state.score = saved.score;
     state.index = saved.index;
-    resumableExam = null;
+    resume.release();
 
     if (saved.expired) {
       state.startedAt = saved.startedAt;
@@ -533,79 +196,13 @@ import {
     show("quiz");
   }
 
-  async function discardResumableExam() {
-    const confirmed = await confirmDialog({
-      title: "Discard your exam?",
-      message: "Your answers so far will be lost and no result will be saved.",
-      confirmLabel: "Discard exam",
-      cancelLabel: "Keep exam",
-      trigger: resumeDiscardButton
-    });
-    if (!confirmed) return;
-
-    clearExamSession();
-    resumableExam = null;
-    renderResumeCard();
-  }
-
-  function getStudyQuestions(filter) {
-    if (filter === "bookmarked") {
-      return getBookmarkedQuestions();
-    }
-
-    const [category, selectedState] = filter.split(":");
-    let filteredQuestions;
-
-    if (filter === "all") {
-      filteredQuestions = questions.slice();
-    } else {
-      filteredQuestions = questions.filter((question) => {
-        if (question.category !== category) return false;
-        return !selectedState || question.state === selectedState;
-      });
-    }
-
-    return orderStudyQuestionsByProgress(filteredQuestions, progress.questionStats);
-  }
-
-  function getWeakQuestionIds() {
-    return Object.keys(progress.weakQuestions).filter((questionId) => {
-      return questions.some((question) => String(question.id) === questionId);
-    });
-  }
-
-  function getBookmarkedQuestionIds() {
-    return Object.keys(progress.bookmarkedQuestions).filter((questionId) => {
-      return questions.some((question) => String(question.id) === questionId);
-    });
-  }
-
-  function getBookmarkedQuestions() {
-    return getBookmarkedQuestionIds()
-      .map((questionId) => questions.find((question) => String(question.id) === questionId))
-      .filter(Boolean);
-  }
-
-  function isBookmarked(question) {
-    return Boolean(question && progress.bookmarkedQuestions[String(question.id)]);
-  }
-
   function toggleCurrentBookmark() {
     const question = state.run[state.index];
     if (!question) return;
 
-    const questionId = String(question.id);
-    if (progress.bookmarkedQuestions[questionId]) {
-      delete progress.bookmarkedQuestions[questionId];
-    } else {
-      progress.bookmarkedQuestions[questionId] = {
-        addedAt: new Date().toISOString()
-      };
-    }
-
-    saveProgress();
+    toggleBookmark(progress, question.id);
+    ctx.commitProgress();
     renderBookmarkToggle(question);
-    renderProgressSummary();
   }
 
   function hasActiveRun() {
@@ -641,21 +238,21 @@ import {
 
   async function startRun() {
     if (!(await confirmDiscardActiveRun())) return;
-    if (resumableExam) {
+    if (resume.hasPending()) {
       const replace = await confirmDialog({
         title: "Start a new exam?",
         message: "Your unfinished exam will be discarded.",
         confirmLabel: "Start new exam",
         cancelLabel: "Keep unfinished exam",
-        trigger: startButton
+        trigger: $("start-button")
       });
       if (!replace) return;
     }
 
-    const selectedState = bundeslandSelect.value;
+    const selectedState = start.getSelectedState();
     const examRun = createExamRun(questions, selectedState, { sampleByCategory, shuffle });
     if (!examRun.length) return;
-    resumableExam = null;
+    resume.release();
 
     state.mode = "exam";
     state.selectedState = selectedState;
@@ -670,11 +267,12 @@ import {
   async function startPracticeRun() {
     if (!(await confirmDiscardActiveRun())) return;
 
-    const studyQuestions = getStudyQuestions(studyFilter.value);
+    const studyFilter = start.getStudyFilter();
+    const studyQuestions = getStudyQuestions(studyFilter, questions, progress);
     if (!studyQuestions.length) return;
 
     state.mode = "study";
-    state.studyFilter = studyFilter.value;
+    state.studyFilter = studyFilter;
     state.run = studyQuestions;
     resetRunState();
     stopTimer();
@@ -689,7 +287,7 @@ import {
       return;
     }
 
-    const studyQuestions = getStudyQuestions(state.studyFilter);
+    const studyQuestions = getStudyQuestions(state.studyFilter, questions, progress);
     if (!studyQuestions.length) return;
 
     state.run = studyQuestions;
@@ -715,19 +313,12 @@ import {
     show("quiz");
   }
 
-  function startCatalogueQuestion(question) {
-    if (!question) return;
-    startPracticeQuestion(question.id);
-  }
-
   async function startWeakReview() {
     if (!(await confirmDiscardActiveRun())) return;
 
-    const weakQuestions = getWeakQuestionIds()
-      .map((questionId) => questions.find((item) => String(item.id) === questionId))
-      .filter(Boolean);
+    const weakQuestions = getWeakQuestions(progress, questions);
     if (!weakQuestions.length) {
-      startTabController.selectTab("progress");
+      start.selectTab("progress");
       return;
     }
 
@@ -743,9 +334,9 @@ import {
   async function startBookmarkReview() {
     if (!(await confirmDiscardActiveRun())) return;
 
-    const bookmarkedQuestions = getBookmarkedQuestions();
+    const bookmarkedQuestions = getBookmarkedQuestions(progress, questions);
     if (!bookmarkedQuestions.length) {
-      startTabController.selectTab("progress");
+      start.selectTab("progress");
       return;
     }
 
@@ -807,25 +398,6 @@ import {
     timerCounter.textContent = formatDuration(isTimedTest ? state.timeRemaining : 0);
   }
 
-  function formatDuration(totalSeconds) {
-    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
-    const minutes = Math.floor(safeSeconds / 60);
-    const seconds = safeSeconds % 60;
-    return `${minutes}:${String(seconds).padStart(2, "0")}`;
-  }
-
-  function formatHistoryDate(value) {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "Date unavailable";
-
-    return new Intl.DateTimeFormat(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    }).format(date);
-  }
-
   function toggleTranslations() {
     if (state.mode === "exam") return;
     state.translationsEnabled = !state.translationsEnabled;
@@ -849,7 +421,7 @@ import {
   }
 
   function renderBookmarkToggle(question) {
-    const bookmarked = isBookmarked(question);
+    const bookmarked = isBookmarked(progress, question);
     bookmarkToggle.setAttribute("aria-pressed", String(bookmarked));
     bookmarkLabel.textContent = bookmarked ? "Saved" : "Bookmark";
     bookmarkToggle.title = bookmarked ? "Remove bookmark" : "Bookmark question";
@@ -1177,7 +749,7 @@ import {
       clearExamSession();
     }
 
-    renderResult();
+    resultView.render();
     show("result");
   }
 
@@ -1190,267 +762,6 @@ import {
       state.answers.push(answerEntry);
       recordAnswer(answerEntry, { countStats: false, trackWeak: false });
     });
-  }
-
-  function renderResult() {
-    if (state.mode !== "exam") {
-      resultScreen.dataset.result = "practice";
-      resultTitle.textContent = state.mode === "weak-review"
-        ? "Weak review complete"
-        : state.mode === "bookmarks"
-          ? "Bookmark review complete"
-          : "Practice complete";
-      resultScore.textContent = `${state.score} / ${state.run.length}`;
-      resultStatus.className = "result-status";
-      resultStatus.replaceChildren(createReviewText(
-        state.mode === "weak-review"
-          ? `Weak questions clear after ${WEAK_CLEAR_STREAK} correct answers in a row.`
-          : state.mode === "bookmarks"
-            ? "Bookmarked practice is untimed and stays separate from exam-simulation history."
-          : "Practice mode is untimed and separate from exam-simulation history."
-      ));
-      resultTime.textContent = "";
-      resultContext.textContent = "";
-      renderReview();
-      return;
-    }
-
-    const passed = getPassResult(state.score);
-    resultScreen.dataset.result = passed ? "pass" : "fail";
-    resultTitle.textContent = passed ? "Passed" : "Not passed";
-    resultScore.textContent = `${state.score} / ${state.run.length}`;
-    resultContext.textContent = `Bundesland: ${state.selectedState || bundeslandSelect.value}. 30 general questions, 3 residence-based Bundesland questions, 60-minute limit.`;
-    resultStatus.className = `result-status ${passed ? "is-pass" : "is-fail"}`;
-    resultStatus.replaceChildren(createReviewText(
-      state.endedByTimeout
-        ? `Time expired. Unanswered questions count against this test result but are not saved as weak questions. Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.`
-        : `Einbürgerung threshold: ${PASS_THRESHOLD} correct answers.`
-    ));
-    resultTime.textContent = formatResultTime();
-    renderReview();
-  }
-
-  function formatResultTime() {
-    if (!state.startedAt || !state.completedAt) return "";
-
-    const elapsed = Math.min(
-      EXAM_DURATION_SECONDS,
-      Math.max(0, Math.floor((state.completedAt - state.startedAt) / 1000))
-    );
-    const remaining = Math.max(EXAM_DURATION_SECONDS - elapsed, 0);
-
-    if (state.endedByTimeout) {
-      return `Time expired after ${formatDuration(EXAM_DURATION_SECONDS)}.`;
-    }
-
-    return `Finished in ${formatDuration(elapsed)} with ${formatDuration(remaining)} remaining.`;
-  }
-
-  function renderReview() {
-    reviewList.replaceChildren();
-    const missed = state.answers.filter((entry) => !entry.isCorrect);
-    reviewHeading.textContent = missed.length === 1 ? "1 missed question" : `${missed.length} missed questions`;
-
-    if (missed.length === 0) {
-      const item = document.createElement("div");
-      item.className = "review-item";
-      reviewHeading.textContent = "Missed questions";
-      item.append(createReviewTitle("No mistakes"));
-      item.append(createReviewText("All answers in this run were correct."));
-      reviewList.append(item);
-      return;
-    }
-
-    missed.forEach((entry) => {
-      const item = document.createElement("div");
-      const selected = formatAnswer(entry.question, entry.selectedIndex);
-      const correct = formatAnswer(entry.question, entry.correctIndex);
-      const practiceButton = document.createElement("button");
-      item.className = "review-item";
-      item.append(createReviewTitle(entry.question.prompt));
-      item.append(createReviewAnswer("Your answer", selected));
-      item.append(createReviewAnswer("Correct answer", correct));
-
-      if (entry.question.explanation) {
-        const explanation = document.createElement("p");
-        explanation.className = "review-explanation";
-        explanation.textContent = entry.question.explanation;
-        item.append(explanation);
-      }
-
-      practiceButton.className = "secondary-action review-practice";
-      practiceButton.type = "button";
-      practiceButton.textContent = "Practice this question";
-      practiceButton.addEventListener("click", () => startPracticeQuestion(entry.question.id));
-      item.append(practiceButton);
-      reviewList.append(item);
-    });
-  }
-
-  function createReviewTitle(text) {
-    const title = document.createElement("strong");
-    title.textContent = text;
-    return title;
-  }
-
-  function createReviewText(text) {
-    const paragraph = document.createElement("p");
-    paragraph.className = "meta";
-    paragraph.textContent = text;
-    return paragraph;
-  }
-
-  function createReviewAnswer(label, answer) {
-    const paragraph = document.createElement("p");
-    const labelElement = document.createElement("b");
-    paragraph.className = "review-answer";
-    labelElement.textContent = `${label}: `;
-    paragraph.append(labelElement, answer);
-    return paragraph;
-  }
-
-  function formatAnswer(question, optionIndex) {
-    if (!Number.isInteger(optionIndex)) return "No answer selected";
-
-    const letter = LETTERS[optionIndex] || "";
-    const option = question.options[optionIndex];
-    return `${letter}. ${option ? option.text : "No answer selected"}`;
-  }
-
-  function getIncorrectQuestionIds() {
-    return Object.entries(progress.questionStats)
-      .filter(([, stats]) => (stats?.wrong || 0) > 0)
-      .map(([questionId]) => questionId)
-      .filter((questionId) => questions.some((question) => String(question.id) === questionId));
-  }
-
-  function resetCatalogueLimit() {
-    catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
-    renderCatalogue({ preserveLimit: true });
-  }
-
-  function showMoreCatalogueItems() {
-    catalogueVisibleCount += CATALOGUE_RESULT_LIMIT;
-    renderCatalogue({ preserveLimit: true });
-  }
-
-  function renderCatalogue(options = {}) {
-    if (!options.preserveLimit) {
-      catalogueVisibleCount = CATALOGUE_RESULT_LIMIT;
-    }
-
-    const query = normalizeSearch(catalogueSearch.value);
-    const filter = catalogueFilter.value;
-    const cataloguePool = getCataloguePool(questions, filter, {
-      incorrectIds: new Set(getIncorrectQuestionIds()),
-      bookmarkedIds: new Set(getBookmarkedQuestionIds())
-    });
-    const filteredQuestions = searchCatalogueQuestions(cataloguePool, query, translations);
-    const visibleQuestions = filteredQuestions.slice(0, catalogueVisibleCount);
-    const hasMore = filteredQuestions.length > visibleQuestions.length;
-
-    catalogueResults.replaceChildren();
-    catalogueSummary.textContent = getCatalogueSummary(filteredQuestions.length, visibleQuestions.length, query);
-    catalogueMoreButton.classList.toggle("is-hidden", !hasMore);
-    catalogueMoreButton.textContent = hasMore
-      ? `Show ${Math.min(CATALOGUE_RESULT_LIMIT, filteredQuestions.length - visibleQuestions.length)} more questions`
-      : "All matching questions shown";
-
-    if (!filteredQuestions.length) {
-      const empty = document.createElement("p");
-      empty.className = "catalogue-empty";
-      empty.textContent = "No matching questions found.";
-      catalogueResults.append(empty);
-      catalogueMoreButton.classList.add("is-hidden");
-      return;
-    }
-
-    visibleQuestions.forEach((question) => {
-      catalogueResults.append(createCatalogueItem(question));
-    });
-  }
-
-  function createCatalogueItem(question) {
-    const item = document.createElement("article");
-    const title = document.createElement("div");
-    const meta = document.createElement("div");
-    const numberTag = document.createElement("span");
-    const typeTag = document.createElement("span");
-    const statusTag = document.createElement("span");
-    const prompt = document.createElement("p");
-    const answer = document.createElement("p");
-    const button = document.createElement("button");
-    const correctIndex = question.options.findIndex((option) => option.correct);
-    const answerId = `catalogue-answer-${question.id}`;
-
-    item.className = "catalogue-item";
-    title.className = "catalogue-item-title";
-    meta.className = "catalogue-meta";
-    numberTag.className = "catalogue-tag";
-    typeTag.className = "catalogue-tag";
-    statusTag.className = "catalogue-tag";
-    prompt.className = "catalogue-prompt";
-    answer.className = "catalogue-answer";
-    answer.id = answerId;
-    button.className = "secondary-action catalogue-study";
-    button.type = "button";
-
-    numberTag.textContent = `#${question.sourceNumber || question.id}`;
-    typeTag.textContent = question.category === "state" ? question.state : "General";
-    statusTag.textContent = getCatalogueStatus(question);
-    prompt.textContent = question.prompt;
-    answer.textContent = `Answer: ${formatAnswer(question, correctIndex)}`;
-    answer.hidden = !shouldShowCatalogueAnswer(question);
-    button.textContent = "Study";
-    button.addEventListener("click", () => startCatalogueQuestion(question));
-    const revealButton = document.createElement("button");
-    revealButton.className = "secondary-action catalogue-study";
-    revealButton.type = "button";
-    revealButton.textContent = answer.hidden ? "Reveal answer" : "Hide answer";
-    revealButton.setAttribute("aria-controls", answerId);
-    revealButton.setAttribute("aria-expanded", String(!answer.hidden));
-    revealButton.addEventListener("click", () => {
-      answer.hidden = !answer.hidden;
-      revealButton.textContent = answer.hidden ? "Reveal answer" : "Hide answer";
-      revealButton.setAttribute("aria-expanded", String(!answer.hidden));
-    });
-
-    meta.append(numberTag, typeTag, statusTag);
-    title.append(meta, prompt, answer);
-    const actions = document.createElement("div");
-    actions.className = "catalogue-actions";
-    actions.append(revealButton, button);
-    item.append(title, actions);
-    return item;
-  }
-
-  function shouldShowCatalogueAnswer(question) {
-    return (progress.questionStats[String(question.id)]?.answered || 0) > 0;
-  }
-
-  function getCatalogueStatus(question) {
-    const questionId = String(question.id);
-    if (progress.bookmarkedQuestions[questionId]) return "Bookmarked";
-    if ((progress.questionStats[questionId]?.wrong || 0) > 0) return "Incorrect before";
-    if ((progress.questionStats[questionId]?.answered || 0) > 0) return "Studied";
-    return "New";
-  }
-
-  function jumpToQuestion(event) {
-    event.preventDefault();
-    const targetNumber = Number.parseInt(jumpQuestion.value, 10);
-    if (!Number.isInteger(targetNumber)) return;
-
-    const question = questions.find((item) => item.sourceNumber === targetNumber || item.id === targetNumber);
-    if (!question) {
-      catalogueSearch.value = String(targetNumber);
-      catalogueFilter.value = "all";
-      renderCatalogue();
-      jumpQuestion.select();
-      return;
-    }
-
-    startCatalogueQuestion(question);
   }
 
   function setupAnalyticsConsent() {
@@ -1557,45 +868,25 @@ import {
     });
   }
 
-  startButton.addEventListener("click", startRun);
-  practiceButton.addEventListener("click", startPracticeRun);
-  weakReviewButton.addEventListener("click", startWeakReview);
-  bookmarkReviewButton.addEventListener("click", startBookmarkReview);
+  ctx.actions.startRun = startRun;
+  ctx.actions.startPracticeRun = startPracticeRun;
+  ctx.actions.startWeakReview = startWeakReview;
+  ctx.actions.startBookmarkReview = startBookmarkReview;
+  ctx.actions.goHome = goHome;
+  ctx.actions.startPracticeQuestion = startPracticeQuestion;
+  ctx.actions.resumeExam = resumeExam;
+  ctx.actions.getSelectedState = start.getSelectedState;
   homeButton.addEventListener("click", goHome);
   restartButton.addEventListener("click", restartCurrentRun);
-  newTestButton.addEventListener("click", startRun);
-  resultHomeButton.addEventListener("click", goHome);
-  resetProgressButton.addEventListener("click", resetProgress);
-  exportProgressButton.addEventListener("click", exportProgress);
-  importProgressButton.addEventListener("click", () => importProgressInput.click());
-  importProgressInput.addEventListener("change", importProgress);
-  resumeButton.addEventListener("click", resumeExam);
-  resumeDiscardButton.addEventListener("click", discardResumableExam);
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && !startScreen.classList.contains("is-hidden")) refreshResumableExam();
-  });
   previousButton.addEventListener("click", previousQuestion);
   nextButton.addEventListener("click", nextQuestion);
   translationToggle.addEventListener("click", toggleTranslations);
   bookmarkToggle.addEventListener("click", toggleCurrentBookmark);
-  catalogueSearch.addEventListener("input", resetCatalogueLimit);
-  catalogueFilter.addEventListener("change", resetCatalogueLimit);
-  catalogueMoreButton.addEventListener("click", showMoreCatalogueItems);
-  jumpForm.addEventListener("submit", jumpToQuestion);
   document.querySelectorAll("[data-legal-panel]").forEach((button) => {
     button.addEventListener("click", () => showLegalPanel(button.dataset.legalPanel, button));
   });
-  populateStateControls();
-  startTabController.selectTab("progress");
   setupAnalyticsConsent();
   registerServiceWorker();
-  renderProgressSummary();
-  refreshResumableExam();
-
-  if (!questions.length) {
-    startButton.disabled = true;
-    practiceButton.disabled = true;
-    weakReviewButton.disabled = true;
-    startButton.textContent = "Question data missing";
-  }
+  events.emit("progress-changed");
+  resume.refresh();
 })();
