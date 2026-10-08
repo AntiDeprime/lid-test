@@ -1,5 +1,7 @@
-const APP_REVISION = "2026-08-complete-question-images";
-const CACHE_NAME = `lid-test-prep-${APP_REVISION}`;
+// ASSET_HASH covers every file in ASSETS. Regenerate it with
+// `node scripts/update-asset-hash.js` after changing any of them.
+const ASSET_HASH = "15bd0c51c162";
+const CACHE_NAME = `lid-test-prep-${ASSET_HASH}`;
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,16 +13,44 @@ const ASSETS = [
   "./explanation-texts-346-460.js?v=catalogue",
   "./explanations.js?v=catalogue",
   "./translations-en.js?v=catalogue",
+  "./translations-ru.js?v=catalogue",
   "./app.js?v=catalogue",
+  "./site-config.js",
+  "./modules/analytics.js",
+  "./modules/legal.js",
   "./modules/storage.js",
   "./modules/sampling.js",
   "./modules/progress.js",
   "./modules/hints.js",
   "./modules/tabs.js",
   "./modules/dialog.js",
+  "./modules/confirm-dialog.js",
+  "./modules/content.js",
+  "./modules/languages.js",
+  "./modules/preferences.js",
+  "./modules/exam-session.js",
+  "./modules/backup.js",
   "./modules/quiz-rules.js",
   "./modules/catalogue.js",
+  "./modules/emitter.js",
+  "./modules/format.js",
+  "./modules/progress-queries.js",
+  "./modules/readiness.js",
+  "./modules/scheduling.js",
+  "./screens/catalogue.js",
+  "./screens/privacy.js",
+  "./screens/progress.js",
+  "./screens/quiz.js",
+  "./screens/result.js",
+  "./screens/resume.js",
+  "./screens/start.js",
+  "./screens/translation.js",
   "./assets/favicon.svg",
+  "./assets/favicon-32.png",
+  "./assets/apple-touch-icon.png",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./assets/icon-maskable-512.png",
   "./assets/lid-logo.svg",
   "./manifest.webmanifest"
 ];
@@ -59,7 +89,9 @@ function isFreshAsset(url) {
 }
 
 function networkFirst(request) {
-  return fetch(request)
+  // no-cache revalidates with the server, so a stale HTTP cache entry cannot
+  // pair an old file with the rest of a new release.
+  return fetch(request, { cache: "no-cache" })
     .then((response) => cacheResponse(request, response))
     .catch(() => caches.match(request).then((cached) => {
       return cached || caches.match("./index.html");

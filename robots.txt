@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alxy.sh/lid-test/sitemap.xml

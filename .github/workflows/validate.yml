@@ -22,6 +22,12 @@ jobs:
       - name: Validate pure app logic
         run: node scripts/validate-progress.mjs
 
+      - name: Validate PWA assets and cache revision
+        run: node scripts/validate-pwa.js
+
+      - name: Validate launch configuration and generated site files
+        run: node scripts/validate-site.mjs
+
       - name: Smoke test static server
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/lid-test-http.log 2>&1 &
@@ -34,3 +40,39 @@ jobs:
             sleep 0.2
           done
           curl --fail --silent --show-error http://127.0.0.1:8000/ | grep -q "Leben in Deutschland Test"
+
+  browser-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: scripts/browser/package-lock.json
+
+      - name: Install browser check dependencies
+        working-directory: scripts/browser
+        run: npm ci
+
+      - name: Install Chromium
+        working-directory: scripts/browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Install the font used by the screenshot baselines
+        run: sudo apt-get install --yes fonts-dejavu-core
+
+      - name: Run browser checks
+        working-directory: scripts/browser
+        run: node run-checks.mjs
+
+      - name: Keep screenshots from a failed run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-check-screenshots
+          path: scripts/browser/artifacts
+          if-no-files-found: ignore

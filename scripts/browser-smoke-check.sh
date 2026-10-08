@@ -9,6 +9,7 @@ BROWSER="${PLAYWRIGHT_BROWSER:-chrome}"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 PWCLI="${PWCLI:-$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh}"
 SERVER_LOG="${SERVER_LOG:-/tmp/lid-test-http-${PORT}.log}"
+CHECKS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/browser/checks"
 
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 is required to run the static server." >&2
@@ -56,115 +57,7 @@ curl --fail --silent --show-error "$URL" >/dev/null
 
 "$PWCLI" --session "$SESSION" open "$URL" --browser "$BROWSER"
 "$PWCLI" --session "$SESSION" resize 390 844
-"$PWCLI" --session "$SESSION" eval "(() => {
-  const required = [
-    ['title', document.title.includes('Leben in Deutschland Test')],
-    ['start button', Boolean(document.querySelector('#start-button'))],
-    ['study button', Boolean(document.querySelector('#practice-button'))],
-    ['brand lockup', document.querySelector('.brand-lockup img')?.getAttribute('src') === 'assets/lid-logo.svg'],
-    ['hero proof points', document.querySelectorAll('.hero-proof-item').length === 3],
-    ['launch cards', document.querySelectorAll('.launch-card').length === 2],
-    ['progress heading', document.querySelector('#progress-title')?.textContent.includes('Your progress')],
-    ['area stats', Boolean(document.querySelector('#area-stats'))],
-    ['recent tests', Boolean(document.querySelector('#recent-tests'))],
-    ['Bundesland selector', document.querySelectorAll('#bundesland-select option').length === 16],
-    ['catalogue summary', document.querySelector('#catalogue-summary')?.textContent.includes('Showing 24 of 460')]
-  ];
-  const missing = required.filter(([, ok]) => !ok).map(([name]) => name);
-  if (missing.length) throw new Error('Browser smoke check failed: ' + missing.join(', '));
-  if (document.documentElement.scrollWidth > window.innerWidth) {
-    throw new Error('Start screen causes horizontal overflow at 390px');
-  }
-  const consentButtons = [...document.querySelectorAll('.consent-banner button')];
-  if (consentButtons.some((button) => button.getBoundingClientRect().height < 44)) {
-    throw new Error('A consent action has a touch target smaller than 44px');
-  }
-  return {
-    title: document.title,
-    progress: document.querySelector('#progress-title').textContent.trim(),
-    catalogue: document.querySelector('#catalogue-summary').textContent
-  };
-})()"
-"$PWCLI" --session "$SESSION" eval "async () => {
-  const explanations = window.LID_SPECIFIC_EXPLANATIONS || {};
-  if (Object.keys(explanations).length !== 460) {
-    throw new Error('Expected 460 bespoke explanations');
-  }
-  if (!window.LID_QUESTIONS.every((question) => question.explanation === explanations[question.id])) {
-    throw new Error('A catalogue question did not receive its bespoke explanation');
-  }
-
-  const imageQuestions = window.LID_QUESTIONS.filter((question) => question.images.length > 0);
-  if (imageQuestions.length !== 43) {
-    throw new Error('Expected 43 image-dependent questions, found ' + imageQuestions.length);
-  }
-
-  for (const question of imageQuestions) {
-    document.querySelector('[data-start-tab=\"catalogue\"]').click();
-    document.querySelector('#jump-question').value = String(question.id);
-    document.querySelector('#jump-form').requestSubmit();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    const renderedImages = [...document.querySelectorAll('#image-grid img')];
-    await Promise.all(renderedImages.map((image) => image.decode()));
-    if (document.querySelector('#question-title')?.textContent !== question.prompt) {
-      throw new Error('Catalogue jump did not open image question ' + question.id);
-    }
-    if (renderedImages.length !== question.images.length) {
-      throw new Error('Question ' + question.id + ' did not render every image');
-    }
-    if (renderedImages.some((image) => image.naturalWidth === 0 || !image.alt.trim())) {
-      throw new Error('Question ' + question.id + ' has a broken or unlabeled image');
-    }
-    if (document.documentElement.scrollWidth > window.innerWidth) {
-      throw new Error('Question ' + question.id + ' causes horizontal overflow at 390px');
-    }
-    if (question.id === 130 && renderedImages[0].getBoundingClientRect().height < 280) {
-      throw new Error('Question 130 ballot image is too small to read at 390px');
-    }
-
-    document.querySelector('#home-button').click();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-
-  document.querySelector('#practice-button').click();
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  const toolbar = document.querySelector('#quiz-toolbar');
-  const toolbarGroups = [...document.querySelectorAll('#quiz-toolbar [role=group]')];
-  const toolbarButtons = [...document.querySelectorAll('#quiz-toolbar .toolbar-action')];
-  if (!toolbar || toolbarGroups.length !== 2 || toolbarButtons.length !== 4) {
-    throw new Error('Quiz actions are not organized into two clear toolbar groups');
-  }
-  if (toolbarButtons.some((button) => !button.querySelector('.toolbar-label')?.textContent.trim())) {
-    throw new Error('A quiz toolbar action is missing a visible text label');
-  }
-  if (toolbarButtons.some((button) => button.getBoundingClientRect().height < 44)) {
-    throw new Error('A quiz toolbar action has a touch target smaller than 44px');
-  }
-  if (new Set(toolbarButtons.map((button) => getComputedStyle(button).borderRadius)).size !== 1) {
-    throw new Error('Quiz toolbar actions do not use one consistent shape');
-  }
-  if (toolbar.scrollWidth > toolbar.clientWidth || document.documentElement.scrollWidth > window.innerWidth) {
-    throw new Error('Quiz toolbar causes horizontal overflow at 390px');
-  }
-  const quizProgress = document.querySelector('#quiz-progress');
-  if (quizProgress?.getAttribute('role') !== 'progressbar' || quizProgress.getAttribute('aria-valuenow') !== '1') {
-    throw new Error('Quiz progress is not exposed accessibly');
-  }
-  const prompt = document.querySelector('#question-title')?.textContent;
-  const question = window.LID_QUESTIONS.find((item) => item.prompt === prompt);
-  if (!question) throw new Error('Study question was not found in the catalogue');
-  const correctIndex = question.options.findIndex((option) => option.correct);
-  document.querySelectorAll('.answer-option')[correctIndex].click();
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  const explanation = document.querySelector('#question-explanation');
-  if (explanation?.classList.contains('is-hidden') || explanation?.textContent !== question.explanation) {
-    throw new Error('Study mode did not reveal the bespoke explanation');
-  }
-  if (!document.querySelector('.answer-option.is-correct .answer-state')?.textContent.includes('Correct')) {
-    throw new Error('Correct feedback relies on color without a visible state label');
-  }
-  return { questionId: question.id, explanation: explanation.textContent };
-}"
+"$PWCLI" --session "$SESSION" eval "$(cat "$CHECKS_DIR/smoke-start.js")"
+"$PWCLI" --session "$SESSION" eval "$(cat "$CHECKS_DIR/smoke-quiz.js")"
 "$PWCLI" --session "$SESSION" snapshot
 "$PWCLI" --session "$SESSION" console

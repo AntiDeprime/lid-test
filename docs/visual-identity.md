@@ -16,13 +16,15 @@ The product is a composed study companion: informed, patient, quietly optimistic
 
 ## Logo and lockup
 
-The connected lowercase LiD pen stroke represents learning by doing. The mint tile is the primary app mark.
+The LiD monogram is drawn with one weight of rounded pen stroke: L and i share a single connected stroke, D stands apart, and the dot of the i is the mark's one paper-white accent. The mint tile is the primary app mark.
 
 - Use the mark with the `LiD Test Prep` name on brand-level screens.
 - Keep the mark square with rounded corners; do not place it inside another decorative shape.
 - Maintain clear space of at least one quarter of the mark's width.
 - Use the full lockup on the start screen and the standalone mark for the favicon/PWA icon.
 - The preferred lockup descriptor is `Learn with clarity`.
+- Strokes are ink `#081512` on a mint tile whose gradient averages learning mint. Do not recolor, outline, rotate, or add effects; the dot of the i stays Paper.
+- `assets/favicon.svg` and `assets/icon-maskable.svg` are the sources. The maskable and Apple touch icons are full-bleed squares with the artwork inside the central 80% safe zone, because the operating system applies its own corner mask. Regenerate the PNGs with `scripts/render-icons.mjs`.
 
 ## Color
 
@@ -78,7 +80,7 @@ The first screen uses a brand lockup, an optimistic two-line promise, three trus
 
 ### Quiz
 
-The question is always visually dominant. Read-only status is compact; question tools and session navigation are separate grouped controls. Answer cards use calm surfaces and explicit selected/correct/wrong labels.
+The question is always visually dominant. Read-only status is compact; question tools and session navigation are separate grouped controls. Answer cards use calm surfaces and explicit selected/correct/wrong labels. Study feedback sits directly under the answers as a verdict line with a check or cross mark followed by the "Why" explanation.
 
 ### Progress and catalogue
 
@@ -90,7 +92,7 @@ Results use a contained hero surface with an emblem, a large score, and state-sp
 
 ### Consent and dialogs
 
-Privacy and legal surfaces use the same radius, border, typography, and depth as the product. They are calm and explicit, never styled like warnings or advertisements.
+Privacy and legal surfaces use the same radius, border, typography, and depth as the product. They are calm and explicit, never styled like warnings or advertisements. Confirmations use the same dialog surface with the safe action as the mint primary button and the leaving action as an amber-outlined secondary button, and never fall back to the browser's native confirm box.
 
 ## Motion
 

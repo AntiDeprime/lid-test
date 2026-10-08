@@ -2,6 +2,69 @@
 
 ## High Priority
 
+- [x] Load explanations and translations on demand, and add Russian translations.
+  - Remove the six data scripts from `index.html`: the first screen now loads only `questions.js` (176 KB instead of 344 KB of data). `modules/content.js` fetches the explanations in the background once the page is idle and translations when a learner turns them on or searches the catalogue; each file loads once, a failed fetch can be retried, and everything is still precached so it works offline.
+  - Add a language registry (`modules/languages.js`) and a picker under the German question; the choice is remembered, and a first visit uses the browser language when it is supported. The quiz toggle now shows the chosen language, and a loading or failed translation says so with a "Try again" button.
+  - Add `translations-ru.js` (all 460 questions) and fill the 150 Bundesland questions that had no English translation, so every question is translated in both languages. Both come from translation tables and a machine-translation pass that no native speaker has reviewed; the app labels them unofficial and `docs/data-provenance.md` lists the Russian wording to review first.
+  - Include a shown translation in each answer button's accessible name (it was missing before), and make the fit scan, the offline check, and the accessibility scan cover Russian.
+  - Validate every registered language for full coverage, empty or identical options, and the right writing system; check the lazily loaded files against the precache list; add a `content` browser section.
+
+- [x] Document data provenance and update workflow.
+  - `docs/data-provenance.md` records the BAMF catalogue (dated 7 May 2025) as the source, the id scheme, the manual refresh steps (there is no import script in the repository), what `scripts/validate-data.js` enforces, and how explanations and translations are written and maintained separately from the official data.
+
+- [x] Add a spaced-repetition "due" queue and an exam-readiness estimate.
+  - Schedule every study answer in a five-box Leitner schedule (`modules/scheduling.js`): correct answers move up a box and wait 1, 3, 7, 14, then 30 days; a miss returns to box 1; due dates fall on local midnight.
+  - Bump the storage version to 2 with a migration that gives saved questions a box from their record and a due-once date, and keep version 1 backups importable.
+  - Add "Review N due questions" to the start page (at most 25 per run, longest-waiting first) and make Restart repeat the same kind of run in every mode instead of starting an exam.
+  - Add an exam-readiness card to the Progress tab (`modules/readiness.js`): the chance of 17 or more of 33 correct from per-question smoothed accuracy, with the number, a word, a meter, the expected score, and the reason it is cautious; it needs 10 studied questions.
+  - Cover scheduling, migration, due ordering, and the readiness math in `scripts/validate-progress.mjs`, and add a `review` browser section that runs the whole flow from version 1 progress.
+
+- [x] Split `app.js` by screen.
+  - Move the start page, progress tab, catalogue, exam resume card, result screen, quiz screen (run lifecycle, timer, question and answer rendering), and privacy controls into `screens/`, each created from one shared context; `app.js` shrinks from about 1,600 lines to a 75-line composition root.
+  - Screens never import each other: they react to `progress-changed` and `screen-shown` events and call each other through late-bound `actions`.
+  - Move answer recording, bookmarking, formatting, and the progress queries (weak, bookmarked, incorrect, area stats, study sets, catalogue status) into pure modules with unit tests in `scripts/validate-progress.mjs`.
+  - No user-facing change; the browser checks, including the keyboard and screenshot comparisons, pass unchanged.
+
+- [x] Run portable browser checks in CI.
+  - Add `scripts/browser/run-checks.mjs`, a Node and Playwright runner with its own `package.json` and lockfile: it serves the repo itself, so it needs no Python server or Codex wrapper.
+  - Share the in-page assertions with the two Codex shell scripts through `scripts/browser/checks/`.
+  - Add an offline check that stops the server and reloads from the service worker cache, a 390px layout check (launch cards in the first screen, compact toolbar, feedback under the answers, reachable Next, no overflow) with screenshots, and an axe-core scan of thirteen app states.
+  - Fix what the scan found: answer buttons and the result "Start page" button now contain their visible text in their accessible name.
+  - Run it as a second GitHub Actions job and keep the screenshots when it fails.
+  - Harden the layout against wide fonts and long German words, which the first CI run exposed (it renders DejaVu Sans, not Inter): grid tracks and answer text now shrink with `minmax(0, 1fr)` and wrap long words, the hero heading scales down on small phones, and a `fit` section checks all 460 questions at 360px and 390px. `TEST_FONT` reproduces the CI font locally.
+
+- [x] Validate PWA assets and derive the cache revision from the files.
+  - Add `scripts/validate-pwa.js`: every manifest icon and every `ASSETS` entry exists, everything `index.html` loads and every module `app.js` imports is precached under the exact URL it is requested with, and the manifest keeps its install-critical fields.
+  - Replace the hand-bumped `APP_REVISION` with `ASSET_HASH`, a hash of all precached files written by `node scripts/update-asset-hash.js` and checked in CI, so installed copies update whenever an asset changes.
+  - Revalidate network-first requests in the service worker so a stale HTTP cache entry cannot pair an old module with a new release.
+  - Document the release step in the README and run the check in GitHub Actions.
+
+- [x] Protect saved progress with migrations and a file backup.
+  - Replace the "version mismatch resets everything" load path with a migration chain (`migrateProgress`), so a future storage version bump upgrades saved progress instead of discarding it.
+  - Keep progress the app cannot read under `lidTestPrepProgress.unreadable` instead of overwriting it, and sanitize loaded progress to the fields the app reads.
+  - Add "Export backup" and "Import backup" to the Progress tab: a JSON file with the progress, validated and confirmed before it replaces what is saved, with Export disabled until there is progress.
+  - Mention the backup in the reset confirmation, and cover migration, normalization, and backup parsing in `scripts/validate-progress.mjs` and the import flow in the browser flow check.
+
+- [x] Tighten the quiz layout.
+  - Show the correct/not-quite verdict and the "Why" explanation directly under the answers, with a check or cross mark as well as colour.
+  - Keep Previous and Next in a bar that sticks to the bottom of the screen on mobile so the next action never scrolls away.
+  - Stack the toolbar buttons icon-over-label in two groups on mobile so the toolbar takes two short rows instead of four stretched ones, keeping labels and 44px targets.
+  - Keep the exam simulation free of feedback and verify study, review, and exam flows at 390px and desktop widths.
+
+- [x] Streamline the first-run start screen.
+  - Show the analytics consent choice in the page flow below the launch cards instead of a fixed banner that covers them.
+  - Keep the mobile headline to two lines and move the proof points below the launch cards so both launch cards sit inside the first 844px screen at 390px.
+  - Replace the first-run progress zeros and disabled queue buttons with one "Nothing studied yet" note, and show queues and stats once there is progress.
+  - Hide the question preview card on mobile and keep the headline accent in the mint family so gold stays reserved for milestones.
+  - Verify at 390px and desktop widths and run the smoke and flow browser checks.
+
+- [x] Replace the app icon with a refined LiD mark.
+  - Redraw the monogram so it reads as LiD at every size: L and i share one connected stroke, D stands apart, and the dot of the i is the paper-white accent on the mint tile.
+  - Add PNG favicon, Apple touch, 192px, 512px, and maskable icons next to the SVG sources, and list them in the web app manifest and the `<head>`.
+  - Precache the new icon files and bump the service-worker revision so installed copies update.
+  - Update `docs/visual-identity.md` and the README with the new mark and the `scripts/render-icons.mjs` regeneration step.
+  - Verify the start-screen lockup, favicon, and manifest icons through a local static server.
+
 - [x] Complete the official question-image catalogue.
   - Audit all 460 questions against the BAMF catalogue dated 7 May 2025.
   - Restore the six missing general-question visuals for questions 70, 176, 181, 187, 216, and 235.
@@ -160,55 +223,51 @@
   - Include the new helper module in the service-worker cache list.
 
 - [ ] Add production privacy and legal controls.
-  - Add a real production privacy page or section with controller/contact details, legal basis, local-storage behavior, analytics behavior, and retention notes.
-  - Add an explicit analytics revocation path after consent.
-  - Replace placeholder-style imprint copy with production-ready legal details before public launch.
+  - Done: the Privacy dialog now describes what the app really does (every storage key, the optional Google Analytics, legal basis, rights, how to withdraw), built from `site-config.js`; a footer control turns analytics off after consent (stops collection on the open page, removes the `_ga` cookies, keeps the tag from loading again) or back on; the privacy dialog scrolls on a phone; unit tests and a `privacy` browser section cover it.
+  - Set by the owner: `operator.name` (Aleksei Shchetinin), `operator.email` (antideprime@gmail.com), and ownership of analytics property `G-6LN5H6T5LW` is confirmed; partial operator details are shown as given instead of the maintainer fallback.
+  - Still needs the owner: `operator.address` (a postal address; never guess it), a legal check of the wording and of the imprint requirement (§ 5 DDG), and the settings in the analytics property (Google Signals and data sharing off, data-processing terms, retention months for `analyticsRetentionMonths`). `node scripts/validate-site.mjs --production` fails until the address is set.
 
 - [ ] Add production SEO assets.
-  - Add canonical URL support when the production domain is known.
-  - Add `robots.txt` and `sitemap.xml`.
-  - Use absolute production URLs for Open Graph and Twitter images.
+  - Done: `site-config.js` `origin` drives `scripts/generate-site.mjs`, which writes the canonical link, `og:url`, absolute Open Graph and Twitter image URLs, `robots.txt` and `sitemap.xml`; `scripts/validate-site.mjs` (also in CI) fails when they drift from the config; a 1200x630 share card (`assets/share-card.png`) with the LiD mark replaces the map question image as the social preview.
+  - Set: `origin` is `https://alxy.sh/lid-test/`; the canonical link, `og:url`, absolute social image URLs, `robots.txt` and `sitemap.xml` are generated from it.
+  - Still needs the owner: `robots.txt` is ignored under a path, so serve the `Sitemap:` line from `https://alxy.sh/robots.txt` or submit `sitemap.xml` in Search Console.
+
+- [ ] Clear the rights to the BAMF questions and images.
+  - Researched: no licence or terms of use for the catalogue were found on the BAMF pages; the Impressum says uncredited images belong to BAMF and refers reuse requests to its press office; five questions carry third-party photograph credits (see `docs/operations.md`).
+  - Still needs the owner: a written answer from the BAMF press office on republishing the questions and images, recorded in `docs/data-provenance.md`, or a decision to launch without the images.
+  - Compare the catalogue dated 26 May 2025 (BAMF download page) with the 7 May 2025 extract used here; the PDF could not be downloaded from the build container.
 
 - [ ] Improve catalogue search quality and spoiler handling.
   - Add diacritic-tolerant search and ranked matches.
   - Highlight matched text in catalogue results.
   - Decide whether hidden answer text should remain searchable before reveal.
 
-- [ ] Add resume support for interrupted exam simulations.
+- [x] Add resume support for interrupted exam simulations.
   - Persist in-progress exam run state, selected answers, selected Bundesland, and start time.
   - Resume or discard stale unfinished exams explicitly.
   - Keep the timer accurate after refresh or mobile browser suspension.
+  - Offer the unfinished exam as a "Resume your exam" card on the start page with Resume and Discard actions; an exam whose 60 minutes passed while away offers "See result" instead, dated to when the time ran out.
+  - Ask before a new exam replaces an unfinished one, clear the saved exam when it finishes or the learner leaves it, and cover the pure snapshot logic in `scripts/validate-progress.mjs` and the resume flows in the browser flow check.
 
-- [ ] Strengthen PWA and offline validation.
-  - Add an offline browser check.
-  - Make service-worker cache revision updates part of the release checklist or generate them.
-  - Verify cache updates after asset changes.
-
-- [ ] Make browser flow tests easier to maintain.
+- [x] Make browser flow tests easier to maintain.
   - Move large inline Playwright assertions out of the shell script.
   - Keep fast smoke checks separate from deeper flow checks.
   - Make the deeper browser check practical to run in CI.
 
-- [ ] Document data provenance and update workflow.
-  - Record the official catalogue source, source date, and import/update process.
-  - Add validation expectations for future catalogue refreshes.
-  - Document how explanations and translations are maintained separately from official answer data.
-
-- [ ] Replace native confirmation dialogs with app dialogs.
+- [x] Replace native confirmation dialogs with app dialogs.
   - Use the existing modal helper for reset-progress and leave-run confirmations.
   - Preserve focus management and mobile-friendly copy.
+  - Focus the safe "Keep going" action first, dismiss with Escape, the close button, or the backdrop, and close any dialog that is replaced so its keyboard handler is released.
+  - Cover the exam leave, study leave, and reset-progress dialogs in the browser flow check.
 
-- [ ] Add accessibility and visual regression checks.
-  - Check keyboard flow through quiz, result, catalogue, and modal interactions.
-  - Add mobile viewport layout checks.
-  - Add contrast and screen-reader-oriented assertions where practical.
+- [x] Add accessibility and visual regression checks.
+  - Scan thirteen app states with axe-core (done with the portable browser checks).
+  - Add a `keyboard` section that drives the app with real key presses: visible focus rings on the start page, the analytics choice, tab arrows, catalogue jump, answering with Space, a result-screen practice link, the leave dialog (safe focus, trap, Escape, focus restore), and a whole exam answered from the keyboard.
+  - Fix what it found: after a screen change focus now moves to the new screen's heading (question, result, start page) and to the question heading after Next and Previous, and choosing from the consent banner hands focus to the next control instead of dropping it to the page body.
+  - Add a `visual` section that compares eleven key screens (phone, desktop, saved progress, dialog, result) with committed baselines in `scripts/browser/baselines/`, rendered in a pinned font with Chromium's hinting and LCD text off and a 0.8% pixel tolerance, and regenerates them with `UPDATE_BASELINES=1`.
 
-- [ ] Reduce first-load payload as content grows.
-  - Consider lazy-loading translations and explanations.
-  - Keep first exam-start performance fast on mobile.
-
-- [ ] Expand operational documentation.
-  - Document CI, release checks, cache-bump rules, production privacy requirements, and known limitations.
+- [x] Expand operational documentation.
+  - `docs/operations.md` covers the CI jobs, the font and baseline pitfalls, the cache-revision rule, releasing, the launch steps only the owner can do, what the app does for privacy, and known limitations.
 
 - [x] Address architecture and UX review follow-ups.
   - Extract reusable exam and answer rules from the main app wiring.
@@ -220,6 +279,7 @@
 - [x] Add a site logo and favicon.
   - Created a lowercase connected pen-stroke LiD mark on the app's primary cyan button background.
   - Added the SVG favicon and wired it into the app metadata.
+  - The mark was later redrawn; see "Replace the app icon with a refined LiD mark."
 
 - [x] Add answer explanations.
   - Add short explanations for important or confusing questions.

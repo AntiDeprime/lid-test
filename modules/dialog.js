@@ -7,12 +7,13 @@ const FOCUSABLE_SELECTOR = [
   "[tabindex]:not([tabindex='-1'])"
 ].join(",");
 
+const openDialogs = new Map();
+
 export function showModalDialog(options) {
-  const { className, title, labelledBy, trigger, renderContent } = options;
-  const existing = document.querySelector(`.${className}`);
-  const existingBackdrop = document.querySelector(`.${className}-backdrop`);
-  if (existing) existing.remove();
-  if (existingBackdrop) existingBackdrop.remove();
+  const { className, title, labelledBy, trigger, renderContent, onClose } = options;
+  openDialogs.get(className)?.();
+  document.querySelector(`.${className}`)?.remove();
+  document.querySelector(`.${className}-backdrop`)?.remove();
 
   const previousFocus = trigger instanceof HTMLElement ? trigger : document.activeElement;
   const backdrop = document.createElement("div");
@@ -26,12 +27,14 @@ export function showModalDialog(options) {
   }
 
   function closeModal() {
+    if (openDialogs.get(className) === closeModal) openDialogs.delete(className);
     document.removeEventListener("keydown", handleDocumentKeydown);
     modal.remove();
     backdrop.remove();
     if (previousFocus instanceof HTMLElement && document.contains(previousFocus)) {
       previousFocus.focus();
     }
+    if (typeof onClose === "function") onClose();
   }
 
   function handleDocumentKeydown(event) {
@@ -80,6 +83,7 @@ export function showModalDialog(options) {
   document.body.append(backdrop);
   document.body.append(modal);
   document.addEventListener("keydown", handleDocumentKeydown);
+  openDialogs.set(className, closeModal);
   close.focus();
 
   return { close: closeModal, element: modal };

@@ -7,7 +7,6 @@ const path = require("node:path");
 global.window = {};
 
 require("../questions.js");
-require("../translations-en.js");
 const explanationFiles = [
   "explanation-texts-001-115.js",
   "explanation-texts-116-230.js",
@@ -18,7 +17,6 @@ explanationFiles.forEach((file) => require(`../${file}`));
 require("../explanations.js");
 
 const questions = window.LID_QUESTIONS || [];
-const translations = window.LID_TRANSLATIONS_EN || {};
 const errors = [];
 const OFFICIAL_IMAGE_QUESTION_IDS = new Set([
   21, 55, 70, 130, 176, 181, 187, 209, 216, 226, 235,
@@ -156,21 +154,6 @@ questions.forEach((question, questionIndex) => {
       fail(`Question ${question.id} explanation is too long (${sentenceCount} sentences).`);
     }
   }
-
-  const translation = translations[question.id];
-  if (!translation && question.category === "general") {
-    fail(`Question ${question.id} is missing an English translation.`);
-  }
-
-  if (translation) {
-    if (typeof translation.prompt !== "string" || !translation.prompt.trim()) {
-      fail(`Question ${question.id} has an empty English prompt translation.`);
-    }
-
-    if (!Array.isArray(translation.options) || translation.options.length !== question.options.length) {
-      fail(`Question ${question.id} translation option count does not match the question.`);
-    }
-  }
 });
 
 if (categoryCounts.general !== 300) {
@@ -196,12 +179,78 @@ if (questions.length !== 460) {
   fail(`Expected 460 total questions; found ${questions.length}.`);
 }
 
-if (errors.length) {
-  console.error("Data validation failed:");
-  errors.forEach((error) => console.error(`- ${error}`));
-  process.exit(1);
+// Every registered language must translate every question.
+async function validateTranslations() {
+  const { LANGUAGES } = await import("../modules/languages.js");
+  const seenCodes = new Set();
+
+  LANGUAGES.forEach((language) => {
+    if (seenCodes.has(language.code)) fail(`Language ${language.code} is registered twice.`);
+    seenCodes.add(language.code);
+
+    const file = language.file.split("?")[0];
+    if (!fs.existsSync(path.join(__dirname, "..", file))) {
+      fail(`Language ${language.code} points at ${file}, which does not exist.`);
+      return;
+    }
+    delete window[language.global];
+    require(`../${file}`);
+    const translations = window[language.global];
+    if (!translations || typeof translations !== "object") {
+      fail(`${file} does not define window.${language.global}.`);
+      return;
+    }
+
+    const script = new RegExp(`\\p{Script=${language.script}}`, "u");
+    const label = `${language.name} translation`;
+    questions.forEach((question) => {
+      const translation = translations[question.id];
+      if (!translation) {
+        fail(`Question ${question.id} is missing a ${label}.`);
+        return;
+      }
+      if (typeof translation.prompt !== "string" || !translation.prompt.trim()) {
+        fail(`Question ${question.id} has an empty ${label} prompt.`);
+      } else if (!script.test(translation.prompt)) {
+        fail(`Question ${question.id} ${label} prompt has no ${language.script} letters: ${translation.prompt}`);
+      }
+
+      const options = translation.options;
+      if (!Array.isArray(options) || options.length !== question.options.length) {
+        fail(`Question ${question.id} ${label} option count does not match the question.`);
+        return;
+      }
+      if (options.some((option) => typeof option !== "string" || !option.trim())) {
+        fail(`Question ${question.id} has an empty ${label} option.`);
+        return;
+      }
+      const germanOptions = question.options.map((option) => option.text);
+      if (new Set(germanOptions).size === germanOptions.length && new Set(options).size !== options.length) {
+        fail(`Question ${question.id} ${label} makes two different answer options identical.`);
+      }
+    });
+
+    Object.keys(translations).forEach((id) => {
+      if (!questions.some((question) => String(question.id) === id)) {
+        fail(`${file} has an entry for ${id}, which is not a question in the catalogue.`);
+      }
+    });
+  });
+
+  return LANGUAGES.length;
 }
 
-console.log(
-  `Data validation passed: ${questions.length} questions, ${categoryCounts.general} general, ${categoryCounts.state} Bundesland state.`
-);
+validateTranslations().then((languageCount) => {
+  if (errors.length) {
+    console.error("Data validation failed:");
+    errors.forEach((error) => console.error(`- ${error}`));
+    process.exit(1);
+  }
+
+  console.log(
+    `Data validation passed: ${questions.length} questions, ${categoryCounts.general} general, ${categoryCounts.state} Bundesland state, translated into ${languageCount} languages.`
+  );
+}, (error) => {
+  console.error(`Data validation could not check the translations: ${error.message}`);
+  process.exit(1);
+});
