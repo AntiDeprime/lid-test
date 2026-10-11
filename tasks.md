@@ -2,6 +2,11 @@
 
 ## High Priority
 
+- [x] Show the learner hint only after the translation button is pressed.
+  - In study and review modes the "Hint: ..." line under the answers no longer appears by default: it shows once the language button (English or Русский) is on and goes away when it is turned off. The hint follows the button, so it stays on for the next questions while the button stays on.
+  - The line keeps its "Choose one answer" instruction until then, and an answered question keeps its "Answer saved" line; the hint never comes back after an answer.
+  - The line's text is now chosen in one place (`renderHintLine` in `screens/quiz.js`), and the flow check covers hidden, shown, hidden again, and answered.
+
 - [x] Load explanations and translations on demand, and add Russian translations.
   - Remove the six data scripts from `index.html`: the first screen now loads only `questions.js` (176 KB instead of 344 KB of data). `modules/content.js` fetches the explanations in the background once the page is idle and translations when a learner turns them on or searches the catalogue; each file loads once, a failed fetch can be retried, and everything is still precached so it works offline.
   - Add a language registry (`modules/languages.js`) and a picker under the German question; the choice is remembered, and a first visit uses the browser language when it is supported. The quiz toggle now shows the chosen language, and a loading or failed translation says so with a "Try again" button.

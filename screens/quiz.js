@@ -47,7 +47,10 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
   const feedbackVerdict = $("feedback-verdict");
   const feedbackWhy = $("feedback-why");
   const questionHint = $("question-hint");
-  const translation = createTranslationControls(ctx, { onOptionsChanged: refreshAnswerLabels });
+  const translation = createTranslationControls(ctx, {
+    onOptionsChanged: refreshAnswerLabels,
+    onToggle: () => renderHintLine(state.run[state.index])
+  });
 
   function recordAnswer(entry, options = {}) {
     if (!applyAnswer(progress, entry, options)) return;
@@ -385,7 +388,6 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     quizProgress.setAttribute("aria-valuenow", String(position));
     quizProgress.setAttribute("aria-valuetext", `Question ${position} of ${total}`);
     progressBar.style.width = `${((position - 1) / total) * 100}%`;
-    questionHint.textContent = "Choose one answer.";
     previousButton.classList.add("is-hidden");
     nextButton.classList.add("is-hidden");
     nextButton.textContent = position === total ? "Finish" : "Next";
@@ -399,7 +401,7 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     renderImages(question);
     renderAnswers(question);
     renderFeedback(question);
-    renderLearnerHint(question);
+    renderHintLine(question);
     translation.render();
     persistExamSession();
   }
@@ -440,20 +442,37 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     feedbackVerdict.append(mark, text);
   }
 
-  function renderLearnerHint(question) {
-    if (state.mode === "exam" || state.selected !== null) return;
+  // The line under the answers says what to do next. Before an answer in the
+  // study modes it gives the learner hint, but only once the translation button
+  // is pressed, so the hint is not on screen unasked.
+  function renderHintLine(question) {
+    if (!question) return;
 
-    const hint = getLearnerHint(question);
-    if (!hint) return;
-    questionHint.textContent = `Hint: ${hint}`;
+    if (state.selected !== null) {
+      questionHint.textContent = state.mode === "study"
+        ? "Answer saved for this study session. Use Previous and Next to browse."
+        : "Answer saved. Continue when ready.";
+      return;
+    }
+
+    if (state.mode === "exam") {
+      questionHint.textContent = "Choose one answer. Correctness is shown after you finish.";
+      return;
+    }
+
+    const hint = state.translationsEnabled ? getLearnerHint(question) : "";
+    if (hint) {
+      questionHint.textContent = `Hint: ${hint}`;
+    } else {
+      questionHint.textContent = state.mode === "study"
+        ? "Choose one answer, or use Previous and Next to browse."
+        : "Choose one answer.";
+    }
   }
 
   function renderModeChrome(question, position, total) {
     if (state.mode === "exam") {
       questionKicker.textContent = `Exam simulation ${position} / ${total}`;
-      questionHint.textContent = state.selected === null
-        ? "Choose one answer. Correctness is shown after you finish."
-        : "Answer saved. Continue when ready.";
       nextButton.classList.toggle("is-hidden", state.selected === null);
       return;
     }
@@ -464,9 +483,6 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
     questionKicker.textContent = `${label} ${position} / ${total}`;
     scoreCounter.textContent = "Study mode";
     progressBar.style.width = `${(position / total) * 100}%`;
-    questionHint.textContent = state.selected === null
-      ? "Choose one answer, or use Previous and Next to browse."
-      : "Answer saved for this study session. Use Previous and Next to browse.";
     previousButton.classList.toggle("is-hidden", total <= 1);
     previousButton.disabled = state.index === 0;
     nextButton.classList.remove("is-hidden");
@@ -592,9 +608,7 @@ export function createQuizScreen(ctx, { start, resume, resultView }) {
       scoreCounter.textContent = `${state.score} correct`;
     }
     progressBar.style.width = `${((state.index + 1) / state.run.length) * 100}%`;
-    questionHint.textContent = state.mode === "study"
-      ? "Answer saved for this study session. Use Previous and Next to browse."
-      : "Answer saved. Continue when ready.";
+    renderHintLine(question);
     renderFeedback(question);
     nextButton.classList.remove("is-hidden");
     nextButton.focus();

@@ -4,7 +4,7 @@ import { saveLanguagePreference } from "../modules/preferences.js";
 // The translation toggle, the language picker, and the translated question
 // text under the German prompt. Translations load on first use; the panel says
 // so while it waits and offers a retry if the file cannot be fetched.
-export function createTranslationControls(ctx, { onOptionsChanged = () => {} } = {}) {
+export function createTranslationControls(ctx, { onOptionsChanged = () => {}, onToggle = () => {} } = {}) {
   const { state, content, events } = ctx;
   const $ = (id) => document.getElementById(id);
   const toggleButton = $("translation-toggle");
@@ -56,6 +56,7 @@ export function createTranslationControls(ctx, { onOptionsChanged = () => {} } =
     status = "idle";
     renderToggle();
     render();
+    onToggle();
   }
 
   function clearOptions() {
