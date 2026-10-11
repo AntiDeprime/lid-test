@@ -135,6 +135,29 @@ async () => {
   if (!document.querySelector('.answer-option')?.getAttribute('aria-label')) {
     throw new Error('Answer options are missing accessible labels before selection');
   }
+  // The learner hint belongs to the translation button: hidden until it is pressed.
+  const { getLearnerHint } = await import(new URL('modules/hints.js', document.baseURI).href);
+  const hintLine = () => document.querySelector('#question-hint').textContent;
+  for (let step = 0; step < 40 && !getLearnerHint(currentQuestion()); step += 1) {
+    click('#next-button');
+    await delay(0);
+  }
+  const hint = getLearnerHint(currentQuestion());
+  if (!hint) throw new Error('No study question with a learner hint was found');
+  if (document.querySelector('#translation-toggle').getAttribute('aria-pressed') !== 'false') {
+    throw new Error('Translations should start off in a new study run');
+  }
+  if (hintLine().includes(hint) || !hintLine().startsWith('Choose one answer')) {
+    throw new Error('Learner hint is shown before the translation button is pressed: ' + hintLine());
+  }
+  click('#translation-toggle');
+  if (hintLine() !== 'Hint: ' + hint) {
+    throw new Error('Pressing the translation button did not show the learner hint: ' + hintLine());
+  }
+  click('#translation-toggle');
+  if (hintLine().includes(hint) || !hintLine().startsWith('Choose one answer')) {
+    throw new Error('Turning the translation off did not hide the learner hint again: ' + hintLine());
+  }
   click('#translation-toggle');
   await until(() => document.querySelector('#question-translation')?.dataset.state === 'ready', 'Translation panel did not render in study mode');
   if (!document.querySelector('#question-translation').textContent.trim()) {
@@ -227,6 +250,11 @@ async () => {
   click('#practice-button');
   await delay(0);
   click('.answer-option');
+  // An answered question keeps its saved-answer line; the hint does not come back.
+  click('#translation-toggle');
+  if (!hintLine().startsWith('Answer saved')) {
+    throw new Error('The translation button replaced the saved-answer line after answering: ' + hintLine());
+  }
   click('#home-button');
   await delay(0);
   if (!document.querySelector('.confirm-modal')) throw new Error('Leaving an answered study run did not open the confirmation dialog');
